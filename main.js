@@ -1,4 +1,7 @@
+let sessionFinished = false;
 let lastPage = null;
+
+
 
 function isPageVisible(pageId) {
   const el = document.getElementById(pageId);
@@ -62,6 +65,10 @@ function showPage(pageID, el) {
 
   // ➜ Additional action when page2 is opened
   if (pageID === "page2") {
+	  if (sessionFinished) {
+    console.warn("Rounds already finished");
+    return;
+	  }
 	 updateMixedSessionFlag();
      if (allRounds.length <= 1) {
 	     resetRounds();

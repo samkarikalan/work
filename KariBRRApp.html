@@ -91,6 +91,7 @@
     </div>
 
     <!-- Reset -->
+    <!-- Reset -->
     <div class="settings-card card-reset">
       <div class="sec" data-i18n="reset"></div>
       <div class="row">
@@ -130,7 +131,7 @@
       <button class="btn danger" id="confirmYes"></button>
     </div>
   </div>
-</div>
+</div>  
 <!--           PAGE 1              -->
 <!--         Players Page          -->
 <!-- ============================= -->
@@ -174,47 +175,65 @@
 <!--           Rounds Page         -->
 <!-- ============================= -->
 <div id="page2" class="page" style="display:none;">  
-  <div id="roundTitle">R</div>
-  <div id="game-results"></div>  
-  <div class="row-field">  
-    <div class="court-card">
-      <label for="num-courts" class="row-label" data-i18n="courts"></label>
-      <button class="circle-btn" id="courtMinus">−</button>
-      <span id="num-courts">1</span>
-      <button class="circle-btn" id="courtPlus">+</button>
-    </div>    
-    <!-- 🔒 Lock / Unlock Icon -->
-    <span class="lock-icon" id="lockToggleBtn">🔒</span>
-    <!-- Timer Icon -->
-    <div class="timer-card">
-      <button id="timerToggleBtn" class="row-label timer-toggle-btn" onclick="toggleTimer()">⏱️</button>
-
-      <button class="circle-btn" id="timerMinus">−</button>
-      <span class="timer-display" id="timerDisplay">08:00</span>
-      <button class="circle-btn" id="timerPlus">+</button>
-    </div>
+  <div class="title-card">
+    <div id="roundTitle">R</div>
+    <img id="lockToggleBtn" class="lock-icon" src="lock.png" alt="Lock" />
   </div>
   
-  <div class="round-navigation">
-    <button class="left small" id="roundTitle2" onclick="RefreshRound()">⟳</button>
+  <div id="game-results"></div>  
+  <div class="court-card" id="courtCard">
+  <div class="court-header">
+    <label for="num-courts" class="row-label" data-i18n="courts"></label>
+    <button class="circle-btn" id="courtMinus">−</button>
+    <span id="num-courts">1</span>
+    <button class="circle-btn" id="courtPlus">+</button>
+    <button class="settings-btn" id="courtSettings">⚙️</button>
+  </div>
+
+  <div class="court-settings-panel" id="courtSettingsPanel">
+    <!-- Courts will be injected here -->
+  </div>
+</div>
+
+
+  <div class="action-card">
+  <!-- LEFT : Mix / Refresh (secondary) -->
+  <button
+    id="endBtn"
+    class="action left small"
+    onclick="showConfirm('endRoundsConfirm', endRounds)"
+  >
+    <span data-i18n="endrounds">Finish</span>
+    <span class="icon">🏁</span>
+  </button>
+    
     <button
-          id="nextBtn"
-          class="center primary"
-          onclick="nextRound()"
-          disabled
-          >
-          <span data-i18n="nround">Next</span>
-          <span class="icon">▶</span>
-    </button>
-    <button
-          id="endBtn"
-          class="right danger"
-          onclick="endRounds()"          
-        >
-        <span data-i18n="endrounds">Next</span>
-          <span class="icon">🏁</span>
-    </button>        
-  </div>  
+    class="action mid small"
+    id="roundShufle"
+    onclick="RefreshRound()"
+    aria-label="Mix round"
+  >
+    ⟳
+  </button>
+
+  <!-- RIGHT : Next (primary) -->
+  <button
+    id="nextBtn"
+    class="action right primary"
+    onclick="nextRound()"
+  >
+    <span data-i18n="nround">Next</span>
+    <span class="icon">▶</span>
+  </button>
+</div>
+
+  
+</div>
+
+  
+  
+
+    
   
  </div>   
 

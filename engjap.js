@@ -24,6 +24,7 @@ const translations = {
     pround: " Round",
     nround: "Next Round ",
     endrounds: "End Session ",
+    roundno: "Round ",
     roundShort: "R",
     rank: "Rank",
     name: "Name",
@@ -77,6 +78,7 @@ const translations = {
     add: "追加",
     pround: " ラウンド",
     nround: "ラウンド ",
+    roundno: "ラウンド ",
     roundShort: "R",
     rank: "順位",
     name: "名前",
@@ -131,6 +133,7 @@ const translations = {
   add: "추가",
   pround: " 라운드",
   nround: "라운드 ",
+  roundno: "라운드 ",  
   roundShort: "R",
   rank: "순위",
   name: "이름",
@@ -184,6 +187,7 @@ vi: {
   add: "Thêm",
   pround: " Vòng",
   nround: "Vòng ",
+  roundno: "Vòng ",
   roundShort: "R",
   rank: "Xếp hạng",
   name: "Tên",
@@ -237,6 +241,7 @@ zh: {
   add: "添加",
   pround: " 回合",
   nround: "回合 ",
+  roundno: "回合 ",
   roundShort: "R",
   rank: "排名",
   name: "姓名",
@@ -269,10 +274,3 @@ zh: {
   
   
 };
-
-
-
-
-
-
-

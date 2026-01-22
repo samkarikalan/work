@@ -1,4 +1,270 @@
 
+let isLocked = true;
+  const lockIcon = document.getElementById('lockToggleBtn');
+
+  function toggleLock() {
+    isLocked = !isLocked;
+    lockIcon.src = isLocked ? 'lock.png' : 'unlock.png';
+    lockIcon.alt = isLocked ? 'Lock' : 'Unlock';
+  }
+
+  lockIcon.addEventListener('click', toggleLock);
+
+function getNextFixedPairGames(schedulerState, fixedPairs, numCourts) {
+  const hash = JSON.stringify(fixedPairs);
+
+  // 🔁 Initialize OR reset when queue is empty OR pairs changed
+  if (
+    !schedulerState.fixedPairGameQueue ||
+    schedulerState.fixedPairGameQueue.length === 0 ||
+    schedulerState.fixedPairGameQueueHash !== hash
+  ) {
+    schedulerState.fixedPairGameQueueHash = hash;
+    schedulerState.fixedPairGameQueue = [];
+
+    // Generate ALL unique games (pair vs pair)
+    for (let i = 0; i < fixedPairs.length; i++) {
+      for (let j = i + 1; j < fixedPairs.length; j++) {
+        schedulerState.fixedPairGameQueue.push({
+          pair1: fixedPairs[i],
+          pair2: fixedPairs[j],
+        });
+      }
+    }
+
+    // Optional shuffle (recommended)
+    schedulerState.fixedPairGameQueue = shuffle(
+      schedulerState.fixedPairGameQueue
+    );
+  }
+
+  const games = [];
+  const usedPairs = new Set();
+  const remainingGames = [];
+
+  // 🎯 Select playable games, remove ONLY played ones
+  for (const game of schedulerState.fixedPairGameQueue) {
+    if (games.length >= numCourts) {
+      remainingGames.push(game);
+      continue;
+    }
+
+    const k1 = game.pair1.join("&");
+    const k2 = game.pair2.join("&");
+
+    if (usedPairs.has(k1) || usedPairs.has(k2)) {
+      // Not playable this round → keep it
+      remainingGames.push(game);
+      continue;
+    }
+
+    // ✅ Game is played → remove
+    games.push({
+      court: games.length + 1,
+      pair1: [...game.pair1],
+      pair2: [...game.pair2],
+    });
+
+    usedPairs.add(k1);
+    usedPairs.add(k2);
+  }
+
+  // Update queue with unplayed games only
+  schedulerState.fixedPairGameQueue = remainingGames;
+
+  return games;
+}
+
+function AischedulerNextRound(schedulerState) {
+  const {
+    activeplayers,
+    numCourts,
+    fixedPairs,
+    restCount,
+    opponentMap,
+    lastRound,
+  } = schedulerState;
+
+  const totalPlayers = activeplayers.length;
+  const numPlayersPerRound = numCourts * 4;
+  const numResting = Math.max(totalPlayers - numPlayersPerRound, 0);
+
+  const fixedPairPlayers = new Set(fixedPairs.flat());
+  let freePlayers = activeplayers.filter(p => !fixedPairPlayers.has(p));
+
+  let resting = [];
+  let playing = [];
+
+  // ================= REST SELECTION (UNCHANGED) =================
+  if (fixedPairs.length > 0 && numResting >= 2) {
+    let needed = numResting;
+    const fixedMap = new Map();
+    for (const [a, b] of fixedPairs) {
+      fixedMap.set(a, b);
+      fixedMap.set(b, a);
+    }
+
+    for (const p of schedulerState.restQueue) {
+      if (resting.includes(p)) continue;
+
+      const partner = fixedMap.get(p);
+      if (partner) {
+        if (needed >= 2) {
+          resting.push(p, partner);
+          needed -= 2;
+        }
+      } else if (needed > 0) {
+        resting.push(p);
+        needed -= 1;
+      }
+
+      if (needed <= 0) break;
+    }
+
+    playing = activeplayers.filter(p => !resting.includes(p));
+  } else {
+    const sortedPlayers = [...schedulerState.restQueue];
+    resting = sortedPlayers.slice(0, numResting);
+    playing = activeplayers
+      .filter(p => !resting.includes(p))
+      .slice(0, numPlayersPerRound);
+  }
+
+  // ================= PAIR PREP =================
+  const playingSet = new Set(playing);
+  let fixedPairsThisRound = [];
+  for (const pair of fixedPairs) {
+    if (playingSet.has(pair[0]) && playingSet.has(pair[1])) {
+      fixedPairsThisRound.push([pair[0], pair[1]]);
+    }
+  }
+
+  const fixedPairPlayersThisRound = new Set(fixedPairsThisRound.flat());
+  let freePlayersThisRound = playing.filter(
+    p => !fixedPairPlayersThisRound.has(p)
+  );
+
+  freePlayersThisRound = reorderFreePlayersByLastRound(
+    freePlayersThisRound,
+    lastRound,
+    numCourts
+  );
+
+  // ================= ALL FIXED DETECTION =================
+  const allFixed =
+    freePlayersThisRound.length === 0 &&
+    fixedPairs.length >= numCourts * 2;
+
+  // ================= ALL FIXED (QUEUE-BASED ROUND ROBIN) =================
+  if (allFixed) {
+    const games = getNextFixedPairGames(
+      schedulerState,
+      fixedPairs,
+      numCourts
+    );
+
+    const playingPlayers = new Set(
+      games.flatMap(g => [...g.pair1, ...g.pair2])
+    );
+
+    resting = activeplayers.filter(p => !playingPlayers.has(p));
+    playing = [...playingPlayers];
+
+    schedulerState.roundIndex =
+      (schedulerState.roundIndex || 0) + 1;
+
+    return {
+      round: schedulerState.roundIndex,
+      resting: resting.map(p => {
+        const c = restCount.get(p) || 0;
+        return `${p}#${c + 1}`;
+      }),
+      playing,
+      games,
+    };
+  }
+
+  // ================= ORIGINAL FREE-PAIR LOGIC =================
+  const requiredPairsCount = Math.floor(numPlayersPerRound / 2);
+  let neededFreePairs =
+    requiredPairsCount - fixedPairsThisRound.length;
+
+  let selectedPairs = findDisjointPairs(
+    freePlayersThisRound,
+    schedulerState.pairPlayedSet,
+    neededFreePairs,
+    opponentMap
+  );
+
+  let finalFreePairs = selectedPairs || [];
+
+  if (finalFreePairs.length < neededFreePairs) {
+    const free = freePlayersThisRound.slice();
+    const usedPlayers = new Set(finalFreePairs.flat());
+
+    for (let i = 0; i < free.length; i++) {
+      const a = free[i];
+      if (usedPlayers.has(a)) continue;
+
+      for (let j = i + 1; j < free.length; j++) {
+        const b = free[j];
+        if (usedPlayers.has(b)) continue;
+
+        finalFreePairs.push([a, b]);
+        usedPlayers.add(a);
+        usedPlayers.add(b);
+        break;
+      }
+
+      if (finalFreePairs.length >= neededFreePairs) break;
+    }
+  }
+
+  let allPairs = fixedPairsThisRound.concat(finalFreePairs);
+  allPairs = shuffle(allPairs);
+
+  let matchupScores = getMatchupScores(allPairs, opponentMap);
+  const games = [];
+  const usedPairs = new Set();
+
+  for (const match of matchupScores) {
+    const { pair1, pair2 } = match;
+    const p1Key = pair1.join("&");
+    const p2Key = pair2.join("&");
+
+    if (usedPairs.has(p1Key) || usedPairs.has(p2Key)) continue;
+
+    games.push({
+      court: games.length + 1,
+      pair1: [...pair1],
+      pair2: [...pair2],
+    });
+
+    usedPairs.add(p1Key);
+    usedPairs.add(p2Key);
+
+    if (games.length >= numCourts) break;
+  }
+
+  const restingWithNumber = resting.map(p => {
+    const c = restCount.get(p) || 0;
+    return `${p}#${c + 1}`;
+  });
+
+  schedulerState.roundIndex =
+    (schedulerState.roundIndex || 0) + 1;
+
+  return {
+    round: schedulerState.roundIndex,
+    resting: restingWithNumber,
+    playing,
+    games,
+  };
+}
+
+
+
+
 // ==============================
 // Generate next round (no global updates)
 // ==============================
@@ -121,7 +387,7 @@ function betaAischedulerNextRound(schedulerState) {
 
 
 
-function AischedulerNextRound(schedulerState) {
+function backupAischedulerNextRound(schedulerState) {
   const {
     activeplayers,
     numCourts,
@@ -550,12 +816,53 @@ function showRound(index) {
   clearPreviousRound();
   const resultsDiv = document.getElementById('game-results');
   resultsDiv.innerHTML = '';
+
+  const data = allRounds[index];
+  if (!data) return;
+
+  // ✅ Update round title
+  const roundTitle = document.getElementById("roundTitle");
+  roundTitle.className = "roundTitle";
+  roundTitle.innerText = translations[currentLang].roundno + " " + data.round;
+
+  // ✅ Create sections safely
+  let restDiv = null;
+  if (data.resting && data.resting.length !== 0) {
+    restDiv = renderRestingPlayers(data, index);
+  }
+
+  const gamesDiv = renderGames(data, index);
+
+  // ✅ Wrap everything
+  const wrapper = document.createElement('div');
+  wrapper.className = 'round-wrapper';
+
+  // 🔒 Apply lock state globally
+  if (interactionLocked) {
+    wrapper.classList.add('locked');
+  }
+
+  // ✅ Append conditionally
+  if (restDiv) {
+    wrapper.append(gamesDiv, restDiv);
+  } else {
+    wrapper.append(gamesDiv);
+  }
+
+  resultsDiv.append(wrapper);
+}
+
+
+function goodshowRound(index) {
+  clearPreviousRound();
+  const resultsDiv = document.getElementById('game-results');
+  resultsDiv.innerHTML = '';
   const data = allRounds[index];
   if (!data) return;
   // ✅ Update round title
   const roundTitle = document.getElementById("roundTitle");
   roundTitle.className = "roundTitle";
-  roundTitle.innerText = translations[currentLang].nround + " " + data.round;
+  roundTitle.innerText = translations[currentLang].roundno + " " + data.round;
   // ✅ Create sections safely
   let restDiv = null;
   if (data.resting && data.resting.length !== 0) {
@@ -575,7 +882,7 @@ function showRound(index) {
   resultsDiv.append(wrapper);
   // ✅ Navigation buttons
   //document.getElementById('prevBtn').disabled = index === 0;
-  document.getElementById('nextBtn').disabled = false;
+  //document.getElementById('nextBtn').disabled = false;
 }
 
 
@@ -773,11 +1080,111 @@ function getTeamTypeFromPairs(playerNames) {
 
   return "unknown";
 }
-
 function renderGames(data, index) {
+  const wrapper = document.createElement('div');
+
+  data.games.forEach((game, gameIndex) => {
+
+    // 🟦 Create the main container for the court
+    const courtDiv = document.createElement('div');
+    courtDiv.className = 'courtcard';
+
+    // 🏟️ Court name / number (TOP)
+    const courtName = document.createElement('div');
+    courtName.classList.add('courtname');
+    courtName.textContent = `Court ${gameIndex + 1}`;
+
+    // 🟨 Teams container (BELOW court name)
+    const teamsDiv = document.createElement('div');
+    teamsDiv.className = 'teams';
+
+    // Helper → Team letters (A, B, C, D...)
+    const getTeamLetter = (gameIndex, teamSide) => {
+      const teamNumber = gameIndex * 2 + (teamSide === 'L' ? 0 : 1);
+      return String.fromCharCode(65 + teamNumber);
+    };
+
+    // 🧩 Create a team block
+    const makeTeamDiv = (teamSide) => {
+      const teamDiv = document.createElement('div');
+      teamDiv.className = 'team';
+      teamDiv.dataset.teamSide = teamSide;
+      teamDiv.dataset.gameIndex = gameIndex;
+
+      // 🔁 Swap icon
+      const swapIcon = document.createElement('div');
+      swapIcon.className = 'swap-icon';
+      swapIcon.innerHTML = '🔁';
+      teamDiv.appendChild(swapIcon);
+
+      // 👥 Add player buttons
+      const teamPairs = teamSide === 'L' ? game.pair1 : game.pair2;
+      teamPairs.forEach((p, i) => {
+        teamDiv.appendChild(
+          makePlayerButton(p, teamSide, gameIndex, i, data, index)
+        );
+      });
+
+      // ✅ Swap logic (only for latest round)
+      const isLatestRound = index === allRounds.length - 1;
+      if (isLatestRound) {
+        swapIcon.addEventListener('click', (e) => {
+          e.stopPropagation();
+          e.preventDefault();
+
+          if (window.selectedTeam) {
+            const src = window.selectedTeam;
+
+            if (src.gameIndex !== gameIndex) {
+              handleTeamSwapAcrossCourts(
+                src,
+                { teamSide, gameIndex },
+                data,
+                index
+              );
+            }
+
+            window.selectedTeam = null;
+            document
+              .querySelectorAll('.selected-team')
+              .forEach(b => b.classList.remove('selected-team'));
+
+          } else {
+            window.selectedTeam = { teamSide, gameIndex };
+            teamDiv.classList.add('selected-team');
+          }
+        });
+      }
+
+      return teamDiv;
+    };
+
+    // 🟢 Create left & right teams
+    const teamLeft = makeTeamDiv('L');
+    const teamRight = makeTeamDiv('R');
+
+    // ⚪ VS label
+    const vs = document.createElement('span');
+    vs.className = 'vs';
+    vs.innerText = '  ';
+
+    // 🧱 Build structure (ORDER MATTERS)
+    teamsDiv.append(teamLeft, vs, teamRight);
+    courtDiv.append(courtName, teamsDiv);
+    wrapper.appendChild(courtDiv);
+  });
+
+  return wrapper;
+}
+
+
+function renderGamesxxx(data, index) {
   const wrapper = document.createElement('div');
   data.games.forEach((game, gameIndex) => {
     // 🟦 Create the main container for the match
+    const courtDiv = document.createElement('div');
+    courtDiv.className = 'courtcard';
+    
     const teamsDiv = document.createElement('div');
     teamsDiv.className = 'teams';
     // Helper → Team letters (A, B, C, D...)
@@ -832,12 +1239,190 @@ function renderGames(data, index) {
     vs.innerText = '  ';
     // Add everything to container
     teamsDiv.append(team1, vs, team2);
-    wrapper.appendChild(teamsDiv);
+    // 🔑 wrap teams inside courtcard
+courtDiv.appendChild(teamsDiv);
+
+// 🔑 add courtcard to wrapper
+wrapper.appendChild(courtDiv);
+    //wrapper.appendChild(teamsDiv);
   });
   return wrapper;
 }
 
+function makeRestButton(player, data, index) {
+  const btn = document.createElement('button');
+  btn.className = 'rest-btn';
+
+  // ───────── GENDER ICON (IMAGE-BASED) ─────────
+  if (IS_MIXED_SESSION && player?.gender) {
+    const genderIcon = document.createElement('img');
+    genderIcon.className = 'gender-icon';
+
+    genderIcon.src =
+      player.gender === 'Female'
+        ? 'female.jpg'
+        : 'male.jpg';
+
+    genderIcon.alt = player.gender;
+    btn.appendChild(genderIcon);
+  }
+
+  // ───────── LABEL ─────────
+  const label = player.displayName || player.name;
+  const textNode = document.createElement('span');
+  textNode.innerText = label;
+  btn.appendChild(textNode);
+
+  /* ───────── COLOR LOGIC ───────── */
+
+  const restMatch = label.match(/#(\d+)/);
+  const restCount = restMatch ? parseInt(restMatch[1], 10) : 0;
+
+  if (IS_MIXED_SESSION && player?.gender) {
+    // Gender-based hue + rest-based lightness
+    const hue = player.gender === "Male" ? 200 : 330;
+    const lightness = Math.min(90, 65 + restCount * 5);
+
+    btn.style.backgroundColor = `hsl(${hue}, 70%, ${lightness}%)`;
+    btn.style.color = "#000";
+  } else {
+    // Original rest-count coloring
+    if (restMatch) {
+      const hue = (restCount * 40) % 360;
+      btn.style.backgroundColor = `hsl(${hue}, 60%, 85%)`;
+    } else {
+      btn.style.backgroundColor = '#eee';
+    }
+    btn.style.color = "#000";
+  }
+
+  /* ─────────────────────────────── */
+
+  const isLatestRound = index === allRounds.length - 1;
+  if (!isLatestRound) return btn;
+
+  const handleTap = (e) => {
+    e.preventDefault();
+
+    if (window.selectedPlayer) {
+      const src = window.selectedPlayer;
+      if (src.from === 'team') {
+        handleDropRestToTeam(
+          e,
+          src.teamSide,
+          src.gameIndex,
+          src.playerIndex,
+          data,
+          index,
+          label
+        );
+      }
+      window.selectedPlayer = null;
+      document
+        .querySelectorAll('.selected')
+        .forEach(b => b.classList.remove('selected'));
+    } else {
+      window.selectedPlayer = { playerName: label, from: 'rest' };
+      btn.classList.add('selected');
+    }
+  };
+
+  btn.addEventListener('click', handleTap);
+  btn.addEventListener('touchstart', handleTap);
+
+  return btn;
+}
+
 function makePlayerButton(name, teamSide, gameIndex, playerIndex, data, index) {
+  const btn = document.createElement('button');
+
+  // Get player object
+  const baseName = name.split('#')[0];
+  const player = schedulerState.allPlayers.find(p => p.name === baseName);
+
+  btn.className = teamSide === 'L'
+    ? 'Lplayer-btn'
+    : 'Rplayer-btn';
+
+  /* ───────── GENDER EMOJI (LEFT) ───────── */
+  if (IS_MIXED_SESSION && player?.gender) {
+  const genderIcon = document.createElement('img');
+  genderIcon.className = 'gender-icon';
+
+  genderIcon.src =
+  player.gender === 'Female'
+    ? 'female.jpg'
+    : 'male.jpg';
+
+  genderIcon.alt = player.gender;
+  btn.prepend(genderIcon);
+}
+
+  /* ───────── PLAYER NAME (TRUNCATED) ───────── */
+  const nameSpan = document.createElement('span');
+  nameSpan.className = 'player-name';
+  nameSpan.textContent = name;
+  nameSpan.title = name; // full name on long-press / hover
+
+  btn.appendChild(nameSpan);
+
+  /* ───────────────────────────────────── */
+
+  const isLatestRound = index === allRounds.length - 1;
+  if (!isLatestRound) return btn;
+
+  const handleTap = (e) => {
+    e.preventDefault();
+
+    if (window.selectedPlayer) {
+      const src = window.selectedPlayer;
+
+      if (src.from === 'rest') {
+        handleDropRestToTeam(
+          e,
+          teamSide,
+          gameIndex,
+          playerIndex,
+          data,
+          index,
+          src.playerName
+        );
+      } else {
+        handleDropBetweenTeams(
+          e,
+          teamSide,
+          gameIndex,
+          playerIndex,
+          data,
+          index,
+          src
+        );
+      }
+
+      window.selectedPlayer = null;
+      document
+        .querySelectorAll('.selected')
+        .forEach(b => b.classList.remove('selected'));
+    } else {
+      window.selectedPlayer = {
+        playerName: name,
+        teamSide,
+        gameIndex,
+        playerIndex,
+        from: 'team'
+      };
+      btn.classList.add('selected');
+    }
+  };
+
+  btn.addEventListener('click', handleTap);
+  btn.addEventListener('touchstart', handleTap);
+
+  return btn;
+}
+
+
+function xxxmakePlayerButton(name, teamSide, gameIndex, playerIndex, data, index) {
   const btn = document.createElement('button');
 
   // Determine if gender icons should be shown
@@ -922,7 +1507,7 @@ if (IS_MIXED_SESSION && player?.gender) {
 
 
 
-function makeRestButton(player, data, index) {
+function xxxmakeRestButton(player, data, index) {
   const btn = document.createElement('button');
 
   let genderIcon = "";
@@ -1210,3 +1795,40 @@ lockBtn.addEventListener('click', () => {
 });
 
 
+const courtSettingsBtn = document.getElementById("courtSettings");
+const courtCard = document.getElementById("courtCard");
+const courtSettingsPanel = document.getElementById("courtSettingsPanel");
+const numCourtsSpan = document.getElementById("num-courts");
+
+courtSettingsBtn.addEventListener("click", () => {
+  courtCard.classList.toggle("expanded");
+  renderCourtSettings();
+});
+
+function renderCourtSettings() {
+  const numCourts = parseInt(numCourtsSpan.textContent);
+  courtSettingsPanel.innerHTML = "";
+
+  for (let i = 1; i <= numCourts; i++) {
+    const row = document.createElement("div");
+    row.className = "court-row";
+    row.innerHTML = `
+      <span>Court ${i}</span>
+      <div class="mode-options">
+        <img src="xd.png" alt="XD" data-mode="xd">
+        <img src="ld.png" alt="LD" data-mode="ld">
+        <img src="md.png" alt="MD" data-mode="md">
+        <img src="open.png" alt="Auto" data-mode="auto" class="selected">
+      </div>
+    `;
+    courtSettingsPanel.appendChild(row);
+  }
+
+  document.querySelectorAll(".mode-options img").forEach(img => {
+    img.addEventListener("click", () => {
+      const parent = img.parentElement;
+      parent.querySelectorAll("img").forEach(i => i.classList.remove("selected"));
+      img.classList.add("selected");
+    });
+  });
+}

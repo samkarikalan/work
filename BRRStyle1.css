@@ -550,6 +550,20 @@ z-index: 1000;
   filter: none !important;
 }
 
+.player-edit-card {
+  cursor: grab;
+}
+
+.player-edit-card:active {
+  cursor: grabbing;
+  opacity: 0.85;
+}
+
+.pec-name {
+  cursor: pointer;
+}
+
+
 /* Columns */
 .pec-active {
   text-align: center;

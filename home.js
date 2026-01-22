@@ -33,7 +33,6 @@ function closeConfirm() {
 }
 
 
-
 let currentLang = "en";
 
 function toggleLangMenu() {
@@ -190,6 +189,13 @@ function resetRounds() {
   clearPreviousRound();
   goToRounds();
   report(); 
+  sessionFinished = false;
+  document.getElementById("nextBtn").disabled = false;
+  document.getElementById("roundShufle").disabled = false;
+
+  // Optional: also disable End to prevent double-click
+  document.getElementById("endBtn").disabled = false;
+	
   const btn = document.getElementById("reset_rounds_btn");
   if (btn) {
     btn.classList.remove("active");
