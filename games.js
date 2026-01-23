@@ -85,6 +85,25 @@ function AischedulerNextRound(schedulerState) {
     lastRound,
   } = schedulerState;
 
+
+  // ================= GLOBAL PAIR RESET (BEGINNING) =================
+  if (
+    allPairsExhausted(activeplayers, schedulerState.pairPlayedSet)
+  ) {
+    const protectedPairs = new Set();
+
+    // Do not repeat last round pairs
+    if (lastRound?.games) {
+      for (const g of lastRound.games) {
+        protectedPairs.add(g.pair1.slice().sort().join("&"));
+        protectedPairs.add(g.pair2.slice().sort().join("&"));
+      }
+    }
+
+    schedulerState.pairPlayedSet = protectedPairs;
+  }
+
+  
   const totalPlayers = activeplayers.length;
   const numPlayersPerRound = numCourts * 4;
   const numResting = Math.max(totalPlayers - numPlayersPerRound, 0);
@@ -262,7 +281,21 @@ function AischedulerNextRound(schedulerState) {
   };
 }
 
+function allPairsExhausted(activePlayers, pairPlayedSet) {
+  let possiblePairs = 0;
+  let playedPairs = 0;
 
+  for (let i = 0; i < activePlayers.length; i++) {
+    for (let j = i + 1; j < activePlayers.length; j++) {
+      possiblePairs++;
+      const key = [activePlayers[i], activePlayers[j]]
+        .sort()
+        .join("&");
+      if (pairPlayedSet.has(key)) playedPairs++;
+    }
+  }
+  return possiblePairs > 0 && possiblePairs === playedPairs;
+}
 
 
 // ==============================
