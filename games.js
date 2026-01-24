@@ -85,25 +85,6 @@ function AischedulerNextRound(schedulerState) {
     lastRound,
   } = schedulerState;
 
-
-  // ================= GLOBAL PAIR RESET (BEGINNING) =================
-  if (
-    allPairsExhausted(activeplayers, schedulerState.pairPlayedSet)
-  ) {
-    const protectedPairs = new Set();
-
-    // Do not repeat last round pairs
-    if (lastRound?.games) {
-      for (const g of lastRound.games) {
-        protectedPairs.add(g.pair1.slice().sort().join("&"));
-        protectedPairs.add(g.pair2.slice().sort().join("&"));
-      }
-    }
-
-    schedulerState.pairPlayedSet = protectedPairs;
-  }
-
-  
   const totalPlayers = activeplayers.length;
   const numPlayersPerRound = numCourts * 4;
   const numResting = Math.max(totalPlayers - numPlayersPerRound, 0);
@@ -281,21 +262,7 @@ function AischedulerNextRound(schedulerState) {
   };
 }
 
-function allPairsExhausted(activePlayers, pairPlayedSet) {
-  let possiblePairs = 0;
-  let playedPairs = 0;
 
-  for (let i = 0; i < activePlayers.length; i++) {
-    for (let j = i + 1; j < activePlayers.length; j++) {
-      possiblePairs++;
-      const key = [activePlayers[i], activePlayers[j]]
-        .sort()
-        .join("&");
-      if (pairPlayedSet.has(key)) playedPairs++;
-    }
-  }
-  return possiblePairs > 0 && possiblePairs === playedPairs;
-}
 
 
 // ==============================
@@ -1828,40 +1795,3 @@ lockBtn.addEventListener('click', () => {
 });
 
 
-const courtSettingsBtn = document.getElementById("courtSettings");
-const courtCard = document.getElementById("courtCard");
-const courtSettingsPanel = document.getElementById("courtSettingsPanel");
-const numCourtsSpan = document.getElementById("num-courts");
-
-courtSettingsBtn.addEventListener("click", () => {
-  courtCard.classList.toggle("expanded");
-  renderCourtSettings();
-});
-
-function renderCourtSettings() {
-  const numCourts = parseInt(numCourtsSpan.textContent);
-  courtSettingsPanel.innerHTML = "";
-
-  for (let i = 1; i <= numCourts; i++) {
-    const row = document.createElement("div");
-    row.className = "court-row";
-    row.innerHTML = `
-      <span>Court ${i}</span>
-      <div class="mode-options">
-        <img src="xd.png" alt="XD" data-mode="xd">
-        <img src="ld.png" alt="LD" data-mode="ld">
-        <img src="md.png" alt="MD" data-mode="md">
-        <img src="open.png" alt="Auto" data-mode="auto" class="selected">
-      </div>
-    `;
-    courtSettingsPanel.appendChild(row);
-  }
-
-  document.querySelectorAll(".mode-options img").forEach(img => {
-    img.addEventListener("click", () => {
-      const parent = img.parentElement;
-      parent.querySelectorAll("img").forEach(i => i.classList.remove("selected"));
-      img.classList.add("selected");
-    });
-  });
-}

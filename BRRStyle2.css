@@ -63,7 +63,7 @@
   border-radius: 1rem;
   overflow: hidden;  
   
-  padding: 4px;
+  padding: 2px;
   box-sizing: border-box;
   text-align: center;
   font-weight: bold;
@@ -135,7 +135,7 @@
 /* Highlight selected team when swapping */
 .selected-team {
   outline: 3px solid red;
-  box-shadow: inset 0 0 10px red;
+  box-shadow: 0 0 10px red;
 }
 .match-card {
   background: white;
@@ -920,56 +920,4 @@ body.locked .swap-icon {
   display: none;
 }
 
-.court-card {
-  border-radius: 12px;
-  padding: 10px;
-  background: #1e1e1e;
-  transition: all 0.3s ease;
-  overflow: hidden;
-}
-
-.court-header {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.settings-btn {
-  margin-left: auto;
-  background: transparent;
-  border: none;
-  font-size: 18px;
-  cursor: pointer;
-}
-
-.court-settings-panel {
-  max-height: 0;
-  opacity: 0;
-  transition: max-height 0.3s ease, opacity 0.3s ease;
-}
-
-.court-card.expanded .court-settings-panel {
-  max-height: 500px;
-  opacity: 1;
-  margin-top: 10px;
-}
-
-.court-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin: 6px 0;
-}
-
-.mode-options img {
-  width: 28px;
-  height: 28px;
-  cursor: pointer;
-  opacity: 0.5;
-  transition: transform 0.2s, opacity 0.2s;
-}
-
-.mode-options img.selected {
-  opacity: 1;
-  transform: scale(1.15);
-}
+/* CARD */

@@ -181,20 +181,23 @@
   </div>
   
   <div id="game-results"></div>  
-  <div class="court-card" id="courtCard">
-  <div class="court-header">
-    <label for="num-courts" class="row-label" data-i18n="courts"></label>
-    <button class="circle-btn" id="courtMinus">−</button>
-    <span id="num-courts">1</span>
-    <button class="circle-btn" id="courtPlus">+</button>
-    <button class="settings-btn" id="courtSettings">⚙️</button>
-  </div>
+  <div class="row-field">  
+    <div class="court-card">
+      <label for="num-courts" class="row-label" data-i18n="courts"></label>
+      <button class="circle-btn" id="courtMinus">−</button>
+      <span id="num-courts">1</span>
+      <button class="circle-btn" id="courtPlus">+</button>
+    </div>    
+    
+    <!-- Timer Icon -->
+    <div class="timer-card">
+      <button id="timerToggleBtn" class="row-label timer-toggle-btn" onclick="toggleTimer()">⏱️</button>
 
-  <div class="court-settings-panel" id="courtSettingsPanel">
-    <!-- Courts will be injected here -->
+      <button class="circle-btn" id="timerMinus">−</button>
+      <span class="timer-display" id="timerDisplay">08:00</span>
+      <button class="circle-btn" id="timerPlus">+</button>
+    </div>
   </div>
-</div>
-
 
   <div class="action-card">
   <!-- LEFT : Mix / Refresh (secondary) -->

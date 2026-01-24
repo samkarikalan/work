@@ -1,6 +1,5 @@
 let timerMinutes = 8;
 let remainingSeconds = timerMinutes * 60;
-let timerInterval = null;
 let isRunning = false;
 let alarmTimeout = null;
 let alarmRepeatTimeout = null;
@@ -53,49 +52,43 @@ function unlockAudio() {
 // ----------------------------
 function toggleTimer() {
   unlockAudio();
-
   const btn = document.getElementById("timerToggleBtn");
 
   if (!isRunning) {
     isRunning = true;
     btn.classList.add("running");
-    startTimer();
+    Android.startTimer(remainingSeconds);   // 🔥 Native timer start
   } else {
-    stopTimer();
+    isRunning = false;
+    btn.classList.remove("running");
+    Android.pauseTimer();                  // 🔥 Native pause
   }
 }
 
 // ----------------------------
-// Start / stop timer
+// Stop / Reset timer
 // ----------------------------
-function startTimer() {
-  clearInterval(timerInterval);
-  timerInterval = setInterval(runTimer, 1000);
-  stopAlarm(); // reset any previous alarm
-}
-
 function stopTimer() {
-  clearInterval(timerInterval);
   isRunning = false;
   document.getElementById("timerToggleBtn").classList.remove("running");
+  Android.stopTimer();                     // 🔥 Native stop
   stopAlarm();
 
-  // Reset countdown to selected minutes
   remainingSeconds = timerMinutes * 60;
   updateTimerDisplay();
 }
 
 // ----------------------------
-// Countdown
+// Native → JS callbacks
 // ----------------------------
-function runTimer() {
-  remainingSeconds--;
+function onNativeTimerTick(seconds) {
+  remainingSeconds = seconds;
   updateTimerDisplay();
+}
 
-  if (remainingSeconds <= 0) {
-    stopTimer();
-    playBeep();
-  }
+function onNativeTimerFinished() {
+  stopTimer();
+  playBeep();
 }
 
 // ----------------------------
