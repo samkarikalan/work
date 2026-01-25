@@ -17,7 +17,7 @@
   <script src="rounds.js" defer></script>
   <script src="games.js" defer></script>
   <script src="engjap.js" defer></script>
-  <script src="timer.js" defer></script>
+  <!--<script src="timer.js" defer></script>-->
   <script src="summary.js" defer></script>
   <script src="help.js" defer></script>
   <script src="ExportCSS.js" defer></script>
@@ -190,25 +190,13 @@
     </div>    
     
     <!-- Timer Icon -->
-    <div class="timer-card">
-      <button id="timerToggleBtn" class="row-label timer-toggle-btn" onclick="toggleTimer()">⏱️</button>
-
-      <button class="circle-btn" id="timerMinus">−</button>
-      <span class="timer-display" id="timerDisplay">08:00</span>
-      <button class="circle-btn" id="timerPlus">+</button>
+    <div class="status-card">     
+      <span class="status-display" id="statusDisplay">Status: Ready</span>      
     </div>
   </div>
 
   <div class="action-card">
-  <!-- LEFT : Mix / Refresh (secondary) -->
-  <button
-    id="endBtn"
-    class="action left small"
-    onclick="showConfirm('endRoundsConfirm', endRounds)"
-  >
-    <span data-i18n="endrounds">Finish</span>
-    <span class="icon">🏁</span>
-  </button>
+  <!-- LEFT : Mix / Refresh (secondary) --> 
     
     <button
     class="action mid small"
@@ -220,14 +208,14 @@
   </button>
 
   <!-- RIGHT : Next (primary) -->
-  <button
-    id="nextBtn"
-    class="action right primary"
-    onclick="nextRound()"
-  >
-    <span data-i18n="nround">Next</span>
-    <span class="icon">▶</span>
-  </button>
+<button id="nextBtn" class="action right primary" onclick="toggleRound()">
+  <span id="btnText" data-i18n="nround"></span>
+  <span class="icon">▶</span>
+</button>
+
+
+
+
 </div>
 
   

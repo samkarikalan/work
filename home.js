@@ -194,7 +194,7 @@ function resetRounds() {
   document.getElementById("roundShufle").disabled = false;
 
   // Optional: also disable End to prevent double-click
-  document.getElementById("endBtn").disabled = false;
+  //document.getElementById("endBtn").disabled = false;
 	
   const btn = document.getElementById("reset_rounds_btn");
   if (btn) {

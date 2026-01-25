@@ -1,3 +1,60 @@
+let roundActive = false;
+
+let currentState = "idle";
+const statusEl = document.getElementById("statusDisplay");
+const textEl = document.getElementById("btnText");
+const btn = document.getElementById("nextBtn");
+const icon = btn.querySelector(".icon");
+const roundStates = {
+  idle: {
+    key: "nround",
+    icon: "▶",
+    class: ""
+  },
+  active: {
+    key: "endrounds",
+    icon: "⏹",
+    class: "end"
+  }
+};
+
+function toggleRound() {
+  const btn = document.getElementById("nextBtn");
+  const textEl = document.getElementById("btnText");
+  const icon = btn.querySelector(".icon");
+
+  if (currentState === "idle") {
+    currentState = "active";
+    setStatus("In Progress");
+    document.body.classList.add("disabled");
+  } else {
+    currentState = "idle";
+    nextRound();
+    setStatus("Ready");
+    document.body.classList.remove("disabled");
+  }
+
+  const state = roundStates[currentState];
+  textEl.dataset.i18n = state.key;
+  icon.textContent = state.icon;
+  btn.classList.toggle("end", state.class === "end");
+
+  setLanguage(currentLang);
+}
+
+
+function setStatus(status) {
+  statusEl.classList.remove("status-ready", "status-progress");
+
+  if (status === "Ready") {
+    statusEl.textContent = "Status: Ready";
+    statusEl.classList.add("status-ready");
+  } else if (status === "In Progress") {
+    statusEl.textContent = "Status: Round in Progress";
+    statusEl.classList.add("status-progress");
+  }
+}
+
 
 let isLocked = true;
   const lockIcon = document.getElementById('lockToggleBtn');

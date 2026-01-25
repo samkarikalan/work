@@ -170,27 +170,9 @@ z-index: 1000;
   z-index: 999;
 }
 
-/* ===== LEFT HAMBURGER ===== */
-.hamburger {
-  margin-right: auto;          /* ✅ stays left-most */
-  margin-left: 0;
 
-  font-size: 22px;
-  background: transparent;     /* ❌ no visible background */
-  border: none;
-  box-shadow: none;
 
-  padding: 8px;
-  color: #222;
-  cursor: pointer;
-}
 
-/* no active / focus style */
-.hamburger:focus,
-.hamburger:active {
-  outline: none;
-  background: transparent;
-}
 
 /* ===== TABS CONTAINER (CENTERED) ===== */
 .tabs-container {
@@ -228,33 +210,8 @@ z-index: 1000;
   box-shadow: 0 3px 7px rgba(93, 37, 235, 0.35);
 }
 
-.hamburger {
-  background: transparent !important;
-  border: none;
-  outline: none;
-  box-shadow: none;
 
-  /* 🔥 kill Android tap feedback */
-  -webkit-tap-highlight-color: rgba(0,0,0,0);
-  tap-highlight-color: transparent;
 
-  /* 🔥 kill pressed ripple */
-  appearance: none;
-  -webkit-appearance: none;
-
-  /* 🔥 prevent default touch behavior */
-  touch-action: manipulation;
-}
-
-/* Cover all states */
-.hamburger:active,
-.hamburger:focus,
-.hamburger:hover,
-.hamburger:focus-visible {
-  background: transparent !important;
-  outline: none;
-  box-shadow: none;
-}
 
 /* ===============================
    SETTINGS LAYOUT
@@ -697,6 +654,8 @@ z-index: 1000;
 }
 
 .card button {
+display: block;
+  margin: 0 auto;
   background: #800080;
   font-size: 1.15rem;
   padding:6px;
@@ -706,17 +665,61 @@ z-index: 1000;
   cursor: pointer;
   border-radius: 8px;
   padding: 0.75rem;
-  width: 95%;
-  margin: 0 0.5rem;
+  width: 98%;  
   transition: background 0.3s, transform 0.2s;
 }
 
 .card button:hover {  
-  transform: scale(1.05);
+  transform: scale(1.02);
 }
 
+.status-card {
+  padding: 12px 16px;
+  border-radius: 10px;
+  width: fit-content;
+  font-weight: 400;
+  font-size: 1rem;
+}
 
+.status-display {
+  padding: 6px 12px;
+  border-radius: 6px;
+  color: white;
+}
 
+/* Status colors */
+.status-ready {
+  background-color: #28a745; /* green */
+}
+
+.status-progress {
+  background-color: #ffc107; /* yellow/orange */
+  color: #000;
+}
+
+.status-error {
+  background-color: #dc3545; /* red */
+}
+
+.primary {
+  background-color: #28a745; /* green */
+  color: white;
+}
+
+.primary.end {
+  background-color: #dc3545; /* red */
+}
+
+body.disabled {
+  pointer-events: none;
+  opacity: 0.9;
+}
+
+/* Re-enable the toggle button */
+#nextBtn {
+  pointer-events: auto;
+  opacity: 1;
+}
 
 
 /* Summary */
