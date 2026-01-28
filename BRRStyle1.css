@@ -10,6 +10,29 @@
   width: 16px;
   height: 16px;
 }
+.player-dropdown {
+  border: 1px solid #ccc;
+  padding: 6px;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.player-option {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px;
+  cursor: pointer;
+}
+
+.player-option:hover {
+  background: #f0f0f0;
+}
+
+.player-option img {
+  width: 18px;
+  height: 18px;
+}
 
 
 
