@@ -1,3 +1,88 @@
+function getGenderIcon(gender) {
+  return gender === "Male" ? "👨‍💼"
+       : gender === "Female" ? "🙎‍♀️"
+       : "❔";
+}
+function updateFixedPairSelectors() {
+  const sel1 = document.getElementById('fixed-pair-1');
+  const sel2 = document.getElementById('fixed-pair-2');
+  const pairedPlayers = new Set(schedulerState.fixedPairs.flat());
+
+  sel1.innerHTML = '<option value=""></option>';
+  sel2.innerHTML = '<option value=""></option>';
+
+  schedulerState.allPlayers.forEach(p => {
+    if (!p.active) return;
+    if (pairedPlayers.has(p.name)) return;
+
+    const label = `${getGenderIcon(p.gender)} ${p.name}`;
+
+    const o1 = document.createElement("option");
+    const o2 = document.createElement("option");
+
+    o1.value = o2.value = p.name;   // value stays clean
+    o1.textContent = o2.textContent = label;
+
+    sel1.appendChild(o1);
+    sel2.appendChild(o2);
+  });
+}
+
+function addFixedCard(p1, p2, key) {
+  const list = document.getElementById('fixed-pair-list');
+
+  const p1Obj = schedulerState.allPlayers.find(p => p.name === p1);
+  const p2Obj = schedulerState.allPlayers.find(p => p.name === p2);
+
+  const card = document.createElement("div");
+  card.className = "fixed-card";
+  card.dataset.key = key;
+
+  card.innerHTML = `
+    <div class="fixed-name">
+      ${getGenderIcon(p1Obj?.gender)} ${p1}
+      &
+      ${getGenderIcon(p2Obj?.gender)} ${p2}
+    </div>
+    <div class="fixed-delete">
+      <button class="pec-btn delete"
+        onclick="modifyFixedPair('${p1}', '${p2}')">🗑</button>
+    </div>
+  `;
+
+  list.appendChild(card);
+}
+
+function refreshFixedCards() {
+  schedulerState.fixedPairs.forEach(pair => {
+    const key = pair.slice().sort().join("&");
+    removeFixedCard(key);
+    addFixedCard(pair[0], pair[1], key);
+  });
+}
+
+function toggleGender(index, iconEl) {
+  const player = schedulerState.allPlayers[index];
+
+  player.gender = player.gender === "Male" ? "Female" : "Male";
+
+  iconEl.textContent = getGenderIcon(player.gender);
+
+  iconEl.classList.remove("male", "female");
+  iconEl.classList.add(player.gender.toLowerCase());
+
+  const card = iconEl.closest(".player-edit-card");
+  card.classList.remove("male", "female");
+  card.classList.add(player.gender.toLowerCase());
+
+  updateGenderGroups();
+  updateFixedPairSelectors();
+  refreshFixedCards();   // ✅ THIS is what you wanted
+}
+
+
+
+
 function pastePlayersText() {
   const textarea = document.getElementById('players-textarea');
 
@@ -155,7 +240,7 @@ function toggleActive(index, checkbox) {
 }
 
 
-function toggleGender(index, iconEl) {
+function xtoggleGender(index, iconEl) {
   const player = schedulerState.allPlayers[index];
 
   // 1️⃣ Toggle data model
@@ -709,7 +794,7 @@ function toggleAllCheckboxes(masterCheckbox) {
 /* =========================
    FIXED PAIRS MANAGEMENT
 ========================= */
-function updateFixedPairSelectors() {
+function xupdateFixedPairSelectors() {
   const sel1 = document.getElementById('fixed-pair-1');
   const sel2 = document.getElementById('fixed-pair-2');
   const pairedPlayers = new Set(schedulerState.fixedPairs.flat());
@@ -772,7 +857,7 @@ function modifyFixedPair(p1 = null, p2 = null) {
   updateFixedPairSelectors();
 }
 
-function addFixedCard(p1, p2, key) {
+function xaddFixedCard(p1, p2, key) {
   const list = document.getElementById('fixed-pair-list');
 
   const card = document.createElement("div");
