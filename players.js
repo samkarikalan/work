@@ -5,25 +5,39 @@ function getGenderIconSrc(gender) {
 }
 
 function updateFixedPairSelectors() {
-  const sel1 = document.getElementById('fixed-pair-1');
-  const sel2 = document.getElementById('fixed-pair-2');
+  renderPlayerDropdown("fixed-pair-1");
+  renderPlayerDropdown("fixed-pair-2");
+}
+
+function renderPlayerDropdown(containerId) {
+  const container = document.getElementById(containerId);
   const pairedPlayers = new Set(schedulerState.fixedPairs.flat());
 
-  sel1.innerHTML = '<option value=""></option>';
-  sel2.innerHTML = '<option value=""></option>';
+  container.innerHTML = "";
 
   schedulerState.allPlayers.forEach(p => {
     if (!p.active) return;
     if (pairedPlayers.has(p.name)) return;
 
-    const o1 = document.createElement("option");
-    const o2 = document.createElement("option");
+    const option = document.createElement("div");
+    option.className = "player-option";
+    option.dataset.value = p.name;
 
-    o1.value = o2.value = p.name;
-    o1.textContent = o2.textContent = p.name;
+    const img = createGenderImg(p.gender);
+    const name = document.createElement("span");
+    name.textContent = p.name;
 
-    sel1.appendChild(o1);
-    sel2.appendChild(o2);
+    option.appendChild(img);
+    option.appendChild(name);
+
+    option.onclick = () => {
+      container.dataset.selected = p.name;
+      container.querySelectorAll(".player-option")
+        .forEach(el => el.classList.remove("selected"));
+      option.classList.add("selected");
+    };
+
+    container.appendChild(option);
   });
 }
 
