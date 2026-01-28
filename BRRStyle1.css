@@ -1,3 +1,18 @@
+.gender-icon {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+  cursor: pointer;
+  vertical-align: middle;
+}
+
+.gender-icon.small {
+  width: 16px;
+  height: 16px;
+}
+
+
+
 :root {
   --base-font-size: 12px; /* Default Medium */
 }
