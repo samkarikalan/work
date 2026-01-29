@@ -4,41 +4,61 @@ function getGenderIconSrc(gender) {
     : "male.png";
 }
 
-function updateFixedPairSelectors() {
-  renderPlayerDropdown("fixed-pair-1");
-  renderPlayerDropdown("fixed-pair-2");
+document.addEventListener("click", closeAllDropdowns);
+
+function closeAllDropdowns() {
+  document.querySelectorAll(".player-menu")
+    .forEach(m => m.classList.remove("open"));
 }
 
-function renderPlayerDropdown(containerId) {
-  const container = document.getElementById(containerId);
-  const pairedPlayers = new Set(schedulerState.fixedPairs.flat());
+function updateFixedPairSelectors() {
+  buildPlayerDropdown("fixed-pair-1");
+  buildPlayerDropdown("fixed-pair-2");
+}
 
-  container.innerHTML = "";
+function buildPlayerDropdown(id) {
+  const root = document.getElementById(id);
+  const pairedPlayers = new Set(schedulerState.fixedPairs.flat());
+  const selected = root.dataset.value || "";
+
+  root.innerHTML = "";
+
+  // selected display
+  const selectedDiv = document.createElement("div");
+  selectedDiv.className = "player-selected";
+  selectedDiv.textContent = selected || "Select player";
+  root.appendChild(selectedDiv);
+
+  // dropdown menu
+  const menu = document.createElement("div");
+  menu.className = "player-menu";
 
   schedulerState.allPlayers.forEach(p => {
     if (!p.active) return;
-    if (pairedPlayers.has(p.name)) return;
+    if (pairedPlayers.has(p.name) && p.name !== selected) return;
 
-    const option = document.createElement("div");
-    option.className = "player-option";
-    option.dataset.value = p.name;
+    const opt = document.createElement("div");
+    opt.className = "player-option";
 
-    const img = createGenderImg(p.gender);
-    const name = document.createElement("span");
-    name.textContent = p.name;
+    opt.appendChild(createGenderImg(p.gender));
+    opt.appendChild(document.createTextNode(p.name));
 
-    option.appendChild(img);
-    option.appendChild(name);
-
-    option.onclick = () => {
-      container.dataset.selected = p.name;
-      container.querySelectorAll(".player-option")
-        .forEach(el => el.classList.remove("selected"));
-      option.classList.add("selected");
+    opt.onclick = e => {
+      e.stopPropagation();
+      root.dataset.value = p.name;
+      updateFixedPairSelectors(); // refresh both dropdowns
     };
 
-    container.appendChild(option);
+    menu.appendChild(opt);
   });
+
+  root.appendChild(menu);
+
+  // toggle menu
+  root.onclick = () => {
+    closeAllDropdowns();
+    menu.classList.toggle("open");
+  };
 }
 
 
