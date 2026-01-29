@@ -1,133 +1,70 @@
-function getGenderIconSrc(gender) {
-  return gender === "Female"
-    ? "female.png"
-    : "male.png";
-}
+function getGenderIconByName(playerName) {
+  const player = schedulerState.allPlayers.find(
+    p => p.name === playerName
+  );
 
-document.addEventListener("click", closeAllDropdowns);
+  if (!player) return "❔";
 
-function closeAllDropdowns() {
-  document.querySelectorAll(".player-menu")
-    .forEach(m => m.classList.remove("open"));
-}
-
-function updateFixedPairSelectors() {
-  buildPlayerDropdown("fixed-pair-1");
-  buildPlayerDropdown("fixed-pair-2");
-}
-
-function buildPlayerDropdown(id) {
-  const root = document.getElementById(id);
-  const pairedPlayers = new Set(schedulerState.fixedPairs.flat());
-  const selected = root.dataset.value || "";
-
-  root.innerHTML = "";
-
-  // selected display
-  const selectedDiv = document.createElement("div");
-  selectedDiv.className = "player-selected";
-  selectedDiv.textContent = selected || "Select player";
-  root.appendChild(selectedDiv);
-
-  // dropdown menu
-  const menu = document.createElement("div");
-  menu.className = "player-menu";
-
-  schedulerState.allPlayers.forEach(p => {
-    if (!p.active) return;
-    if (pairedPlayers.has(p.name) && p.name !== selected) return;
-
-    const opt = document.createElement("div");
-    opt.className = "player-option";
-
-    opt.appendChild(createGenderImg(p.gender));
-    opt.appendChild(document.createTextNode(p.name));
-
-    opt.onclick = e => {
-      e.stopPropagation();
-      root.dataset.value = p.name;
-      updateFixedPairSelectors(); // refresh both dropdowns
-    };
-
-    menu.appendChild(opt);
-  });
-
-  root.appendChild(menu);
-
-  // toggle menu
-  root.onclick = () => {
-    closeAllDropdowns();
-    menu.classList.toggle("open");
-  };
-}
-
-
-
-function addFixedCard(p1, p2, key) {
-  const list = document.getElementById("fixed-pair-list");
-
-  const p1Obj = schedulerState.allPlayers.find(p => p.name === p1);
-  const p2Obj = schedulerState.allPlayers.find(p => p.name === p2);
-
-  const card = document.createElement("div");
-  card.className = "fixed-card";
-  card.dataset.key = key;
-
-  const nameDiv = document.createElement("div");
-  nameDiv.className = "fixed-name";
-
-  if (p1Obj) nameDiv.appendChild(createGenderImg(p1Obj.gender));
-  nameDiv.append(" " + p1 + " & ");
-  if (p2Obj) nameDiv.appendChild(createGenderImg(p2Obj.gender));
-  nameDiv.append(" " + p2);
-
-  const del = document.createElement("div");
-  del.className = "fixed-delete";
-  del.innerHTML = `
-    <button class="pec-btn delete"
-      onclick="modifyFixedPair('${p1}', '${p2}')">🗑</button>
-  `;
-
-  card.appendChild(nameDiv);
-  card.appendChild(del);
-  list.appendChild(card);
+  return player.gender === "Male" ? "👨‍💼" : "🙎‍♀️";
 }
 
 function refreshFixedCards() {
-  schedulerState.fixedPairs.forEach(pair => {
-    const key = pair.slice().sort().join("&");
-    removeFixedCard(key);
-    addFixedCard(pair[0], pair[1], key);
+  const list = document.getElementById("fixed-pair-list");
+  list.innerHTML = "";
+
+  schedulerState.fixedPairs.forEach(([p1, p2], index) => {
+    addFixedCard(p1, p2, index);
   });
 }
 
-function toggleGender(index, imgEl) {
-  const player = schedulerState.allPlayers[index];
 
-  // toggle
-  player.gender = player.gender === "Male" ? "Female" : "Male";
+function updateFixedPairSelectors() {
+  const sel1 = document.getElementById('fixed-pair-1');
+  const sel2 = document.getElementById('fixed-pair-2');
+  const pairedPlayers = new Set(schedulerState.fixedPairs.flat());
 
-  // update image
-  imgEl.src = getGenderIconSrc(player.gender);
-  imgEl.alt = player.gender;
+  sel1.innerHTML = '<option value="" data-i18n="selectPlayer1"></option>';
+  sel2.innerHTML = '<option value="" data-i18n="selectPlayer2"></option>';
 
-  // update card class
-  const card = imgEl.closest(".player-edit-card");
-  card.classList.remove("male", "female");
-  card.classList.add(player.gender.toLowerCase());
+  schedulerState.activeplayers.slice().reverse().forEach(p => {
+    if (!pairedPlayers.has(p)) {
+      const option1 = document.createElement('option');
+      const option2 = document.createElement('option');
 
-  updateGenderGroups();
-  updateFixedPairSelectors();
-  refreshFixedCards();   // 🔥 keeps fixed cards in sync
+      const icon = getGenderIconByName(p);
+
+      option1.value = option2.value = p;
+      option1.textContent = option2.textContent = `${icon} ${p}`;
+
+      sel1.appendChild(option1);
+      sel2.appendChild(option2);
+    }
+  });
 }
 
-function createGenderImg(gender) {
-  const img = document.createElement("img");
-  img.className = "gender-icon small";
-  img.src = getGenderIconSrc(gender);
-  img.alt = gender;
-  return img;
+function addFixedCard(p1, p2, key) {
+  const list = document.getElementById('fixed-pair-list');
+
+  const card = document.createElement("div");
+  card.className = "fixed-card";
+  card.setAttribute("data-key", key);
+
+  const icon1 = getGenderIconByName(p1);
+  const icon2 = getGenderIconByName(p2);
+
+  card.innerHTML = `
+    <div class="fixed-name">
+      ${icon1} ${p1} & ${icon2} ${p2}
+    </div>
+    <div class="fixed-delete">
+      <button class="pec-btn delete"
+              onclick="modifyFixedPair('${p1}', '${p2}')">🗑</button>
+    </div>
+  `;
+
+  list.appendChild(card);
 }
+
 
 
 function pastePlayersText() {
@@ -230,23 +167,27 @@ function removeFixedPairsForPlayer(playerName) {
    DELETE PLAYER
 ========================= */
 function deletePlayer(i) {
-  const deletedPlayer = schedulerState.allPlayers[i].name;
+  const deletedPlayer = schedulerState.allPlayers[i]?.name;
+  if (!deletedPlayer) return;
 
-  // Remove player
+  // 1️⃣ Remove player
   schedulerState.allPlayers.splice(i, 1);
 
-  // Remove any fixed pairs involving this player
+  // 2️⃣ Remove any fixed pairs involving this player
   removeFixedPairsForPlayer(deletedPlayer);
 
-  // Recalculate active players
+  // 3️⃣ Recalculate active players
   schedulerState.activeplayers = schedulerState.allPlayers
     .filter(p => p.active)
     .map(p => p.name)
     .reverse();
 
+  // 4️⃣ Refresh UI
   updatePlayerList();
   updateFixedPairSelectors();
+  refreshFixedCards(); // 🔥 THIS is the key
 }
+
 
 
 function olddeletePlayer(i) {
@@ -287,30 +228,41 @@ function toggleActive(index, checkbox) {
 }
 
 
-function xtoggleGender(index, iconEl) {
-  const player = schedulerState.allPlayers[index];
+function getGenderIcon(gender) {
+  return gender === "Male" ? "👨‍💼" : "🙎‍♀️";
+}
 
-  // 1️⃣ Toggle data model
+function toggleGender(index, iconEl) {
+  const player = schedulerState.allPlayers[index];
+  if (!player) return;
+
+  // 1️⃣ Toggle gender
   player.gender = player.gender === "Male" ? "Female" : "Male";
 
+  const genderClass = player.gender.toLowerCase();
+
   // 2️⃣ Update icon
-  iconEl.textContent = player.gender === "Male" ? "👨‍💼" : "🙎‍♀️";
+  iconEl.textContent = getGenderIcon(player.gender);
 
   // 3️⃣ Update icon class
   iconEl.classList.remove("male", "female");
-  iconEl.classList.add(player.gender.toLowerCase());
+  iconEl.classList.add(genderClass);
 
   // 4️⃣ Update card class
   const card = iconEl.closest(".player-edit-card");
-  card.classList.remove("male", "female");
-  card.classList.add(player.gender.toLowerCase());
+  if (card) {
+    card.classList.remove("male", "female");
+    card.classList.add(genderClass);
+  }
 
-  // 5️⃣ Update linked variables
+  // 5️⃣ Update linked state
   updateGenderGroups();
 
   // 6️⃣ Refresh dependent UI
   updateFixedPairSelectors();
+  refreshFixedCards(); // 🔥 THIS fixes your issue
 }
+
 
 function updateGenderGroups() {
   schedulerState.malePlayers = schedulerState.allPlayers
@@ -841,7 +793,7 @@ function toggleAllCheckboxes(masterCheckbox) {
 /* =========================
    FIXED PAIRS MANAGEMENT
 ========================= */
-function xupdateFixedPairSelectors() {
+function oldupdateFixedPairSelectors() {
   const sel1 = document.getElementById('fixed-pair-1');
   const sel2 = document.getElementById('fixed-pair-2');
   const pairedPlayers = new Set(schedulerState.fixedPairs.flat());
@@ -904,7 +856,7 @@ function modifyFixedPair(p1 = null, p2 = null) {
   updateFixedPairSelectors();
 }
 
-function xaddFixedCard(p1, p2, key) {
+function oldaddFixedCard(p1, p2, key) {
   const list = document.getElementById('fixed-pair-list');
 
   const card = document.createElement("div");
@@ -970,11 +922,19 @@ PAGE NAVIGATION
 ========================= */
 
 function showToast(msg) {
+  if (!msg) return; // ⛔ nothing to show
+
   const toast = document.getElementById("toast");
+  if (!toast) return; // ⛔ toast element not present
+
   toast.textContent = msg;
   toast.classList.remove("hidden");
-  setTimeout(() => toast.classList.add("hidden"), 2500);
+
+  setTimeout(() => {
+    if (toast) toast.classList.add("hidden");
+  }, 2500);
 }
+
 
 function alert(msg) {
   showToast(msg);   // your toast function

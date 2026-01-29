@@ -47,13 +47,17 @@ function setStatus(status) {
   statusEl.classList.remove("status-ready", "status-progress");
 
   if (status === "Ready") {
-    statusEl.textContent = "Status: Ready";
+    statusEl.dataset.i18n = "statusReady";
     statusEl.classList.add("status-ready");
   } else if (status === "In Progress") {
-    statusEl.textContent = "Status: Round in Progress";
+    statusEl.dataset.i18n = "statusProgress";
     statusEl.classList.add("status-progress");
   }
+
+  // Re-apply translations so text updates immediately
+  setLanguage(currentLang);
 }
+
 
 
 let isLocked = true;
@@ -1317,8 +1321,8 @@ function makeRestButton(player, data, index) {
 
     genderIcon.src =
       player.gender === 'Female'
-        ? 'female.jpg'
-        : 'male.jpg';
+        ? 'female.png'
+        : 'male.png';
 
     genderIcon.alt = player.gender;
     btn.appendChild(genderIcon);
@@ -1408,8 +1412,8 @@ function makePlayerButton(name, teamSide, gameIndex, playerIndex, data, index) {
 
   genderIcon.src =
   player.gender === 'Female'
-    ? 'female.jpg'
-    : 'male.jpg';
+    ? 'female.png'
+    : 'male.png';
 
   genderIcon.alt = player.gender;
   btn.prepend(genderIcon);

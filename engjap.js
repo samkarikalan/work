@@ -22,8 +22,8 @@ const translations = {
     fixedPairs: "Set Fixed Pairs (Optional)",
     add: "Add",
     pround: " Round",
-    nround: "Next Round ",
-    endrounds: "End Session ",
+    nround: "Play Round ",
+    endrounds: "Finish & Next Round ",
     roundno: "Round ",
     roundShort: "R",
     rank: "Rank",
@@ -50,7 +50,10 @@ const translations = {
     confirmResetAll: "Do you want to reset everything?",
     confirmResetGames: "Do you want to reset games only?",
     endRoundsConfirm: "Do you want to end the rounds?",
-    yes: "Yes"
+    yes: "Yes",
+    statusReady: "Status: Ready",
+    statusProgress: "Status: Progress..."
+
    
   },
   
@@ -77,8 +80,9 @@ const translations = {
     fixedPairs: "固定ペア設定（任意）",
     add: "追加",
     pround: " ラウンド",
-    nround: "ラウンド ",
-    endrounds: "終了する ",
+    nround: "ラウンド開始 ",
+    endrounds: "終了して次のラウンド ",
+
     roundno: "ラウンド ",
     roundShort: "R",
     rank: "順位",
@@ -106,7 +110,10 @@ const translations = {
     confirmResetGames: "試合のみをリセットしますか？",
     endRoundsConfirm: "ラウンドを終了しますか？",
     yes: "はい",
-    help: "ヘルプ"
+    help: "ヘルプ",
+    statusReady: "状態: 準備完了",
+    statusProgress: "状態: 進行中..."
+
 
   },
   
@@ -133,8 +140,9 @@ const translations = {
   fixedPairs: "고정 페어 설정 (선택)",
   add: "추가",
   pround: " 라운드",
-  nround: "라운드 ",
-  endrounds: "종료하기 ",  
+  nround: "라운드 시작 ",
+  endrounds: "종료 및 다음 라운드 ",
+  
   roundno: "라운드 ",  
   roundShort: "R",
   rank: "순위",
@@ -162,7 +170,10 @@ const translations = {
   confirmResetGames: "경기만 초기화하시겠습니까?",
   endRoundsConfirm: "라운드를 종료하시겠습니까?",
   yes: "확인",
-  help: "도움말"
+  help: "도움말",
+  statusReady: "상태: 준비 완료",
+  statusProgress: "상태: 진행 중..."
+
 },
   
 vi: {
@@ -188,8 +199,9 @@ vi: {
   fixedPairs: "Cố định cặp đấu (Tùy chọn)",
   add: "Thêm",
   pround: " Vòng",
-  nround: "Vòng ",
-  endrounds: "Kết thúc phiên ",  
+  nround: "Bắt đầu vòng ",
+  endrounds: "Kết thúc & Vòng tiếp theo ",
+
   roundno: "Vòng ",
   roundShort: "R",
   rank: "Xếp hạng",
@@ -217,7 +229,10 @@ vi: {
   confirmResetGames: "Bạn có muốn đặt lại trận đấu không?",
   endRoundsConfirm: "Bạn có muốn kết thúc các vòng không?",
   yes: "Có",
-  help: "Trợ giúp"
+  help: "Trợ giúp",
+  statusReady: "Trạng thái: Sẵn sàng",
+  statusProgress: "Trạng thái: Đang 진행..."
+
 },
   
 zh: {
@@ -243,8 +258,9 @@ zh: {
   fixedPairs: "设置固定搭档（可选）",
   add: "添加",
   pround: " 回合",
-  nround: "回合 ",
-  endrounds: "结束会话 ",  
+  nround: "开始回合 ",
+  endrounds: "结束并进入下一回合 ",
+
   roundno: "回合 ",
   roundShort: "R",
   rank: "排名",
@@ -272,7 +288,10 @@ zh: {
   confirmResetGames: "确定只重置比赛吗？",
   endRoundsConfirm: "确定要结束回合吗？",
   yes: "确定",
-  help: "帮助"
+  help: "帮助",
+  statusReady: "状态: 就绪",
+  statusProgress: "状态: 进行中..."
+
 }
   
   
