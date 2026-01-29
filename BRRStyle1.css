@@ -9,12 +9,35 @@
 .gender-icon.small {
   width: 16px;
   height: 16px;
-}
-.player-dropdown {
-  border: 1px solid #ccc;
+}.player-select {
+  position: relative;
+  border: 1px solid #bbb;
   padding: 6px;
-  max-height: 200px;
+  cursor: pointer;
+  background: #fff;
+}
+
+.player-selected {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.player-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  border: 1px solid #bbb;
+  background: #fff;
+  z-index: 100;
+  max-height: 220px;
   overflow-y: auto;
+  display: none;
+}
+
+.player-menu.open {
+  display: block;
 }
 
 .player-option {
@@ -22,7 +45,6 @@
   align-items: center;
   gap: 6px;
   padding: 6px;
-  cursor: pointer;
 }
 
 .player-option:hover {
