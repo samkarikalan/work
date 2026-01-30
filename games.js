@@ -136,7 +136,237 @@ function getNextFixedPairGames(schedulerState, fixedPairs, numCourts) {
   return games;
 }
 
+function handleEqualRestPlayRound(schedulerState, numPlayersPerRound) {
+  const {
+    activeplayers,
+    lastRound,
+    numCourts,
+    opponentMap,
+    pairPlayedSet,
+  } = schedulerState;
+
+  if (!lastRound || !lastRound.playing || !lastRound.resting) {
+    return null;
+  }
+
+  const prevPlaying = [...lastRound.playing];
+  const prevResting = lastRound.resting.map(r => r.split("#")[0]);
+
+  // 🔁 force 50% swap
+  const swapCount = Math.floor(numPlayersPerRound / 2);
+
+  const newPlaying = [
+    ...prevPlaying.slice(0, swapCount),
+    ...prevResting.slice(0, numPlayersPerRound - swapCount),
+  ];
+
+  const newResting = activeplayers.filter(p => !newPlaying.includes(p));
+
+  const reordered = reorderFreePlayersByLastRound(
+    newPlaying,
+    lastRound,
+    numCourts
+  );
+
+  const neededPairs = numCourts * 2;
+
+  let pairs = findDisjointPairs(
+    reordered,
+    pairPlayedSet,
+    neededPairs,
+    opponentMap
+  );
+
+  // fallback (never fail)
+  if (!pairs || pairs.length < neededPairs) {
+    pairs = [];
+    for (let i = 0; i < reordered.length; i += 2) {
+      if (reordered[i + 1]) {
+        pairs.push([reordered[i], reordered[i + 1]]);
+      }
+    }
+  }
+
+  pairs = shuffle(pairs);
+
+  const games = [];
+  for (let i = 0; i < pairs.length; i += 2) {
+    if (games.length >= numCourts) break;
+    games.push({
+      court: games.length + 1,
+      pair1: pairs[i],
+      pair2: pairs[i + 1],
+    });
+  }
+
+  return { playing: newPlaying, resting: newResting, games };
+}
+
 function AischedulerNextRound(schedulerState) {
+  const {
+    activeplayers,
+    numCourts,
+    fixedPairs,
+    restCount,
+    opponentMap,
+    lastRound,
+  } = schedulerState;
+
+  const totalPlayers = activeplayers.length;
+  const numPlayersPerRound = numCourts * 4;
+  const numResting = Math.max(totalPlayers - numPlayersPerRound, 0);
+
+  // ================= EQUAL REST = PLAY (NEW FIX) =================
+  if (numResting > 0 && numResting === numPlayersPerRound) {
+    const equalResult = handleEqualRestPlayRound(
+      schedulerState,
+      numPlayersPerRound
+    );
+
+    if (equalResult) {
+      schedulerState.roundIndex =
+        (schedulerState.roundIndex || 0) + 1;
+
+      return {
+        round: schedulerState.roundIndex,
+        resting: equalResult.resting.map(p => {
+          const c = restCount.get(p) || 0;
+          return `${p}#${c + 1}`;
+        }),
+        playing: equalResult.playing,
+        games: equalResult.games,
+      };
+    }
+  }
+
+  // ================= ORIGINAL LOGIC (UNCHANGED) =================
+  const fixedPairPlayers = new Set(fixedPairs.flat());
+  let freePlayers = activeplayers.filter(p => !fixedPairPlayers.has(p));
+
+  let resting = [];
+  let playing = [];
+
+  if (fixedPairs.length > 0 && numResting >= 2) {
+    let needed = numResting;
+    const fixedMap = new Map();
+    for (const [a, b] of fixedPairs) {
+      fixedMap.set(a, b);
+      fixedMap.set(b, a);
+    }
+
+    for (const p of schedulerState.restQueue) {
+      if (resting.includes(p)) continue;
+
+      const partner = fixedMap.get(p);
+      if (partner && needed >= 2) {
+        resting.push(p, partner);
+        needed -= 2;
+      } else if (!partner && needed > 0) {
+        resting.push(p);
+        needed -= 1;
+      }
+
+      if (needed <= 0) break;
+    }
+
+    playing = activeplayers.filter(p => !resting.includes(p));
+  } else {
+    const sortedPlayers = [...schedulerState.restQueue];
+    resting = sortedPlayers.slice(0, numResting);
+    playing = activeplayers
+      .filter(p => !resting.includes(p))
+      .slice(0, numPlayersPerRound);
+  }
+
+  const playingSet = new Set(playing);
+  let fixedPairsThisRound = [];
+  for (const pair of fixedPairs) {
+    if (playingSet.has(pair[0]) && playingSet.has(pair[1])) {
+      fixedPairsThisRound.push([pair[0], pair[1]]);
+    }
+  }
+
+  const fixedPairPlayersThisRound = new Set(fixedPairsThisRound.flat());
+  let freePlayersThisRound = playing.filter(
+    p => !fixedPairPlayersThisRound.has(p)
+  );
+
+  freePlayersThisRound = reorderFreePlayersByLastRound(
+    freePlayersThisRound,
+    lastRound,
+    numCourts
+  );
+
+  const requiredPairsCount = Math.floor(numPlayersPerRound / 2);
+  const neededFreePairs =
+    requiredPairsCount - fixedPairsThisRound.length;
+
+  let selectedPairs = findDisjointPairs(
+    freePlayersThisRound,
+    schedulerState.pairPlayedSet,
+    neededFreePairs,
+    opponentMap
+  );
+
+  let finalFreePairs = selectedPairs || [];
+
+  if (finalFreePairs.length < neededFreePairs) {
+    const free = freePlayersThisRound.slice();
+    const used = new Set(finalFreePairs.flat());
+
+    for (let i = 0; i < free.length; i++) {
+      if (used.has(free[i])) continue;
+      for (let j = i + 1; j < free.length; j++) {
+        if (used.has(free[j])) continue;
+        finalFreePairs.push([free[i], free[j]]);
+        used.add(free[i]);
+        used.add(free[j]);
+        break;
+      }
+      if (finalFreePairs.length >= neededFreePairs) break;
+    }
+  }
+
+  let allPairs = shuffle(fixedPairsThisRound.concat(finalFreePairs));
+  let matchupScores = getMatchupScores(allPairs, opponentMap);
+
+  const games = [];
+  const usedPairs = new Set();
+
+  for (const m of matchupScores) {
+    const k1 = m.pair1.join("&");
+    const k2 = m.pair2.join("&");
+    if (usedPairs.has(k1) || usedPairs.has(k2)) continue;
+
+    games.push({
+      court: games.length + 1,
+      pair1: [...m.pair1],
+      pair2: [...m.pair2],
+    });
+
+    usedPairs.add(k1);
+    usedPairs.add(k2);
+    if (games.length >= numCourts) break;
+  }
+
+  schedulerState.roundIndex =
+    (schedulerState.roundIndex || 0) + 1;
+
+  return {
+    round: schedulerState.roundIndex,
+    resting: resting.map(p => {
+      const c = restCount.get(p) || 0;
+      return `${p}#${c + 1}`;
+    }),
+    playing,
+    games,
+  };
+}
+
+
+
+
+function goodAischedulerNextRound(schedulerState) {
   const {
     activeplayers,
     numCourts,
