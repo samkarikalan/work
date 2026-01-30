@@ -229,17 +229,99 @@ function gameFirstNextRound(schedulerState) {
 }
 
 function AischedulerNextRound(schedulerState) {
-  const totalPlayers = schedulerState.activeplayers.length;
-  const numPlayersPerRound = schedulerState.numCourts * 4;
-  const numResting = Math.max(totalPlayers - numPlayersPerRound, 0);
+  const {
+    activeplayers,
+    numCourts,
+    fixedPairs,
+    restCount,
+    opponentMap,
+    lastRound,
+    playCount,
+    pairPlayedSet,
+  } = schedulerState;
 
-  // ✅ Case 1: resting < playing → KEEP EXISTING LOGIC
-  if (numResting < numPlayersPerRound) {
-    return existingAischedulerNextRound(schedulerState);
+  const PLAYERS_PER_ROUND = numCourts * 4;
+
+  const getPlayCount = p => playCount.get(p) || 0;
+
+  // ---------- generate all possible pairs ----------
+  const pairs = [];
+  for (let i = 0; i < activeplayers.length; i++) {
+    for (let j = i + 1; j < activeplayers.length; j++) {
+      pairs.push([activeplayers[i], activeplayers[j]]);
+    }
   }
 
-  // 🔥 Case 2 & 3: resting == playing OR resting > playing
-  return gameFirstNextRound(schedulerState);
+  // ---------- generate all possible games ----------
+  const games = [];
+  for (let i = 0; i < pairs.length; i++) {
+    for (let j = i + 1; j < pairs.length; j++) {
+      const p1 = pairs[i];
+      const p2 = pairs[j];
+
+      const used = new Set([...p1, ...p2]);
+      if (used.size !== 4) continue;
+
+      const pairKey1 = p1.join("&");
+      const pairKey2 = p2.join("&");
+
+      const freshPairs =
+        !pairPlayedSet.has(pairKey1) &&
+        !pairPlayedSet.has(pairKey2);
+
+      const fairness = Math.max(
+        ...[...used].map(getPlayCount)
+      );
+
+      games.push({
+        pair1: p1,
+        pair2: p2,
+        freshness: freshPairs ? 1 : 0,
+        fairness,
+      });
+    }
+  }
+
+  // ---------- SORT (THIS IS THE ALGORITHM) ----------
+  games.sort((a, b) => {
+    // 1️⃣ freshness first
+    if (a.freshness !== b.freshness)
+      return b.freshness - a.freshness;
+
+    // 2️⃣ fewer-played players win
+    if (a.fairness !== b.fairness)
+      return a.fairness - b.fairness;
+
+    return 0;
+  });
+
+  // ---------- select games ----------
+  const selectedGames = [];
+  const usedPlayers = new Set();
+
+  for (const g of games) {
+    const players = [...g.pair1, ...g.pair2];
+    if (players.some(p => usedPlayers.has(p))) continue;
+
+    selectedGames.push({
+      court: selectedGames.length + 1,
+      pair1: g.pair1,
+      pair2: g.pair2,
+    });
+
+    players.forEach(p => usedPlayers.add(p));
+
+    if (selectedGames.length === numCourts) break;
+  }
+
+  const playing = [...usedPlayers];
+  const resting = activeplayers.filter(p => !usedPlayers.has(p));
+
+  return {
+    playing,
+    resting,
+    games: selectedGames,
+  };
 }
 
 // OLD function (unchanged)
