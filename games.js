@@ -18,6 +18,82 @@ const roundStates = {
   }
 };
 
+
+function AischedulerNextRound(schedulerState) {
+  const { activeplayers, numCourts, restCount } = schedulerState;
+
+  // Initialize unique games if not done yet
+  if (!schedulerState.uniqueGames) {
+    const groupCount = activeplayers.length / 4; // 6 groups for 24 players
+    let groups = [];
+    for (let i = 0; i < groupCount; i++) {
+      groups.push(activeplayers.slice(i * 4, i * 4 + 4));
+    }
+
+    schedulerState.uniqueGames = [];
+    schedulerState.seenGames = new Set();
+    schedulerState.currentUniqueIndex = 0;
+
+    // Add a round to uniqueGames
+    function addRound(gr) {
+      for (const g of gr) {
+        const key = [...g].sort((a,b)=>a-b).join("-");
+        if (!schedulerState.seenGames.has(key)) {
+          schedulerState.seenGames.add(key);
+          schedulerState.uniqueGames.push([...g]);
+        }
+      }
+    }
+
+    addRound(groups);
+
+    // Rotation function (shift columns down)
+    function rotateGroups(gr) {
+      const newGr = Array(gr.length).fill(0).map(() => []);
+      for (let pos = 0; pos < 4; pos++) {
+        for (let i = 0; i < gr.length; i++) {
+          const newIndex = (i + 1) % gr.length;
+          newGr[newIndex].push(gr[i][pos]);
+        }
+      }
+      return newGr;
+    }
+
+    while (schedulerState.uniqueGames.length < 46) {
+      groups = rotateGroups(groups);
+      addRound(groups);
+    }
+  }
+
+  // Take next numCourts games for this round
+  const games = [];
+  const start = schedulerState.currentUniqueIndex;
+  const end = start + numCourts;
+  for (let i = start; i < end && i < schedulerState.uniqueGames.length; i++) {
+    const g = schedulerState.uniqueGames[i];
+    games.push({ court: i - start + 1, pair1: g.slice(0,2), pair2: g.slice(2,4) });
+  }
+  schedulerState.currentUniqueIndex += numCourts;
+
+  // Compute playing and resting
+  const playing = games.flatMap(g => g.pair1.concat(g.pair2));
+  const resting = activeplayers.filter(p => !playing.includes(p));
+
+  // Add rest numbers
+  const restingWithNumber = resting.map(p => {
+    const c = restCount.get(p) || 0;
+    return `${p}#${c + 1}`;
+  });
+
+  schedulerState.roundIndex = (schedulerState.roundIndex || 0) + 1;
+
+  return {
+    round: schedulerState.roundIndex,
+    resting: restingWithNumber,
+    playing,
+    games,
+  };
+}
 function toggleRound() {
   const btn = document.getElementById("nextBtn");
   const textEl = document.getElementById("btnText");
@@ -228,7 +304,7 @@ function gameFirstNextRound(schedulerState) {
   };
 }
 
-function AischedulerNextRound(schedulerState) {
+function oldAischedulerNextRound(schedulerState) {
   const {
     activeplayers,
     numCourts,
