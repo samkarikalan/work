@@ -18,8 +18,109 @@ const roundStates = {
   }
 };
 
-
 function AischedulerNextRound(schedulerState) {
+  const {
+    activeplayers,
+    numCourts,
+    restCount,
+    roundIndex = 0,
+  } = schedulerState;
+
+  const PLAYERS_PER_ROUND = numCourts * 4;
+
+  // Initialize uniqueGames list if not already
+  schedulerState.uniqueGames ||= generateAllUniqueGames(activeplayers);
+
+  // Pick next games for this round
+  const games = [];
+  const usedPlayers = new Set();
+
+  for (let i = 0; i < schedulerState.uniqueGames.length && games.length < numCourts; i++) {
+    const g = schedulerState.uniqueGames[i];
+    // Skip if any player already assigned in this round
+    if (g.some(p => usedPlayers.has(p))) continue;
+
+    games.push({
+      court: games.length + 1,
+      pair1: [g[0], g[1]],
+      pair2: [g[2], g[3]],
+    });
+    g.forEach(p => usedPlayers.add(p));
+  }
+
+  // Remove the selected games from uniqueGames
+  schedulerState.uniqueGames = schedulerState.uniqueGames.filter(
+    g => !g.every(p => usedPlayers.has(p))
+  );
+
+  // Fallback: if not enough games, generate using freshness/fairness
+  if (games.length < numCourts) {
+    const remaining = generateGamesFallback(activeplayers, usedPlayers, numCourts - games.length, schedulerState);
+    remaining.forEach(g => {
+      games.push({
+        court: games.length + 1,
+        pair1: g.pair1,
+        pair2: g.pair2,
+      });
+      [...g.pair1, ...g.pair2].forEach(p => usedPlayers.add(p));
+    });
+  }
+
+  // Determine playing and resting
+  const playing = [...usedPlayers];
+  const resting = activeplayers.filter(p => !usedPlayers.has(p));
+
+  // Increment round index
+  schedulerState.roundIndex = (schedulerState.roundIndex || 0) + 1;
+
+  return {
+    round: schedulerState.roundIndex,
+    playing,
+    resting: resting.map(p => {
+      const c = restCount.get(p) || 0;
+      return `${p}#${c + 1}`;
+    }),
+    games,
+  };
+}
+
+// ------------------- HELPERS -------------------
+
+// Generates all unique 4-player games (each combination of 4 players)
+function generateAllUniqueGames(players) {
+  const games = [];
+  const n = players.length;
+  for (let i = 0; i < n; i++) {
+    for (let j = i + 1; j < n; j++) {
+      for (let k = j + 1; k < n; k++) {
+        for (let l = k + 1; l < n; l++) {
+          games.push([players[i], players[j], players[k], players[l]]);
+        }
+      }
+    }
+  }
+  return games;
+}
+
+// Fallback generator for when unique games exhausted
+function generateGamesFallback(activeplayers, usedPlayers, numGames, schedulerState) {
+  const games = [];
+  const remaining = activeplayers.filter(p => !usedPlayers.has(p));
+
+  while (games.length < numGames && remaining.length >= 4) {
+    const g = remaining.splice(0, 4);
+    games.push({ pair1: [g[0], g[1]], pair2: [g[2], g[3]] });
+  }
+
+  // If still not enough, allow repeats from activeplayers
+  while (games.length < numGames) {
+    const g = activeplayers.slice(0, 4);
+    games.push({ pair1: [g[0], g[1]], pair2: [g[2], g[3]] });
+  }
+
+  return games;
+}
+function xxxxxx(schedulerState) {
   const { activeplayers, numCourts, restCount } = schedulerState;
 
   // Initialize unique games if not done yet
