@@ -52,9 +52,27 @@ const translations = {
     endRoundsConfirm: "Do you want to end the rounds?",
     yes: "Yes",
     statusReady: "Status: Ready",
-    statusProgress: "Status: Progress..."
+    statusProgress: "Status: Progress...",
 
-   
+    tooltips: {
+      home: "Go to home screen",
+      players: "Manage players list",
+      rounds: "View and play rounds",
+      summary: "View match summary",
+      resetAll: "Reset the entire app data",
+      resetExcept: "Reset games but keep players",
+      enterCourts: "Set number of available courts",
+      importPlayers: "Import players using CSV format",
+      fixedPairs: "Lock two players as permanent partners",
+      addPlayer: "Add a new player",
+      nround: "Generate and play next round",
+      endrounds: "Finish all rounds and stop scheduling",
+      exporthtml: "Export match summary as HTML",
+      theme: "Switch app theme",
+      fontSize: "Change text size",
+      Timer: "Set match timer",
+      help: "Open help information"
+    }
   },
   
   jp: {
@@ -112,7 +130,27 @@ const translations = {
     yes: "はい",
     help: "ヘルプ",
     statusReady: "状態: 準備完了",
-    statusProgress: "状態: 進行中..."
+    statusProgress: "状態: 進行中...",
+
+    tooltips: {
+  home: "ホーム画面へ移動",
+  players: "選手一覧を管理",
+  rounds: "ラウンドを表示・開始",
+  summary: "試合結果を表示",
+  resetAll: "すべてのデータをリセット",
+  resetExcept: "試合のみリセット",
+  enterCourts: "使用するコート数を設定",
+  importPlayers: "CSVで選手を取り込み",
+  fixedPairs: "固定ペアを設定",
+  addPlayer: "新しい選手を追加",
+  nround: "次のラウンドを開始",
+  endrounds: "全ラウンドを終了",
+  exporthtml: "試合概要をHTMLで出力",
+  theme: "テーマを変更",
+  fontSize: "文字サイズを変更",
+  Timer: "試合タイマー設定",
+  help: "ヘルプを表示"
+}
 
 
   },
@@ -172,7 +210,27 @@ const translations = {
   yes: "확인",
   help: "도움말",
   statusReady: "상태: 준비 완료",
-  statusProgress: "상태: 진행 중..."
+  statusProgress: "상태: 진행 중...",
+
+  tooltips: {
+  home: "홈 화면으로 이동",
+  players: "선수 목록 관리",
+  rounds: "라운드 보기 및 진행",
+  summary: "경기 요약 보기",
+  resetAll: "모든 데이터 초기화",
+  resetExcept: "경기만 초기화",
+  enterCourts: "사용할 코트 수 설정",
+  importPlayers: "CSV로 선수 가져오기",
+  fixedPairs: "고정 페어 설정",
+  addPlayer: "새 선수 추가",
+  nround: "다음 라운드 시작",
+  endrounds: "모든 라운드 종료",
+  exporthtml: "HTML 요약 내보내기",
+  theme: "테마 변경",
+  fontSize: "글자 크기 변경",
+  Timer: "경기 타이머 설정",
+  help: "도움말 열기"
+}
 
 },
   
@@ -231,7 +289,27 @@ vi: {
   yes: "Có",
   help: "Trợ giúp",
   statusReady: "Trạng thái: Sẵn sàng",
-  statusProgress: "Trạng thái: Đang 진행..."
+  statusProgress: "Trạng thái: Đang 진행...",
+
+  tooltips: {
+  home: "Quay về trang chủ",
+  players: "Quản lý danh sách người chơi",
+  rounds: "Xem và chơi vòng đấu",
+  summary: "Xem tóm tắt trận đấu",
+  resetAll: "Đặt lại toàn bộ dữ liệu",
+  resetExcept: "Chỉ đặt lại trận đấu",
+  enterCourts: "Thiết lập số sân",
+  importPlayers: "Nhập người chơi từ CSV",
+  fixedPairs: "Cố định cặp người chơi",
+  addPlayer: "Thêm người chơi mới",
+  nround: "Bắt đầu vòng tiếp theo",
+  endrounds: "Kết thúc tất cả vòng đấu",
+  exporthtml: "Xuất tóm tắt HTML",
+  theme: "Thay đổi chủ đề",
+  fontSize: "Thay đổi cỡ chữ",
+  Timer: "Cài đặt hẹn giờ",
+  help: "Mở trợ giúp"
+}
 
 },
   
@@ -290,7 +368,27 @@ zh: {
   yes: "确定",
   help: "帮助",
   statusReady: "状态: 就绪",
-  statusProgress: "状态: 进行中..."
+  statusProgress: "状态: 进行中...",
+
+  tooltips: {
+  home: "返回首页",
+  players: "管理球员列表",
+  rounds: "查看并进行回合",
+  summary: "查看比赛汇总",
+  resetAll: "重置所有数据",
+  resetExcept: "仅重置比赛",
+  enterCourts: "设置场地数量",
+  importPlayers: "通过CSV导入球员",
+  fixedPairs: "设置固定搭档",
+  addPlayer: "添加新球员",
+  nround: "开始下一回合",
+  endrounds: "结束所有回合",
+  exporthtml: "导出HTML汇总",
+  theme: "切换主题",
+  fontSize: "调整字体大小",
+  Timer: "设置比赛计时器",
+  help: "打开帮助"
+}
 
 }
   
