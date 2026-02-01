@@ -17,29 +17,28 @@
   <script src="rounds.js" defer></script>
   <script src="games.js" defer></script>
   <script src="engjap.js" defer></script>
-  <!--<script src="timer.js" defer></script>-->
   <script src="summary.js" defer></script>
   <script src="help.js" defer></script>
   <script src="ExportCSS.js" defer></script>
-  <!--
-  <script src="SaveRestore.js" defer></script> -->
-
-  
 </head>
 
 <body>
-  <div class="top-bar">
-  <span class="menu-btn" onclick="showPage('homePage', this)">☰</span>
+
+<div class="top-bar">
+  <span class="menu-btn"
+        onclick="showPage('homePage', this)"
+        data-tooltip="home">☰</span>
 
   <span class="app-logo-premium">CLUB Scheduler</span>
 
-  <!-- Flag button ONLY -->
   <div class="lang-wrapper">
-    <button class="lang-btn" onclick="toggleLangMenu()" aria-label="Language">
+    <button class="lang-btn"
+            onclick="toggleLangMenu()"
+            aria-label="Language"
+            data-tooltip="language">
       <span id="currentFlag">🇺🇸</span>
     </button>
 
-    <!-- Custom menu -->
     <div class="lang-menu" id="langMenu">
       <div data-lang="en" data-flag="🇺🇸">🇺🇸 English</div>
       <div data-lang="jp" data-flag="🇯🇵">🇯🇵 日本語</div>
@@ -50,276 +49,162 @@
   </div>
 </div>
 
-
-<!-- ============================= -->
-<!--       TOP TAB NAVIGATION      -->
-<!-- ============================= -->
 <div class="top-tabs">
-  <!-- Tabs container -->
   <div class="tabs-container">
-    <button class="tab-btn active" onclick="showPage('page1', this)" data-i18n="players"></button>
-    <button class="tab-btn" onclick="showPage('page2', this)" data-i18n="rounds"></button>
-    <button class="tab-btn" onclick="showPage('page3', this)" data-i18n="summary"></button>
-    <button class="tab-btn" onclick="showPage('page4', this)" data-i18n="help"></button>
-  </div> 
+    <button class="tab-btn active"
+            onclick="showPage('page1', this)"
+            data-i18n="players"
+            data-tooltip="players"></button>
 
+    <button class="tab-btn"
+            onclick="showPage('page2', this)"
+            data-i18n="rounds"
+            data-tooltip="rounds"></button>
+
+    <button class="tab-btn"
+            onclick="showPage('page3', this)"
+            data-i18n="summary"
+            data-tooltip="summary"></button>
+
+    <button class="tab-btn"
+            onclick="showPage('page4', this)"
+            data-i18n="help"
+            data-tooltip="help"></button>
+  </div>
 </div>
 
-<!-- ============================= -->
-<!--           HOME PAGE           -->
-<!-- ============================= -->
+<!-- HOME -->
 <div id="homePage" class="page" style="display:none;">
   <div class="settings-wrap">
 
-    <!-- Font Size -->
-    <div class="settings-card card-font">
+    <div class="settings-card card-font" data-tooltip="fontSize">
       <div class="sec" data-i18n="fontSize"></div>
       <div class="row">
-        <div class="btn active" id="font_small" onclick="setFontSize('small')" data-i18n="small"></div>
-        <div class="btn" id="font_medium" onclick="setFontSize('medium')" data-i18n="medium"></div>
-        <div class="btn" id="font_large" onclick="setFontSize('large')" data-i18n="large"></div>
+        <div class="btn active" onclick="setFontSize('small')" data-i18n="small"></div>
+        <div class="btn" onclick="setFontSize('medium')" data-i18n="medium"></div>
+        <div class="btn" onclick="setFontSize('large')" data-i18n="large"></div>
       </div>
     </div>
 
-    <!-- Theme -->
-    <div class="settings-card card-theme">
+    <div class="settings-card card-theme" data-tooltip="theme">
       <div class="sec" data-i18n="theme"></div>
       <div class="row">
-        <div class="btn active" id="theme_light" onclick="setTheme('light')" data-i18n="light"></div>
-        <div class="btn" id="theme_dark" onclick="setTheme('dark')" data-i18n="dark"></div>
+        <div class="btn active" onclick="setTheme('light')" data-i18n="light"></div>
+        <div class="btn" onclick="setTheme('dark')" data-i18n="dark"></div>
       </div>
     </div>
 
-    <!-- Reset -->
-    <!-- Reset -->
-    <div class="settings-card card-reset">
+    <div class="settings-card card-reset" data-tooltip="reset">
       <div class="sec" data-i18n="reset"></div>
       <div class="row">
         <div class="btn danger"
-           onclick="showConfirm('confirmResetAll', ResetAll)"
-           data-i18n="resetAll">
-        </div>
+             onclick="showConfirm('confirmResetAll', ResetAll)"
+             data-i18n="resetAll"
+             data-tooltip="resetAll"></div>
 
         <div class="btn warn"
-           onclick="showConfirm('confirmResetGames', resetRounds)"
-           data-i18n="resetExcept">
-        </div>
-       </div>
+             onclick="showConfirm('confirmResetGames', resetRounds)"
+             data-i18n="resetExcept"
+             data-tooltip="resetExcept"></div>
+      </div>
     </div>
 
-        <!-- Export / Save -->
-    <div class="settings-card card-export">
+    <div class="settings-card card-export" data-tooltip="export">
       <div class="sec" data-i18n="export"></div>
       <div class="row">
-        <div class="btn" onclick="exportBRR2HTML()" 
-          data-i18n="exporthtml">  📄 
-        </div>
+        <div class="btn"
+             onclick="exportBRR2HTML()"
+             data-i18n="exporthtml"
+             data-tooltip="exporthtml">📄</div>
       </div>
-    </div>  
+    </div>
 
-    
   </div>
 </div>
 
-
-<div id="confirmOverlay" class="confirm-overlay hidden">
-  <div class="confirm-box">
-    <div class="confirm-title" id="confirmTitle"></div>
-
-    <div class="confirm-actions">
-      <button class="btn cancel" id="confirmCancel"></button>
-      <button class="btn danger" id="confirmYes"></button>
-    </div>
+<!-- PLAYERS -->
+<div id="page1" class="page">
+  <div class="card">
+    <button onclick="showImportModal()"
+            data-i18n="importPlayers"
+            data-tooltip="importPlayers"></button>
   </div>
-</div>  
-<!--           PAGE 1              -->
-<!--         Players Page          -->
-<!-- ============================= -->
-<div id="page1" class="page" > 
-
-  <div class="card">    
-    <button onclick="showImportModal()" data-i18n="importPlayers"></button>
-  </div> 
 
   <div class="card">
     <input type="text"
-      id="player-name"
-      data-i18n-placeholder="enterPlayerName">
+           id="player-name"
+           data-i18n-placeholder="enterPlayerName"
+           data-tooltip="addPlayer">
 
-    <div class="row-addplayer">  
+    <div class="row-addplayer">
       <select id="player-gender">
         <option value="Male" data-i18n="male"></option>
         <option value="Female" data-i18n="female"></option>
       </select>
-      <button class="add-button" onclick="addPlayer()" data-i18n="addPlayer"></button>
+      <button class="add-button"
+              onclick="addPlayer()"
+              data-i18n="addPlayer"
+              data-tooltip="addPlayer"></button>
     </div>
   </div>
 
   <div class="card">
-    <div id="playerList" class="player-list"></div>
-  </div>
-
-  <div class="card">
-    <h3 data-i18n="fixedPairs"></h3>
+    <h3 data-i18n="fixedPairs" data-tooltip="fixedPairs"></h3>
     <select id="fixed-pair-1"></select>
     <select id="fixed-pair-2"></select>
     <button onclick="modifyFixedPair()" data-i18n="add"></button>
-
-    <div id="fixed-pair-list" class="fixed-pairs-list"></div>
   </div>
+</div>
 
-</div> <!-- page1 -->
-
-<!-- ============================= -->
-<!--           PAGE 2              -->
-<!--           Rounds Page         -->
-<!-- ============================= -->
-<div id="page2" class="page" style="display:none;">  
+<!-- ROUNDS -->
+<div id="page2" class="page" style="display:none;">
   <div class="title-card">
     <div id="roundTitle">R</div>
-    <img id="lockToggleBtn" class="lock-icon" src="lock.png" alt="Lock" />
+    <img id="lockToggleBtn" class="lock-icon" src="lock.png" alt="Lock">
   </div>
-  
-  <div id="game-results"></div>  
-  <div class="row-field">  
-    <div class="court-card">
-      <label for="num-courts" class="row-label" data-i18n="courts"></label>
-      <button class="circle-btn" id="courtMinus">−</button>
+
+  <div class="row-field">
+    <div class="court-card" data-tooltip="enterCourts">
+      <label data-i18n="courts"></label>
+      <button class="circle-btn">−</button>
       <span id="num-courts">1</span>
-      <button class="circle-btn" id="courtPlus">+</button>
-    </div>    
-    
-    <!-- Timer Icon -->
-    <div class="status-card">     
-      <span class="status-display" id="statusDisplay">Status: Ready</span>      
+      <button class="circle-btn">+</button>
+    </div>
+
+    <div class="status-card">
+      <span class="status-display"
+            id="statusDisplay"
+            data-tooltip="Timer">Status: Ready</span>
     </div>
   </div>
 
   <div class="action-card">
-  <!-- LEFT : Mix / Refresh (secondary) --> 
-    
-    <button
-    class="action mid small"
-    id="roundShufle"
-    onclick="RefreshRound()"
-    aria-label="Mix round"
-  >
-    ⟳
-  </button>
+    <button class="action mid small"
+            onclick="RefreshRound()"
+            data-tooltip="rounds">⟳</button>
 
-  <!-- RIGHT : Next (primary) -->
-<button id="nextBtn" class="action right primary" onclick="toggleRound()">
-  <span id="btnText" data-i18n="nround"></span>
-  <span class="icon">▶</span>
-</button>
-
-
-
-
+    <button class="action right primary"
+            onclick="toggleRound()"
+            data-tooltip="nround">
+      <span data-i18n="nround"></span> ▶
+    </button>
+  </div>
 </div>
 
-  
-</div>
-
-  
-  
-
-    
-  
- </div>   
-
-
-
-
-
-
-
-<!-- Timer Sound -->
-<audio id="timerSound">
-  <source src="timer.mp3" type="audio/mpeg">
-</audio>
- 
-
-<!-- ============================= -->
-<!--           PAGE 3              -->
-<!--        Summary / Report       -->
-<!-- ============================= -->
+<!-- SUMMARY -->
 <div id="page3" class="page" style="display:none;">
   <div id="reportContainer"></div>
-  <div id="export"></div>
 </div>
 
+<!-- HELP -->
 <div id="page4" class="page" style="display:none;">
   <div class="help-buttons">
-    <button class="help-btn active" onclick="loadHelp('players')" data-i18n="players"></button>
-    <button class="help-btn" onclick="loadHelp('rounds')" data-i18n="rounds"></button>
-    <button class="help-btn" onclick="loadHelp('summary')" data-i18n="summary"></button>
+    <button onclick="loadHelp('players')" data-i18n="players" data-tooltip="players"></button>
+    <button onclick="loadHelp('rounds')" data-i18n="rounds" data-tooltip="rounds"></button>
+    <button onclick="loadHelp('summary')" data-i18n="summary" data-tooltip="summary"></button>
   </div>
   <div id="helpContainer"></div>
 </div>
-  
-<!-- ============================= -->
-<!--           Import Modal        -->
-<!-- ============================= -->
-  <!-- Import Modal -->
-  <div id="importModal">
-  <div class="modal-content">
 
-    <!-- Left Section -->
-    <textarea
-      id="players-textarea"
-      rows="12"
-      data-i18n-placeholder="importExample"
-      placeholder="Enter or paste player names"
-    ></textarea>
-
-    <!-- Right Section -->
-    <div class="modal-right">
-
-      <!-- Gender -->
-      <div class="gender-radio" data-i18n="gender"></div>
-      <div class="gender-radio">
-        <label>
-          <input type="radio" name="genderSelect" value="Male" checked>
-          <span data-i18n="male"></span>
-        </label>
-        <label>
-          <input type="radio" name="genderSelect" value="Female">
-          <span data-i18n="female"></span>
-        </label>
-      </div>
-
-      <!-- Action Buttons -->
-      <div class="modal-buttons">
-
-        <!-- 📋 Paste (NEW) 
-        <button
-          class="paste-btn"
-          onclick="pastePlayersText()"
-        >📋 Paste</button> -->
-
-        <!-- ⬇️ Import (existing) -->
-        <button
-          class="ok-btn"
-          onclick="addPlayersFromText()"
-          data-i18n="import"
-        ></button>
-
-        <!-- ✖ Cancel (existing) -->
-        <button
-          class="cancel-btn"
-          onclick="hideImportModal()"
-          data-i18n="cancel"
-        ></button>
-
-      </div>
-
-    </div>
-
-  </div>
-</div>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
-  
 </body>
 </html>
