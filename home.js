@@ -150,6 +150,10 @@ function setLanguage(lang) {
   });
   
    loadHelp(currentHelpSection);
+
+	if (typeof applyTooltips === "function") {
+  applyTooltips(lang);
+}
 }
 
 function updateRoundTitle(round) {
