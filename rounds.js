@@ -5,6 +5,8 @@ let currentRoundIndex = 0;
 let isOnPage2 = false;
 let resetRest = false;
 
+
+	
 let schedulerState = {
     numCourts: 0,
     allPlayers: [],
@@ -21,6 +23,8 @@ let schedulerState = {
 	pairPlayedSet: new Set(),
     gamesMap: new Map(), // 🆕 per-player opponent tracking
 	markingWinnerMode: false,
+	winCount: new Map(), // 🏆 Track player wins
+	pairCooldownMap: new Map(),
 };
 
 schedulerState.activeplayers = new Proxy([], {
@@ -245,8 +249,14 @@ function initScheduler(numCourts) {
     schedulerState.fixedMap.set(b, a);
   });
     schedulerState.restQueue = createRestQueue();
+	 // ✅ Competitive ranking points
+  schedulerState.rankPoints = new Map(
+    schedulerState.activeplayers.map(p => [p, 0])
+  );
     
 }
+
+
 function updateScheduler() {
    schedulerState.opponentMap = new Map();
   for (const p1 of schedulerState.activeplayers) {
@@ -498,6 +508,34 @@ for (const game of games) {
   gamesMap.add(gameKey);
 }
 
+/// 7️⃣ 🏆 Update COMPETITIVE RANK POINTS (+2 / -2)
+if (getPlayMode() === "competitive") {
+  for (const game of games) {
+    if (!game.winner) continue;
+
+    const winners = game.winner === 'L' ? game.pair1 : game.pair2;
+    const losers  = game.winner === 'L' ? game.pair2 : game.pair1;
+
+    for (const p of winners) {
+      schedulerState.rankPoints.set(
+        p,
+        (schedulerState.rankPoints.get(p) || 0) + 2
+      );
+	  schedulerState.winCount.set(
+	    p,
+	    (schedulerState.winCount.get(p) || 0) + 1
+	  );	
+    }
+
+    for (const p of losers) {
+      schedulerState.rankPoints.set(
+        p,
+        (schedulerState.rankPoints.get(p) || 0) - 2
+      );
+    }
+  }
+}
+
 // after tracking pairs & games
 checkAndResetPairCycle(schedulerState, games, roundIndex);
 	// ✅ EXECUTE ONLY WHEN BOTH CONDITIONS ARE TRUE
@@ -549,7 +587,70 @@ function RefreshRound() {
     allRounds[allRounds.length - 1] = newRound;
     showRound(currentRoundIndex);
 }
+
 function report() {
+  const container = document.getElementById("reportContainer");
+  container.innerHTML = "";
+
+  const playMode = getPlayMode(); // "competitive" | "random"
+
+  /* ===== HEADER ===== */
+  const header = document.createElement("div");
+  header.className = "report-header";
+  header.innerHTML = `
+    <div class="header-rank" data-i18n="rank">Rank</div>
+    <div class="header-name" data-i18n="name">Name</div>
+    <div class="header-wins" data-i18n="wins">Wins</div>
+    <div class="header-played" data-i18n="played">Played</div>
+    <div class="header-rested" data-i18n="rested">Rested</div>
+  `;
+  container.appendChild(header);
+
+  /* ===== SORT LOGIC ===== */
+  let sortedPlayers = [...schedulerState.allPlayers];
+
+  if (playMode === "competitive") {
+    // 🔥 PURE WINS LADDER
+    sortedPlayers.sort((a, b) => {
+      const wA = schedulerState.winCount.get(a.name) || 0;
+      const wB = schedulerState.winCount.get(b.name) || 0;
+      return wB - wA;
+    });
+  } else {
+    // 🎲 EXISTING FAIRNESS MODE
+    sortedPlayers.sort((a, b) => {
+      const playedA = schedulerState.PlayedCount.get(a.name) || 0;
+      const playedB = schedulerState.PlayedCount.get(b.name) || 0;
+      if (playedB !== playedA) return playedB - playedA;
+
+      const restA = schedulerState.restCount.get(a.name) || 0;
+      const restB = schedulerState.restCount.get(b.name) || 0;
+      return restB - restA;
+    });
+  }
+
+  /* ===== RENDER ===== */
+  sortedPlayers.forEach((p, index) => {
+    const wins = schedulerState.winCount.get(p.name) || 0;
+    const played = schedulerState.PlayedCount.get(p.name) || 0;
+    const rest = schedulerState.restCount.get(p.name) || 0;
+
+    const card = document.createElement("div");
+    card.className = "player-card";
+    card.innerHTML = `
+      <div class="rank">#${index + 1}</div>
+      <div class="name">${p.name}</div>
+      <div class="stat wins">${wins}</div>
+      <div class="stat played">${played}</div>
+      <div class="stat rest">${rest}</div>
+    `;
+    container.appendChild(card);
+  });
+
+  setLanguage(currentLang);
+}
+
+function workedreport() {
   const container = document.getElementById("reportContainer");
   container.innerHTML = ""; // Clear old cards
 

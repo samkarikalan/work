@@ -1,10 +1,8 @@
 function renderRounds() {
   const exportRoot = document.getElementById('export');
   exportRoot.innerHTML = '';
-  
-  allRounds.slice(0, -1).forEach((data) => {
-  //allRounds.forEach((data) => {
 
+  allRounds.slice(0, -1).forEach((data) => {
     /* ───────── Round Container ───────── */
     const roundDiv = document.createElement('div');
     roundDiv.className = 'export-round';
@@ -12,7 +10,7 @@ function renderRounds() {
     /* ───────── Round Title ───────── */
     const title = document.createElement('div');
     title.className = 'export-round-title';
-    title.textContent = data.round; // existing variable
+    title.textContent = data.round;
     roundDiv.appendChild(title);
 
     /* ───────── Matches ───────── */
@@ -32,6 +30,21 @@ function renderRounds() {
       rightTeam.className = 'export-team';
       rightTeam.innerHTML = game.pair2.join('<br>');
 
+      // ✅ Add 🏆 to the winning team
+      if (game.winners && Array.isArray(game.winners)) {
+        const leftWins = game.pair1.filter(p => game.winners.includes(p)).length;
+        const rightWins = game.pair2.filter(p => game.winners.includes(p)).length;
+
+       if (leftWins > rightWins) {
+          leftTeam.classList.add('winner');
+        } else if (rightWins > leftWins) {
+          rightTeam.classList.add('winner');
+        } else if (leftWins > 0 && leftWins === rightWins) {
+          leftTeam.classList.add('winner');
+          rightTeam.classList.add('winner');
+        }
+      }
+
       match.append(leftTeam, vs, rightTeam);
       roundDiv.appendChild(match);
     });
@@ -39,14 +52,14 @@ function renderRounds() {
     /* ───────── Sitting Out Section ───────── */
     const restTitle = document.createElement('div');
     restTitle.className = 'export-rest-title';
-    restTitle.textContent = t('sittingOut'); // ✅ translated
+    restTitle.textContent = t('sittingOut'); 
     roundDiv.appendChild(restTitle);
 
     const restBox = document.createElement('div');
     restBox.className = 'export-rest-box';
 
     if (!data.resting || data.resting.length === 0) {
-      restBox.textContent = t('none'); // ✅ translated
+      restBox.textContent = t('none'); 
     } else {
       restBox.innerHTML = data.resting.join(', ');
     }
@@ -57,24 +70,137 @@ function renderRounds() {
   });
 }
 
+// ExportCSS.js
+
+async function createSummaryCSS() {
+  return `
+/* Summary */
+.report-header,
+.player-card {
+  display: grid;
+  grid-template-columns: 50px 1fr minmax(60px, auto) minmax(60px, auto) minmax(60px, auto);
+  align-items: center;
+  gap: 10px;
+}
+
+/* Header styling */
+.report-header {
+  margin: 5px 0;
+  background: #800080;
+  font-weight: bold;
+  color: #fff;
+  padding: 6px;
+  border-radius: 6px;
+  margin-bottom: 1px;
+  position: sticky;
+  z-index: 10;
+}
+
+/* Player card styling */
+.player-card {
+  background: #296472;
+  color: #fff;
+  padding: 2px;
+  margin: 5px 0;
+  border-radius: 1.1rem;
+  border: 1px solid #555;
+  box-shadow: 0 0 4px rgba(0,0,0,0.4);
+}
+
+/* Rank styling */
+.player-card .rank {
+  text-align: center;
+  font-size: 1.1rem;
+  font-weight: bold;
+}
+
+/* Name column */
+.player-card .name {
+  font-size: 1.1rem;
+  padding-left: 6px;
+}
+
+
+.export-round {
+  margin: 15px 3px 3px;
+  border: 3px solid #800080;
+}
+
+.export-round-title {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 16px;
+  border-bottom: 1px solid #000;
+  padding-bottom: 4px;
+  text-align: center;
+}
+
+.export-match {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 5px;
+}
+
+.export-team {
+  position: relative;           /* allow positioning of trophy */
+  padding: 10px 25px 10px 10px; /* top/right/bottom/left; right space for trophy */
+  display: flex;                /* use flex for centering and spacing */
+  flex-direction: column;       /* stack players vertically */
+  align-items: center;          /* center horizontally */
+  justify-content: center;      /* center vertically */
+  border: 2px solid #333;    /* boundary */
+  border-radius: 8px;           /* optional rounded corners */
+  width: 37%;             /* ensures all boxes roughly same size */
+  background-color:none;    /* optional light background */
+  text-align: center;           /* center text inside */
+}
+
+/* Trophy on the right for winning team */
+.export-team::after {
+  content: '🏆';
+  position: absolute;
+  right: 5px;                   /* stick to right edge */
+  top: 50%;                     /* vertically center */
+  transform: translateY(-50%);
+  display: none;                 /* hidden by default */
+}
+
+.export-team.winner::after {
+  display: inline-block;
+}
 
 
 
-function isAndroidWebView() {
-  return (
-    /Android/i.test(navigator.userAgent) &&
-    /wv/.test(navigator.userAgent)
-  );
+.export-vs {
+  width: 10%;
+  text-align: center;
+  font-weight: 600;
+}
+
+/* Sitting out */
+.export-rest-title {
+  margin: 5px;
+  font-weight: 600;
+}
+
+.export-rest-box {
+  margin: 5px;
+  font-size: 13px;
+}
+
+`;
 }
 
 async function exportBRR2HTML() {
-showPage('page3');
-await new Promise(r => setTimeout(r, 300));
+  const SUMMARY_CSS = await createSummaryCSS();
+  showPage('page3');
+  await new Promise(r => setTimeout(r, 300));
 
-const page = document.getElementById('page3');
-if (!page) return alert("Export page not found");
+  const page = document.getElementById('page3');
+  if (!page) return alert("Export page not found");
 
-const html = `
+  const html = `
 <!DOCTYPE html>
 <html>
 <head>
@@ -91,259 +217,34 @@ ${page.outerHTML}
 </html>
 `;
 
-Android.saveHtml(html);
-}
-
-async function exportBRR2HTMLbk() {
-  showPage('page3');
-  await new Promise(r => setTimeout(r, 300));
-
-  const page = document.getElementById('page3');
-  if (!page) return alert("Export page not found");
-
-  let css = '';
-  for (const sheet of document.styleSheets) {
-    try {
-      for (const rule of sheet.cssRules) {
-        css += rule.cssText + '\n';
-      }
-    } catch {}
+  // ✅ Android WebView
+  if (window.Android && typeof Android.saveHtml === "function") {
+    Android.saveHtml(html);
   }
 
-  const html = `
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>BRR Export</title>
-<style>${css}</style>
-</head>
-<body>
-${page.outerHTML}
-</body>
-</html>
-`;
-
-  Android.saveHtml(html);
-}
-
-
-async function exportBRR2pdf() {
-    showPage('page3');
-  await new Promise(r => setTimeout(r, 400));
-
-  const page1 = document.getElementById('page3');
-  if (!page1 || page1.offsetHeight === 0) {
-    alert('page1 not visible');
-    return;
+  // ✅ iOS WebView (if you implemented message handler)
+  else if (window.webkit && window.webkit.messageHandlers?.saveHtml) {
+    window.webkit.messageHandlers.saveHtml.postMessage(html);
   }
 
+  // ✅ Normal browser fallback (download file)
+  else {
+    const blob = new Blob([html], { type: "text/html" });
+    const url = URL.createObjectURL(blob);
 
-  const { jsPDF } = window.jspdf;
-  const pdf = new jsPDF('p', 'px', 'a4');
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "BRR_Export.html";
+    a.click();
 
-  // Save original styles
-  const originalOverflow = page1.style.overflow;
-  const originalHeight = page1.style.height;
-  page1.style.overflow = 'visible';
-  page1.style.height = 'auto';
-  await new Promise(r => setTimeout(r, 100));
-
-  const canvas = await html2canvas(page1, {
-    scale: 1,
-    useCORS: true,
-    backgroundColor: '#ffffff'
-  });
-
-  // Restore styles
-  page1.style.overflow = originalOverflow;
-  page1.style.height = originalHeight;
-
-  const imgData = canvas.toDataURL('image/png');
-  const pdfWidth = pdf.internal.pageSize.getWidth();
-  const pdfHeight = pdf.internal.pageSize.getHeight();
-
-  // Height of canvas in PDF units
-  const canvasWidth = canvas.width;
-  const canvasHeight = canvas.height;
-  const ratio = pdfWidth / canvasWidth;
-  const pdfCanvasHeight = canvasHeight * ratio;
-
-  let remainingHeight = pdfCanvasHeight;
-  let position = 0;
-
-  while (remainingHeight > 0) {
-    const pageHeight = Math.min(remainingHeight, pdfHeight);
-
-    pdf.addImage(
-      imgData,
-      'PNG',
-      0,
-      position, // vertical position in PDF
-      pdfWidth,
-      pdfCanvasHeight
-    );
-
-    remainingHeight -= pdfHeight;
-    if (remainingHeight > 0) pdf.addPage();
-    position -= pdfHeight; // shift next page up
+    URL.revokeObjectURL(url);
   }
-
-  pdf.save('page1_multi.pdf');
-}
-
-
-
-async function waexportBRR2pdf() {
-
-  const { jsPDF } = window.jspdf;
-  const pdf = new jsPDF('p', 'px', 'a4');
-
-  const page1 = document.getElementById('page1');
-  const page3 = document.getElementById('page3');
-
-  if (!page1 || !page3) {
-    alert('Pages not found');
-    return;
-  }
-
-  // ---------- PAGE 1 ----------
-  page1.scrollIntoView({ behavior: 'auto' });
-  await new Promise(r => setTimeout(r, 300)); // wait for paint
-
-  let canvas1 = await html2canvas(page1, {
-    scale: 1,
-    useCORS: true,
-    backgroundColor: '#ffffff'
-  });
-
-  let img1 = canvas1.toDataURL('image/png');
-  let w = pdf.internal.pageSize.getWidth();
-  let h1 = (canvas1.height * w) / canvas1.width;
-
-  pdf.addImage(img1, 'PNG', 0, 0, w, h1);
-
-  // ---------- PAGE 3 ----------
-  page3.scrollIntoView({ behavior: 'auto' });
-  await new Promise(r => setTimeout(r, 300)); // wait for paint
-
-  let canvas3 = await html2canvas(page3, {
-    scale: 1,
-    useCORS: true,
-    backgroundColor: '#ffffff'
-  });
-
-  let img3 = canvas3.toDataURL('image/png');
-  let h3 = (canvas3.height * w) / canvas3.width;
-
-  pdf.addPage();
-  pdf.addImage(img3, 'PNG', 0, 0, w, h3);
-
-  pdf.save('Page1_Page3.pdf');
 }
 
 
 
 
 
-async function bestexportAllRoundsToPDF() {
-  if (!allRounds || allRounds.length === 0) {
-    alert('No rounds to export');
-    return;
-  }
 
-  const originalRoundIndex = currentRoundIndex ?? 0;
 
-  // 🔹 Temporary container for PDF
-  const exportContainer = document.createElement('div');
-  exportContainer.style.width = '210mm';
-  exportContainer.style.background = '#fff';
-  document.body.appendChild(exportContainer);
 
-  /* =========================
-     1️⃣ PLAYERS PAGE
-  ========================= */
-  const page1 = document.getElementById('page1');
-  if (page1) {
-    const clone = page1.cloneNode(true);
-    clone.style.display = 'block';
-    clone.style.pageBreakAfter = 'always';
-
-    clone.prepend(makeTitle('Players'));
-    exportContainer.appendChild(clone);
-  }
-
-  /* =========================
-     2️⃣ SUMMARY PAGE
-  ========================= */
-  const page3 = document.getElementById('page3');
-  if (page3) {
-    const clone = page3.cloneNode(true);
-    clone.style.display = 'block';
-    clone.style.pageBreakAfter = 'always';
-
-    clone.prepend(makeTitle('Summary'));
-    exportContainer.appendChild(clone);
-  }
-
-  /* =========================
-     3️⃣ ROUNDS (FULL PAGE2)
-  ========================= */
-  const page2 = document.getElementById('page2');
-
-  for (let i = 0; i < allRounds.length; i++) {
-    showRound(i);
-    await waitForPaint();
-
-    const roundClone = page2.cloneNode(true);
-
-    // 🔥 Force render hidden page
-    roundClone.style.display = 'block';
-    roundClone.style.pageBreakAfter = 'always';
-
-    roundClone.prepend(makeTitle(allRounds[i].round));
-
-    exportContainer.appendChild(roundClone);
-  }
-
-  /* =========================
-     EXPORT
-  ========================= */
-  await html2pdf().set({
-    margin: 1,
-    filename: 'Badminton_Schedule.pdf',
-    image: { type: 'jpeg', quality: 0.98 },
-    html2canvas: { scale: 2 },
-    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-  }).from(exportContainer).save();
-
-  // 🧹 Restore UI
-  document.body.removeChild(exportContainer);
-  showRound(originalRoundIndex);
-}
-
-/* ===== helpers ===== */
-
-function makeTitle(text) {
-  const h = document.createElement('h2');
-  h.innerText = text;
-  h.style.textAlign = 'center';
-  h.style.marginBottom = '10px';
-  return h;
-}
-
-function waitForPaint() {
-  return new Promise(resolve => setTimeout(resolve, 150));
-}
-function saveSchedule() {
-  // Placeholder – implement later
-  console.log('Save schedule clicked');
-
-  // Future ideas:
-  // localStorage.setItem('savedSchedule', JSON.stringify(allRounds));
-  // export JSON
-  // cloud sync
-
-  alert('Save feature coming soon');
-}

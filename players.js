@@ -1,3 +1,29 @@
+document.addEventListener("DOMContentLoaded", function () {
+
+  const textarea = document.getElementById("players-names");
+  if (!textarea) return;
+
+  const defaultHeight = 40;
+
+  function autoResize(el) {
+    el.style.height = "auto";
+    el.style.height = el.scrollHeight + "px";
+  }
+
+  textarea.addEventListener("input", function () {
+    autoResize(this);
+  });
+
+  textarea.addEventListener("blur", function () {
+    if (!this.value.trim()) {
+      this.style.height = defaultHeight + "px";
+    }
+  });
+
+});
+
+
+
 function getGenderIconByName(playerName) {
   const player = schedulerState.allPlayers.find(
     p => p.name === playerName
@@ -70,10 +96,56 @@ function addFixedCard(p1, p2, key) {
 function pastePlayersText() {
   const textarea = document.getElementById('players-textarea');
 
+  const stopMarkers = [
+    /court full/i, /wl/i, /waitlist/i, /late cancel/i,
+    /cancelled/i, /reserve/i, /bench/i, /extras/i, /backup/i
+  ];
+
+  function cleanText(text) {
+    const lines = text.split(/\r?\n/);
+
+    let startIndex = 0;
+    let stopIndex = lines.length;
+
+    // Find first "Confirm" line
+    const confirmLineIndex = lines.findIndex(line => /confirm/i.test(line));
+
+    if (confirmLineIndex >= 0) {
+      startIndex = confirmLineIndex + 1;
+
+      for (let i = startIndex; i < lines.length; i++) {
+        if (stopMarkers.some(re => re.test(lines[i]))) {
+          stopIndex = i;
+          break;
+        }
+      }
+    }
+
+    const cleanedLines = [];
+
+    for (let i = startIndex; i < stopIndex; i++) {
+      let line = lines[i].trim();
+
+      if (!line) continue;                  // skip empty
+      if (line.toLowerCase().includes("http")) continue; // skip links
+
+      cleanedLines.push(line);
+    }
+
+    return cleanedLines.join("\n");
+  }
+
   if (navigator.clipboard && navigator.clipboard.readText) {
     navigator.clipboard.readText()
       .then(text => {
-        textarea.value += (textarea.value ? '\n' : '') + text;
+        const cleaned = cleanText(text);
+
+        if (!cleaned) {
+          alert("No valid player names found.");
+          return;
+        }
+
+        textarea.value += (textarea.value ? '\n' : '') + cleaned;
         textarea.focus();
       })
       .catch(() => {
@@ -95,14 +167,175 @@ function showImportModal() {
 }
 
 function hideImportModal() {
-  document.getElementById('importModal').style.display = 'none';
-  document.getElementById('players-textarea').value = '';
+  document.getElementById('newImportModal').style.display = 'none';
+  //document.getElementById('players-textarea').value = '';
 }
 
 /* =========================
    ADD SINGLE PLAYER
 ========================= */
 function addPlayer() {
+
+  const textarea = document.getElementById("players-names");
+  if (!textarea) return;
+
+  const text = textarea.value.trim();
+  if (!text) return;
+
+  const defaultGender =
+    document.getElementById("player-gender")?.value || "Male";
+
+  const lines = text.split(/\r?\n/);
+
+  // ======================
+  // GENDER LOOKUP (multi-language)
+  // ======================
+  const genderLookup = {};
+
+  if (typeof translations !== "undefined") {
+    Object.values(translations).forEach(langObj => {
+      if (langObj.male)
+        genderLookup[langObj.male.toLowerCase()] = "Male";
+
+      if (langObj.female)
+        genderLookup[langObj.female.toLowerCase()] = "Female";
+    });
+  }
+
+  // fallback English
+  genderLookup["male"] = "Male";
+  genderLookup["m"] = "Male";
+  genderLookup["female"] = "Female";
+  genderLookup["f"] = "Female";
+
+  const extractedNames = [];
+
+  for (let line of lines) {
+    line = line.trim();
+    if (!line) continue;
+
+    let gender = defaultGender;
+
+    // Remove numbering (1. John → John)
+    const match = line.match(/^(\d+\.?\s*)?(.*)$/);
+    if (match) line = match[2].trim();
+
+    // name, gender
+    if (line.includes(",")) {
+      const parts = line.split(",").map(p => p.trim());
+      line = parts[0];
+
+      if (parts[1]) {
+        const g = parts[1].toLowerCase();
+        if (genderLookup[g]) gender = genderLookup[g];
+      }
+    }
+
+    // name (gender)
+    const parenMatch = line.match(/\(([^)]+)\)/);
+    if (parenMatch) {
+      const inside = parenMatch[1].trim().toLowerCase();
+
+      if (genderLookup[inside])
+        gender = genderLookup[inside];
+
+      line = line.replace(/\([^)]+\)/, "").trim();
+    }
+
+    if (!line) continue;
+
+    const normalized = line.toLowerCase();
+
+    // Avoid duplicates in scheduler + current import
+    const exists =
+      schedulerState.allPlayers.some(
+        p => p.name.trim().toLowerCase() === normalized
+      ) ||
+      extractedNames.some(
+        p => p.name.trim().toLowerCase() === normalized
+      );
+
+    if (!exists) {
+      extractedNames.push({
+        name: line,
+        gender,
+        active: true
+      });
+    }
+  }
+
+  if (extractedNames.length === 0) return;
+
+  // ======================
+  // SAVE TO MAIN PLAYER LIST
+  // ======================
+  schedulerState.allPlayers.push(...extractedNames);
+
+  schedulerState.activeplayers = schedulerState.allPlayers
+    .filter(p => p.active)
+    .map(p => p.name)
+    .reverse();
+
+  updatePlayerList();
+  updateFixedPairSelectors();
+
+  // ======================
+  // ENSURE IMPORT HISTORY EXISTS
+  // ======================
+  if (!localStorage.getItem("newImportHistory")) {
+    localStorage.setItem("newImportHistory", JSON.stringify([]));
+  }
+
+  // ======================
+  // SAVE TO IMPORT HISTORY (for Import Modal)
+  // ======================
+  let history = JSON.parse(localStorage.getItem("newImportHistory"));
+
+  const historyPlayers = extractedNames.map(p => ({
+    displayName: p.name,
+    gender: p.gender
+  }));
+
+  historyPlayers.forEach(newPlayer => {
+    if (!history.some(p => p.displayName === newPlayer.displayName)) {
+      history.unshift(newPlayer); // newest first
+    }
+  });
+
+  history = history.slice(0, 50); // keep last 50
+
+  localStorage.setItem("newImportHistory", JSON.stringify(history));
+
+  // ======================
+  // RESET UI
+  // ======================
+  const defaultHeight = 40;
+  textarea.value = "";
+  textarea.style.height = defaultHeight + "px";
+  textarea.focus();
+}
+
+function saveAllPlayersState() {
+
+  // save scheduler players (main list)
+  localStorage.setItem(
+    "schedulerPlayers",
+    JSON.stringify(schedulerState.allPlayers)
+  );
+
+  // save import modal lists
+  localStorage.setItem(
+    "newImportHistory",
+    JSON.stringify(newImportState.historyPlayers)
+  );
+
+  localStorage.setItem(
+    "newImportFavorites",
+    JSON.stringify(newImportState.favoritePlayers)
+  );
+}
+
+function oldaddPlayer() {
   const name = document.getElementById('player-name').value.trim();
   const gender = document.getElementById('player-gender').value;
   if (name && !schedulerState.allPlayers.some(p => p.name.toLowerCase() === name.toLowerCase())) {
@@ -261,6 +494,9 @@ function toggleGender(index, iconEl) {
   // 6️⃣ Refresh dependent UI
   updateFixedPairSelectors();
   refreshFixedCards(); // 🔥 THIS fixes your issue
+
+   saveAllPlayersState();
+	
 }
 
 
@@ -274,110 +510,38 @@ function updateGenderGroups() {
     .map(p => p.name);
 }
 
+function addPlayersFromInputUI() {
 
-/* =========================
-   ADD PLAYERS FROM TEXT
-========================= */
+  const importPlayers = newImportState.selectedPlayers;
 
-function addPlayersFromText() {
-  const text = document.getElementById('players-textarea').value.trim();
-  if (!text) return;
-
-  const defaultGender =
-    document.querySelector('input[name="genderSelect"]:checked')?.value || "Male";
-
-  const lines = text.split(/\r?\n/);
-
-  const stopMarkers = [
-    /court full/i, /wl/i, /waitlist/i, /late cancel/i,
-    /cancelled/i, /reserve/i, /bench/i, /extras/i, /backup/i
-  ];
-
-  let startIndex = 0;
-  let stopIndex = lines.length;
-
-  // Find first "Confirm" line
-  const confirmLineIndex = lines.findIndex(line => /confirm/i.test(line));
-
-  if (confirmLineIndex >= 0) {
-    startIndex = confirmLineIndex + 1;
-    for (let i = startIndex; i < lines.length; i++) {
-      if (stopMarkers.some(re => re.test(lines[i]))) {
-        stopIndex = i;
-        break;
-      }
-    }
+  if (!importPlayers || importPlayers.length === 0) {
+    alert('No players to add!');
+    return;
   }
-  const genderLookup = {};
 
-	// Iterate all languages
-	Object.values(translations).forEach(langObj => {
-	  if (langObj.male) genderLookup[langObj.male.toLowerCase()] = "Male";
-	  if (langObj.female) genderLookup[langObj.female.toLowerCase()] = "Female";
-	});
   const extractedNames = [];
 
-  for (let i = startIndex; i < stopIndex; i++) {
-    let line = lines[i].trim();
-    if (!line) continue;
-    if (line.toLowerCase().includes("https")) continue;
+  importPlayers.forEach(p => {
 
-    let gender = defaultGender;
+    const name = p.displayName.trim();
+    const gender = p.gender || "Male";
 
-    // ✅ Handle name,gender format
-    if (line.includes(",")) {
-      const parts = line.split(",").map(p => p.trim());
-      line = parts[0];
-
-      // Name,Gender format
-		if (parts[1]) {
-		  const g = parts[1].trim().toLowerCase();
-		  if (genderLookup[g]) gender = genderLookup[g]; // maps to "Male"/"Female"
-		}
-
-		// Parentheses content
-		const parenMatch = line.match(/\(([^)]+)\)/);
-		if (parenMatch) {
-		  const inside = parenMatch[1].trim().toLowerCase();
-		  if (genderLookup[inside]) gender = genderLookup[inside];
-		  line = line.replace(/\([^)]+\)/, "").trim();
-		}
-	}	
-
-    // Normalize numbering (keep prefix)
-    const match = line.match(/^(\d+\.?\s*)?(.*)$/);
-    if (match) {
-      const prefix = match[1] || "";
-      const namePart = match[2].trim();
-      line = prefix + namePart;
-    }
-
-    // Avoid duplicates (case-insensitive)
-    /*if (!schedulerState.allPlayers.some(
-      p => p.name.toLowerCase() === line.toLowerCase()
-    )) {
+    if (
+      !schedulerState.allPlayers.some(
+        existing => existing.name.trim().toLowerCase() === name.toLowerCase()
+      ) &&
+      !extractedNames.some(
+        existing => existing.name.trim().toLowerCase() === name.toLowerCase()
+      )
+    ) {
       extractedNames.push({
-        name: line,
-        gender,
+        name: name,
+        gender: gender,
         active: true
       });
-    }*/
-	// Avoid duplicates (case-insensitive + same import)
-if (
-  !schedulerState.allPlayers.some(
-    p => p.name.trim().toLowerCase() === line.trim().toLowerCase()
-  ) &&
-  !extractedNames.some(
-    p => p.name.trim().toLowerCase() === line.trim().toLowerCase()
-  )
-) {
-  extractedNames.push({
-    name: line,
-    gender,
-    active: true
+    }
+
   });
-}
-  }
 
   schedulerState.allPlayers.push(...extractedNames);
 
@@ -389,7 +553,155 @@ if (
   updatePlayerList();
   updateFixedPairSelectors();
   hideImportModal();
+
+  // Optional: reset selection after import
+  newImportState.selectPlayers = [];
 }
+
+
+/* =========================
+   ADD PLAYERS FROM TEXT
+========================= */
+function addPlayersFromText() {
+
+  const textarea = document.getElementById("players-textarea");
+  if (!textarea) return;
+
+  const text = textarea.value.trim();
+  if (!text) return;
+
+  const defaultGender =
+    document.querySelector('input[name="genderSelect"]:checked')?.value || "Male";
+
+  const lines = text.split(/\r?\n/);
+
+  // stop markers
+  const stopMarkers = [
+    /court full/i, /wl/i, /waitlist/i, /late cancel/i,
+    /cancelled/i, /reserve/i, /bench/i, /extras/i, /backup/i
+  ];
+
+  let startIndex = 0;
+  let stopIndex = lines.length;
+
+  // detect "confirm" section
+  const confirmLineIndex = lines.findIndex(line => /confirm/i.test(line));
+
+  if (confirmLineIndex >= 0) {
+    startIndex = confirmLineIndex + 1;
+
+    for (let i = startIndex; i < lines.length; i++) {
+      if (stopMarkers.some(re => re.test(lines[i]))) {
+        stopIndex = i;
+        break;
+      }
+    }
+  }
+
+  // ======================
+  // GENDER LOOKUP (multi-language)
+  // ======================
+  const genderLookup = {};
+
+  if (typeof translations !== "undefined") {
+    Object.values(translations).forEach(langObj => {
+      if (langObj.male)
+        genderLookup[langObj.male.toLowerCase()] = "Male";
+
+      if (langObj.female)
+        genderLookup[langObj.female.toLowerCase()] = "Female";
+    });
+  }
+
+  // fallback English
+  genderLookup["male"] = "Male";
+  genderLookup["m"] = "Male";
+  genderLookup["female"] = "Female";
+  genderLookup["f"] = "Female";
+
+  // ======================
+  // EXTRACT NAMES
+  // ======================
+  const extractedNames = [];
+
+  for (let i = startIndex; i < stopIndex; i++) {
+
+    let line = lines[i].trim();
+    if (!line) continue;
+    if (/https?/i.test(line)) continue;
+
+    let gender = defaultGender;
+
+    // remove numbering (1. John → John)
+    const match = line.match(/^(\d+\.?\s*)?(.*)$/);
+    if (match) line = match[2].trim();
+
+    // ======================
+    // name, gender
+    // ======================
+    if (line.includes(",")) {
+      const parts = line.split(",").map(p => p.trim());
+
+      line = parts[0];
+
+      if (parts[1]) {
+        const g = parts[1].toLowerCase();
+        if (genderLookup[g]) gender = genderLookup[g];
+      }
+    }
+
+    // ======================
+    // name (gender)
+    // ======================
+    const parenMatch = line.match(/\(([^)]+)\)/);
+    if (parenMatch) {
+      const inside = parenMatch[1].trim().toLowerCase();
+
+      if (genderLookup[inside])
+        gender = genderLookup[inside];
+
+      line = line.replace(/\([^)]+\)/, "").trim();
+    }
+
+    if (!line) continue;
+
+    const normalized = line.toLowerCase();
+
+    // avoid duplicates globally + in this import
+    const exists =
+      schedulerState.allPlayers.some(
+        p => p.name.trim().toLowerCase() === normalized
+      ) ||
+      extractedNames.some(
+        p => p.name.trim().toLowerCase() === normalized
+      );
+
+    if (!exists) {
+      extractedNames.push({
+        name: line,
+        gender,
+        active: true
+      });
+    }
+  }
+
+  if (extractedNames.length === 0) return;
+
+  // ======================
+  // SAVE
+  // ======================
+  schedulerState.allPlayers.push(...extractedNames);
+
+  schedulerState.activeplayers = schedulerState.allPlayers
+    .filter(p => p.active)
+    .map(p => p.name)
+    .reverse();
+
+  updatePlayerList();
+  updateFixedPairSelectors();
+  hideImportModal();
+}
+
 
 
 /* =========================
@@ -939,3 +1251,485 @@ function showToast(msg) {
 function alert(msg) {
   showToast(msg);   // your toast function
 }
+
+
+
+// ======================
+// HELPERS
+// ======================
+function debounce(func, delay = 250) {
+  let timeout;
+  return function (...args) {
+    clearTimeout(timeout);
+    timeout = setTimeout(() => func.apply(this, args), delay);
+  };
+}
+
+// ======================
+// MODAL
+// ======================
+
+// ================= STATE =================
+const newImportState = {
+  historyPlayers: [],
+  favoritePlayers: [],
+  selectedPlayers: [],
+  currentSelectMode: "history"
+};
+
+let newImportModal;
+let newImportSelectCards;
+let newImportSelectedCards;
+let newImportSelectedCount;
+let newImportSearch;
+
+
+// ================= INIT =================
+document.addEventListener("DOMContentLoaded", () => {
+  newImportModal = document.getElementById("newImportModal");
+  newImportSelectCards = document.getElementById("newImportSelectCards");
+  newImportSelectedCards = document.getElementById("newImportSelectedCards");
+  newImportSelectedCount = document.getElementById("newImportSelectedCount");
+  newImportSearch = document.getElementById("newImportSearch");
+
+  newImportLoadHistory();
+  newImportLoadFavorites();
+
+  newImportRefreshSelectCards();
+  newImportRefreshSelectedCards();
+
+  newImportSelectCards.addEventListener("click", newImportHandleCardClick);
+  newImportSearch.addEventListener("input", newImportRefreshSelectCards);
+});
+
+
+// ================= MODAL =================
+function newImportShowModal(){
+  newImportModal.style.display="flex";
+  newImportLoadHistory();
+  newImportLoadFavorites();
+  newImportRefreshSelectCards();
+  newImportRefreshSelectedCards();
+}
+
+function newImportHideModal(){
+  newImportModal.style.display="none";
+  newImportState.selectedPlayers=[];
+}
+
+
+// ================= TAB SWITCH =================
+
+function newImportShowSelectMode(mode){
+
+  newImportState.currentSelectMode = mode;
+
+  // remove active
+  document.querySelectorAll(".newImport-subtab-btn")
+    .forEach(btn => btn.classList.remove("active"));
+
+  // activate clicked
+  document.getElementById(
+    "newImport" + mode.charAt(0).toUpperCase() + mode.slice(1) + "Btn"
+  )?.classList.add("active");
+
+  const clearHistory = document.getElementById("newImportClearHistoryBtn");
+  const clearFavorites = document.getElementById("newImportClearFavoritesBtn");
+  const listContainer = document.getElementById("newImportSelectCards");
+  const addSection = document.getElementById("newImportAddPlayersSection");
+  const searchInput = document.getElementById("newImportSearch");
+
+  // ===== ADD PLAYERS MODE =====
+  if(mode === "addplayers"){
+    listContainer.style.display = "none";
+    addSection.style.display = "block";
+    searchInput.style.display = "none";
+    clearHistory.style.display = "none";
+    clearFavorites.style.display = "none";
+    return;
+  }
+
+  // ===== HISTORY / FAVORITES =====
+  listContainer.style.display = "flex";
+  addSection.style.display = "none";
+  searchInput.style.display = "block";
+
+  if(mode === "history"){
+    clearHistory.style.display = "block";
+    clearFavorites.style.display = "none";
+  } else {
+    clearHistory.style.display = "none";
+    clearFavorites.style.display = "block";
+  }
+
+  newImportRefreshSelectCards();
+}
+
+
+
+function newImportShowSelectModeor(mode){
+  newImportState.currentSelectMode=mode;
+
+  document.querySelectorAll(".newImport-subtab-btn")
+    .forEach(btn=>btn.classList.remove("active"));
+
+  document.getElementById(
+    "newImport"+mode.charAt(0).toUpperCase()+mode.slice(1)+"Btn"
+  )?.classList.add("active");
+
+  newImportRefreshSelectCards();
+}
+
+
+// ================= STORAGE =================
+function newImportLoadHistory(){
+  const data=localStorage.getItem("newImportHistory");
+  newImportState.historyPlayers=data?JSON.parse(data):[];
+}
+
+function newImportLoadFavorites(){
+  const data=localStorage.getItem("newImportFavorites");
+  newImportState.favoritePlayers=data?JSON.parse(data):[];
+}
+
+function newImportSaveFavorites(){
+  localStorage.setItem(
+    "newImportFavorites",
+    JSON.stringify(newImportState.favoritePlayers)
+  );
+}
+
+
+// ================= RENDER LIST =================
+
+function newImportRefreshSelectCards(){
+
+  if(newImportState.currentSelectMode === "addplayers"){
+    return;
+  }
+
+  newImportSelectCards.innerHTML = "";
+
+  const source =
+    newImportState.currentSelectMode === "favorites"
+      ? newImportState.favoritePlayers
+      : newImportState.historyPlayers;
+
+  const search = newImportSearch.value.toLowerCase();
+
+  source
+    .filter(p => p.displayName.toLowerCase().includes(search))
+    .forEach((p) => {
+
+      const added = newImportState.selectedPlayers.some(
+        sp => sp.displayName === p.displayName
+      );
+
+      const fav = newImportState.favoritePlayers.some(
+        fp => fp.displayName === p.displayName
+      );
+
+      const card = document.createElement("div");
+      card.className = "newImport-player-card";
+
+      card.innerHTML = `
+        <div class="newImport-player-top">
+          <img src="${p.gender === "Male" ? "male.png" : "female.png"}"
+               data-action="gender"
+               data-player="${p.displayName}">
+          <div class="newImport-player-name">${p.displayName}</div>
+        </div>
+
+        <div class="newImport-player-actions">
+          <button 
+            class="circle-btn favorite ${fav ? 'active-favorite' : ''}" 
+            data-action="favorite" 
+            data-player="${p.displayName}">
+            ${fav ? "★" : "☆"}
+          </button>
+
+          <button 
+            class="circle-btn delete" 
+            data-action="delete" 
+            data-player="${p.displayName}">
+            ×
+          </button>
+
+          <button 
+            class="circle-btn add ${added ? 'active-added' : ''}" 
+            data-action="add" 
+            data-player="${p.displayName}" 
+            ${added ? "disabled" : ""}>
+            ${added ? "✓" : "+"}
+          </button>
+        </div>
+      `;
+
+      newImportSelectCards.appendChild(card);
+    });
+}
+
+
+// ================= CARD ACTIONS =================
+
+function newImportHandleCardClick(e){
+  const action = e.target.dataset.action;
+  if(!action) return;
+
+  const playerName = e.target.dataset.player;
+  if(!playerName) return;
+
+  const source =
+    newImportState.currentSelectMode==="favorites"
+      ? newImportState.favoritePlayers
+      : newImportState.historyPlayers;
+
+  const player = source.find(p => p.displayName === playerName);
+  if(!player) return;
+
+  // ADD PLAYER
+  if(action==="add"){
+    if(!newImportState.selectedPlayers.some(
+      p => p.displayName===player.displayName
+    )){
+      newImportState.selectedPlayers.push({...player});
+      newImportRefreshSelectedCards();
+    }
+  }
+
+  // TOGGLE GENDER
+  if(action==="gender"){
+  player.gender = player.gender==="Male" ? "Female" : "Male";
+
+  // update in history
+  newImportState.historyPlayers.forEach(p=>{
+    if(p.displayName===player.displayName){
+      p.gender = player.gender;
+    }
+  });
+
+  // update in favorites
+  newImportState.favoritePlayers.forEach(p=>{
+    if(p.displayName===player.displayName){
+      p.gender = player.gender;
+    }
+  });
+
+  localStorage.setItem(
+    "newImportHistory",
+    JSON.stringify(newImportState.historyPlayers)
+  );
+
+  localStorage.setItem(
+    "newImportFavorites",
+    JSON.stringify(newImportState.favoritePlayers)
+  );
+}
+
+  // TOGGLE FAVORITE
+  if(action==="favorite"){
+    const i = newImportState.favoritePlayers.findIndex(
+      p => p.displayName===player.displayName
+    );
+
+    if(i>=0){
+      newImportState.favoritePlayers.splice(i,1);
+    }else{
+      newImportState.favoritePlayers.push({...player});
+    }
+
+    newImportSaveFavorites();
+  }
+
+  // DELETE PLAYER
+  if(action==="delete"){
+    const removeIndex = source.findIndex(
+      p => p.displayName === playerName
+    );
+
+    if(removeIndex >= 0) source.splice(removeIndex,1);
+
+    if(newImportState.currentSelectMode==="history"){
+      localStorage.setItem(
+        "newImportHistory",
+        JSON.stringify(newImportState.historyPlayers)
+      );
+    }else{
+      localStorage.setItem(
+        "newImportFavorites",
+        JSON.stringify(newImportState.favoritePlayers)
+      );
+    }
+  }
+
+  newImportRefreshSelectCards();
+}
+
+
+function newImportHandleCardClickold(e){
+  const action=e.target.dataset.action;
+  if(!action) return;
+
+  const idx=parseInt(e.target.dataset.index);
+
+  const source=
+    newImportState.currentSelectMode==="favorites"
+      ?newImportState.favoritePlayers
+      :newImportState.historyPlayers;
+
+  const player=source[idx];
+  if(!player) return;
+
+  if(action==="add"){
+    if(!newImportState.selectedPlayers.some(
+      p=>p.displayName===player.displayName
+    )){
+      newImportState.selectedPlayers.push({...player});
+      newImportRefreshSelectedCards();
+    }
+  }
+
+  if(action==="gender"){
+    player.gender=player.gender==="Male"?"Female":"Male";
+  }
+
+  if(action==="favorite"){
+    const i=newImportState.favoritePlayers.findIndex(
+      p=>p.displayName===player.displayName
+    );
+
+    i>=0
+      ?newImportState.favoritePlayers.splice(i,1)
+      :newImportState.favoritePlayers.push({...player});
+
+    newImportSaveFavorites();
+  }
+
+  if(action==="delete"){
+  source.splice(idx,1);
+
+  // save to storage depending on tab
+  if(newImportState.currentSelectMode==="history"){
+    localStorage.setItem(
+      "newImportHistory",
+      JSON.stringify(newImportState.historyPlayers)
+    );
+  }else{
+    localStorage.setItem(
+      "newImportFavorites",
+      JSON.stringify(newImportState.favoritePlayers)
+    );
+  }
+}
+
+  newImportRefreshSelectCards();
+}
+
+
+// ================= SELECTED LIST =================
+function newImportRefreshSelectedCards(){
+  newImportSelectedCards.innerHTML="";
+  newImportSelectedCount.textContent=newImportState.selectedPlayers.length;
+
+  newImportState.selectedPlayers.forEach((p,i)=>{
+    const card=document.createElement("div");
+    card.className="newImport-player-card";
+
+    card.innerHTML=`
+      <div class="newImport-player-top">
+        <img src="${p.gender==="Male"?"male.png":"female.png"}">
+        <div class="newImport-player-name">${p.displayName}</div>
+      </div>
+      <div class="newImport-player-actions">
+        <button onclick="newImportRemoveSelected(${i})">×</button>
+      </div>
+    `;
+
+    newImportSelectedCards.appendChild(card);
+  });
+}
+
+function newImportRemoveSelected(i){
+  newImportState.selectedPlayers.splice(i,1);
+  newImportRefreshSelectedCards();
+  newImportRefreshSelectCards();
+}
+
+function newImportClearSelected(){
+  newImportState.selectedPlayers=[];
+  newImportRefreshSelectedCards();
+  newImportRefreshSelectCards();
+}
+
+
+// ================= FINAL IMPORT =================
+function newImportAddPlayers(){
+  if(!newImportState.selectedPlayers.length){
+    alert("No players selected");
+    return;
+  }
+
+  if(typeof addPlayersFromText==="function"){
+    addPlayersFromText(newImportState.selectedPlayers);
+  }
+
+  newImportState.historyPlayers=[
+    ...newImportState.selectedPlayers,
+    ...newImportState.historyPlayers
+  ].slice(0,50);
+
+  localStorage.setItem(
+    "newImportHistory",
+    JSON.stringify(newImportState.historyPlayers)
+  );
+
+  newImportHideModal();
+}
+
+function newImportAddIfNotExists(list, player) {
+  const exists = list.some(
+    p => p.displayName.trim().toLowerCase() ===
+         player.displayName.trim().toLowerCase()
+  );
+
+  if (!exists) {
+    list.push(player);
+    return true;
+  }
+
+  return false;
+}
+
+
+// ================= CLEAR LISTS =================
+function newImportClearHistory(){
+  if(!confirm("Clear history?")) return;
+  newImportState.historyPlayers=[];
+  localStorage.setItem("newImportHistory","[]");
+  newImportRefreshSelectCards();
+}
+
+function newImportClearFavorites(){
+  if(!confirm("Clear favorites?")) return;
+  newImportState.favoritePlayers=[];
+  localStorage.setItem("newImportFavorites","[]");
+  newImportRefreshSelectCards();
+}
+
+document.addEventListener("click", (e) => {
+  if (!e.target.matches(".circle-btn")) return;
+
+  const action = e.target.dataset.action;
+
+  if (action === "favorite") {
+    e.target.classList.toggle("active-favorite");
+    e.target.textContent = e.target.classList.contains("active-favorite") ? "★" : "☆";
+  }
+
+  if (action === "add") {
+    e.target.classList.add("active-added");
+    e.target.textContent = "✓";
+    e.target.disabled = true;
+  }
+});
+

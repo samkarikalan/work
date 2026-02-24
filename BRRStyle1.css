@@ -1,6 +1,12 @@
 :root {
-  --base-font-size: 12px; /* Default Medium */
+  --base-font-size: 14px; /* Default Medium — change here to resize everything */
+  --player-font-size: 1rem;
 }
+
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
 html {
   font-size: var(--base-font-size);
 }
@@ -20,7 +26,7 @@ body {
   left: 50%;
   transform: translateX(-50%); /* FIX */
 
-  font-size: 35px;
+  font-size: 2.2rem;
   font-weight: 800;
   background: #1f2933;  
   );
@@ -178,7 +184,7 @@ z-index: 1000;
 .tabs-container {
   flex: 1;                       /* take remaining width */
   display: flex;
-  justify-content: space-evenly; /* ✅ equal spacing */
+  justify-content: space-evenly; /* âœ… equal spacing */
   align-items: center;
 }
 
@@ -195,10 +201,10 @@ z-index: 1000;
   padding: 7px 16px;
   border-radius: 16px;
 
-  font-size: 15px;
+  font-size: 1rem;
   text-align: center;
 
-  display: inline-flex;        /* ✅ prevents canvas shrink */
+  display: inline-flex;        /* âœ… prevents canvas shrink */
   align-items: center;
   justify-content: center;
 }
@@ -227,7 +233,7 @@ z-index: 1000;
 ================================ */
 .sec {
   font-weight: 700;
-  font-size: 14px;
+  font-size: 0.9rem;
   text-align: center;
   color: #374151;
   margin-bottom: 6px;
@@ -263,7 +269,7 @@ z-index: 1000;
   background: linear-gradient(135deg, #7c3aed, #6366f1);
   color: #ffffff;
   font-weight: 600;
-  font-size: 14px;
+  font-size: 0.9rem;
   text-align: center;
   cursor: pointer;
   user-select: none;
@@ -368,93 +374,7 @@ z-index: 1000;
   box-shadow: 0 0 0 2px #4f8cff33;
 }
 
-/* players*/
-/* Modal Background */
-#importModal {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.4);
-  display: none;
-  justify-content: center;
-  align-items: center;
-  z-index: 2000;
-}
 
-/* Modal Box */
-.modal-content {
-  display: flex;
-  gap: 15px;
-  width: 95%;
-
-  max-width: 550px;
-  background: #fff;
-  padding: 18px;
-  border-radius: 14px;
-  box-shadow: 0 6px 18px rgba(0,0,0,0.25);
-}
-
-/* Left Side - Textarea */
-#players-textarea {
-  width: 65%;
-  height: 260px;
-  resize: vertical;
-  padding: 10px;
-  font-size: 16px;
-  border-radius: 10px;
-  border: 1px solid #d4d4d8;
-}
-
-.modal-right {
-  width: 35%;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start; /* FIXED */
-  gap: 20px;                   /* keeps spacing clean */
-}
-
-/* Radio buttons */
-.gender-radio {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  font-size: 16px;
-}
-.gender-radio input {
-  transform: scale(1.2);
-}
-
-/* Buttons */
-.modal-buttons {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.ok-btn,
-.cancel-btn {
-  padding: 10px;
-  width: 100%;
-  border: none;
-  border-radius: 10px;
-  font-size: 16px;
-  cursor: pointer;
-  font-weight: 600;
-}
-
-.ok-btn {
-  background: #2563eb;
-  color: white;
-}
-.ok-btn:hover {
-  background: #1e40af;
-}
-
-.cancel-btn {
-  background: #e5e7eb;
-}
-.cancel-btn:hover {
-  background: #cbd5e1;
-}
 
 .page {
   font-size: 1.0rem;
@@ -470,7 +390,7 @@ z-index: 1000;
   align-items: center;
   gap: 5px;
 
-  font-size: 1.3rem;
+  font-size: 1rem;
   padding: 6px 15px;
   border-radius: 1.5rem;
   border: 1px solid #ddd;
@@ -538,19 +458,19 @@ z-index: 1000;
 
 /* Gender icon style */
 .gender-icon {
-  font-size: 20px;
+  font-size: 1.25rem;
 }
 
 
 
-/* Name column – wraps to second line */
+/* Name column â€“ wraps to second line */
 .pec-name {
   white-space: normal;
   overflow: visible;
   text-overflow: clip;
   line-height: 1.25rem;
   word-break: break-word;
-  margin-left: -4px; /* reduce gap between gender → name */
+  margin-left: -4px; /* reduce gap between gender â†’ name */
 }
 
 /* Delete column */
@@ -611,7 +531,7 @@ z-index: 1000;
 .row-addplayer {
   display: flex;
   gap: 10px;
-  flex-wrap: nowrap; /* ❌ stop wrapping */
+  flex-wrap: nowrap; /* âŒ stop wrapping */
   align-items: center; /* vertical alignment */
 }
 
@@ -637,7 +557,7 @@ z-index: 1000;
   border: 0.0625rem solid #ccc;
 }
 .card select {
-  font-size: 1.15rem;
+  font-size: 1rem;
   width: 100%;
   padding: 0.5rem;
   margin: 0.5rem 0;  
@@ -645,7 +565,7 @@ z-index: 1000;
   box-sizing: border-box;
 }
 .card input {
-  font-size: 1.15rem;
+  font-size: 1rem;
   width: 100%;
   padding: 0.5rem;
   margin: 0.5rem 0;  
@@ -657,7 +577,7 @@ z-index: 1000;
 display: block;
   margin: 0 auto;
   background: #800080;
-  font-size: 1.15rem;
+  font-size: 1rem;
   padding:6px;
   color: white;
   border: none;
@@ -673,6 +593,12 @@ display: block;
   transform: scale(1.02);
 }
 
+#players-names {
+  width: 95%;
+  font-size: 1rem;
+  min-height:fit-content
+}
+
 .status-card {
   padding: 12px 16px;
   border-radius: 10px;
@@ -683,7 +609,7 @@ display: block;
 }
 
 .status-display {
-  display: inline-block; /* 🔑 this is the fix */
+  display: inline-block; /* ðŸ”‘ this is the fix */
   padding: 6px 12px;
   border-radius: 6px;
   color: white;
@@ -736,51 +662,7 @@ body.disabled {
 }
 
 
-/* Summary */
-.report-header,
-.player-card {
-  display: grid;
-  grid-template-columns: 50px 1fr minmax(60px, auto) minmax(60px, auto);
-  align-items: center;
-  gap: 10px;
-}
 
-/* Header styling */
-.report-header {
-  margin: 5px 0;
-  background: #800080;
-  font-weight: bold;
-  color: #fff;
-  padding: 6px;
-  border-radius: 6px;
-  margin-bottom: 1px;
-  position: sticky;
-  z-index: 10;
-}
-
-/* Player card styling */
-.player-card {
-  background: #296472;
-  color: #fff;
-  padding: 2px;
-  margin: 5px 0;
-  border-radius: 1.1rem;
-  border: 1px solid #555;
-  box-shadow: 0 0 4px rgba(0,0,0,0.4);
-}
-
-/* Rank styling */
-.player-card .rank {
-  text-align: center;
-  font-size: 1.1rem;
-  font-weight: bold;
-}
-
-/* Name column */
-.player-card .name {
-  font-size: 1.1rem;
-  padding-left: 6px;
-}
 
 .toast {
   position: fixed;
@@ -860,3 +742,280 @@ body.disabled {
 }
 .help-card h3 { margin-top: 0; }
 .help-btn.active { background: #1976d2; color: #fff; }
+
+/* MODAL BASE */
+/* Modal background */
+
+/* =========================
+   MODAL FULLSCREEN
+========================= */
+.newImport-modal {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+
+  background: rgba(0,0,0,0.45);
+  z-index: 9999;
+
+  display: flex;
+}
+.newImport-container {
+  background: white;
+
+  width: 100%;
+  height: 100%;        /* fill screen */
+  max-width: none;     /* remove box look */
+  border-radius: 0;    /* full screen style */
+
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
+  padding: 6px;
+
+  overflow-y: auto;    /* scroll INSIDE modal */
+}
+
+/* ===== Selected Players Section ===== */
+.newImport-selected-section{
+  background: #f4f8ff;      /* light blue */
+  border: 1px solid #dbe7ff;
+  border-radius: 12px;
+  padding: 8px;
+  
+}
+
+/* ===== History / Favorites Section ===== */
+.newImport-select-section{
+  background: #fafafa;      /* light gray */
+  border: 1px solid #eee;
+  border-radius: 12px;
+  padding: 8px;
+  
+}
+
+
+
+/* ---------- cards row ---------- */
+.newImport-cards-container {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 10px;
+  overflow-x: auto;
+  padding: 10px 0;
+}
+
+/* ---------- selected section ---------- */
+.newImport-selected-actions {
+  margin-top: 10px;
+}
+
+.newImport-footer {
+  display: flex;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+/* ---------- tabs ---------- */
+.newImport-subtabs {
+  display: flex;
+  gap: 8px;
+ 
+}
+
+
+
+/* ---------- buttons ---------- */
+.newImport-clear-btn {
+  padding: 6px 12px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  
+}
+.newImport-ok-btn{
+  padding: 6px 12px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  background:azure;
+}
+
+.newImport-cancel-btn{
+  padding: 6px 12px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  background: #ffd7d7;
+}
+
+.newImport-search {
+  padding: 8px;
+  border: 1px solid #ddd;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  width:95%;
+  font-size:0.9rem;
+  
+}
+/* Cards container */
+.newImport-cards-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  overflow-y: auto;
+ 
+  padding-right: 5px; /* prevent scrollbar overlap */
+}
+
+
+/* ================= PLAYER CARD ================= */
+.newImport-player-card {
+  width: 100%;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 8px 10px;
+  background: #fff;
+
+  /* CHANGE → horizontal layout */
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* icon + name container */
+.newImport-player-top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1; /* takes all available space */
+}
+
+/* player icon */
+.newImport-player-top img {
+  width: 28px;
+  height: 28px;
+  cursor: pointer;
+}
+
+/* player name */
+.newImport-player-name {
+  flex: 1;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* buttons on right side */
+.newImport-player-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+
+/* Circular buttons */
+.circle-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: none;
+  background: #eee;
+  cursor: pointer;
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.circle-btn:hover {
+  transform: scale(1.1);
+}
+
+.circle-btn.active-favorite {
+  background: gold;
+  color: white;
+}
+
+.circle-btn.active-added {
+  background: #2196f3;
+  color: white;
+}
+
+.circle-btn.delete {
+  background: #ff5252;
+  color: white;
+}
+
+.circle-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+
+.newImport-subtabs{
+  display:flex;
+  border-bottom:2px solid #e5e5e5;
+  margin-bottom:10px;
+}
+
+.newImport-subtab-btn{
+  padding:10px 15px;
+  border:none;
+  background:none;
+  cursor:pointer;
+  font-weight:600;
+  color:#666;
+  font-size:1rem;
+  border-bottom:3px solid transparent;
+  transition:all .2s ease;
+}
+
+/* hover */
+.newImport-subtab-btn:hover{
+  color:#2b7cff;
+}
+
+/* active → underline only */
+.newImport-subtab-btn.active{
+  background:none;
+  color:#2b7cff;
+  border-bottom:3px solid #2b7cff;
+}
+/* ---------- player action buttons ---------- */
+
+/* container */
+.newImport-player-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+
+/* hover effect */
+.newImport-player-actions button:hover{
+  transform: scale(1.08);
+}
+
+/* delete button → red */
+.newImport-player-actions button[data-action="delete"]{
+  background:#ff5252;
+  color:white;
+}
+
+/* favorite selected → yellow */
+.newImport-player-actions button[data-action="favorite"].active{
+  background: gold;
+  color:white;
+}
+
+/* added selected → blue */
+.newImport-player-actions button[data-action="add"].active{
+  background:#2196f3;
+  color:white;
+}
+
+/* disabled state */
+.newImport-player-actions button:disabled{
+  opacity:.6;
+  cursor:not-allowed;
+}

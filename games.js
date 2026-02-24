@@ -18,198 +18,103 @@ const roundStates = {
   }
 };
 
-function existingAischedulerNextRound(schedulerState) {
-  const { activeplayers, numCourts, restCount } = schedulerState;
-  const PLAYERS_PER_ROUND = numCourts * 4;
-
-  // ------------------ GENERATE ALL UNIQUE GAMES ------------------
-  // Only generate temporarily, do NOT store in schedulerState
-  const uniqueGames = generateAllUniqueGames(activeplayers);
-
-  const games = [];
-  const usedPlayers = new Set();
-
-  // Pick next round games
-  for (let i = 0; i < uniqueGames.length && games.length < numCourts; i++) {
-    const g = uniqueGames[i];
-    if (g.some(p => usedPlayers.has(p))) continue;
-
-    games.push({
-      court: games.length + 1,
-      pair1: [g[0], g[1]],
-      pair2: [g[2], g[3]],
-    });
-
-    g.forEach(p => usedPlayers.add(p));
-  }
-
-  // ------------------ FALLBACK IF NOT ENOUGH GAMES ------------------
-  if (games.length < numCourts) {
-    const remaining = activeplayers.filter(p => !usedPlayers.has(p));
-    while (games.length < numCourts && remaining.length >= 4) {
-      const g = remaining.splice(0, 4);
-      games.push({
-        court: games.length + 1,
-        pair1: [g[0], g[1]],
-        pair2: [g[2], g[3]],
-      });
-      g.forEach(p => usedPlayers.add(p));
-    }
-
-    while (games.length < numCourts) {
-      const g = activeplayers.slice(0, 4);
-      games.push({
-        court: games.length + 1,
-        pair1: [g[0], g[1]],
-        pair2: [g[2], g[3]],
-      });
-      g.forEach(p => usedPlayers.add(p));
-    }
-  }
-
-  // ------------------ PLAYING AND RESTING ------------------
-  const playing = [...usedPlayers];
-  const resting = activeplayers.filter(p => !usedPlayers.has(p));
-
-  // ------------------ FORMAT RESTING ------------------
-  const restingWithNumber = resting.map(p => {
-    const c = restCount.get(p) || 0;
-    return `${p}#${c + 1}`;
-  });
-
-  // ------------------ RETURN ------------------
-  return {
-    round: schedulerState.roundIndex || 0, // keep same, do not update
-    playing,
-    resting: restingWithNumber,
-    games,
-  };
-
-  // ------------------ HELPER ------------------
-  function generateAllUniqueGames(players) {
-    const games = [];
-    const n = players.length;
-    for (let i = 0; i < n; i++) {
-      for (let j = i + 1; j < n; j++) {
-        for (let k = j + 1; k < n; k++) {
-          for (let l = k + 1; l < n; l++) {
-            games.push([players[i], players[j], players[k], players[l]]);
-          }
-        }
-      }
-    }
-    return games;
-  }
-}tion xxxxxx(schedulerState) {
-  const { activeplayers, numCourts, restCount } = schedulerState;
-
-  // Initialize unique games if not done yet
-  if (!schedulerState.uniqueGames) {
-    const groupCount = activeplayers.length / 4; // 6 groups for 24 players
-    let groups = [];
-    for (let i = 0; i < groupCount; i++) {
-      groups.push(activeplayers.slice(i * 4, i * 4 + 4));
-    }
-
-    schedulerState.uniqueGames = [];
-    schedulerState.seenGames = new Set();
-    schedulerState.currentUniqueIndex = 0;
-
-    // Add a round to uniqueGames
-    function addRound(gr) {
-      for (const g of gr) {
-        const key = [...g].sort((a,b)=>a-b).join("-");
-        if (!schedulerState.seenGames.has(key)) {
-          schedulerState.seenGames.add(key);
-          schedulerState.uniqueGames.push([...g]);
-        }
-      }
-    }
-
-    addRound(groups);
-
-    // Rotation function (shift columns down)
-    function rotateGroups(gr) {
-      const newGr = Array(gr.length).fill(0).map(() => []);
-      for (let pos = 0; pos < 4; pos++) {
-        for (let i = 0; i < gr.length; i++) {
-          const newIndex = (i + 1) % gr.length;
-          newGr[newIndex].push(gr[i][pos]);
-        }
-      }
-      return newGr;
-    }
-
-    while (schedulerState.uniqueGames.length < 46) {
-      groups = rotateGroups(groups);
-      addRound(groups);
-    }
-  }
-
-  // Take next numCourts games for this round
-  const games = [];
-  const start = schedulerState.currentUniqueIndex;
-  const end = start + numCourts;
-  for (let i = start; i < end && i < schedulerState.uniqueGames.length; i++) {
-    const g = schedulerState.uniqueGames[i];
-    games.push({ court: i - start + 1, pair1: g.slice(0,2), pair2: g.slice(2,4) });
-  }
-  schedulerState.currentUniqueIndex += numCourts;
-
-  // Compute playing and resting
-  const playing = games.flatMap(g => g.pair1.concat(g.pair2));
-  const resting = activeplayers.filter(p => !playing.includes(p));
-
-  // Add rest numbers
-  const restingWithNumber = resting.map(p => {
-    const c = restCount.get(p) || 0;
-    return `${p}#${c + 1}`;
-  });
-
-  schedulerState.roundIndex = (schedulerState.roundIndex || 0) + 1;
-
-  return {
-    round: schedulerState.roundIndex,
-    resting: restingWithNumber,
-    playing,
-    games,
-  };
-}
 function toggleRound() {
   const btn = document.getElementById("nextBtn");
   const textEl = document.getElementById("btnText");
   const icon = btn.querySelector(".icon");
-
+  const playmode = getPlayMode();
+  
   if (currentState === "idle") {
+    // ---- ENTER ACTIVE (BUSY) MODE ----
+    if (interactionLocked ==false) {
+      lockBtn.click();
+    }
     currentState = "active";
-    setStatus("In Progress");
-    document.body.classList.add("disabled");
+
+    // Disable everything except #nextBtn and .win-cup
+    document.querySelectorAll(
+      "button, .player-btn, .mode-card, .lock-icon, .swap-icon, .menu-btn"
+    ).forEach(el => {
+      if (el.id !== "nextBtn" && !el.classList.contains("win-cup")) {
+        // Disable clicks
+        el.style.pointerEvents = "none";
+        
+        // Add disabled styling
+        el.classList.add("disabled");    
+        
+      }
+    });   
+
+    document.querySelectorAll(".win-cup").forEach(cup => {
+      cup.style.visibility = "visible";
+      cup.style.pointerEvents = "auto";
+      cup.classList.add("blinking");
+      cup.style.visibility = playmode === "competitive" ? "visible" : "hidden";
+    });
+
   } else {
+    // ---- RETURN TO IDLE MODE ----   
+    if (playmode === "competitive") {     
+      const currentRoundGames = allRounds[allRounds.length - 1].games;
+      const winnersCount = currentRoundGames.filter(game => game.winner).length;
+      
+      if (!currentRoundGames.length || winnersCount !== currentRoundGames.length) {
+        alert("Please mark winners for all games");
+        return; // ❌ stay in active mode
+      }
+
+    }
     currentState = "idle";
     nextRound();
-    setStatus("Ready");
-    document.body.classList.remove("disabled");
+
+    
+   // Re-enable everything previously disabled
+    document.querySelectorAll(".disabled").forEach(el => {
+      // Restore pointer events
+      el.style.pointerEvents = "";
+    
+      // Remove the disabled class
+      el.classList.remove("disabled");
+    
+      // If you had removed inline onclick handlers, you may need to restore them manually
+      // For example, for the menu button:
+      if (el.classList.contains("menu-btn")) {
+        el.onclick = function() {
+          showPage('homePage', this);
+        };
+      }
+    });
+
+
+    // Hide & disable win cups
+    document.querySelectorAll(".win-cup").forEach(cup => {
+      cup.style.pointerEvents = "none";
+      cup.style.visibility = "hidden";
+    });
   }
 
   const state = roundStates[currentState];
   textEl.dataset.i18n = state.key;
   icon.textContent = state.icon;
   btn.classList.toggle("end", state.class === "end");
-
   setLanguage(currentLang);
 }
 
 
-function setStatus(status) {
-  statusEl.classList.remove("status-ready", "status-progress");
 
-  if (status === "Ready") {
+
+
+function setStatus(status) {
+  //statusEl.classList.remove("status-ready", "status-progress");
+
+  /*if (status === "Ready") {
     statusEl.dataset.i18n = "statusReady";
     statusEl.classList.add("status-ready");
   } else if (status === "In Progress") {
     statusEl.dataset.i18n = "statusProgress";
     statusEl.classList.add("status-progress");
-  }
+  } 
+*/
 
   // Re-apply translations so text updates immediately
   setLanguage(currentLang);
@@ -277,10 +182,13 @@ function getNextFixedPairGames(schedulerState, fixedPairs, numCourts) {
     }
 
     // ✅ Game is played → remove
+    playername1 = "";
+    playername2 = "";
     games.push({
       court: games.length + 1,
       pair1: [...game.pair1],
       pair2: [...game.pair2],
+      winners: [playername1, playername2]
     });
 
     usedPairs.add(k1);
@@ -293,197 +201,246 @@ function getNextFixedPairGames(schedulerState, fixedPairs, numCourts) {
   return games;
 }
 
-function gameFirstNextRound(schedulerState) {
-  const { activeplayers, numCourts, restCount } = schedulerState;
 
-  schedulerState.roundIndex ||= 0;
-  schedulerState.gamePlayedSet ||= new Set();
-  schedulerState.pairPlayedSet ||= new Set();
-  schedulerState.gameHistory ||= [];
+function AischedulerNextRound(schedulerState) {
 
-  const players = [...activeplayers];
-  const neededPlayers = numCourts * 4;
+  const { PlayedCount, activeplayers } = schedulerState;
+  const playmode = getPlayMode();
+  const page2 = document.getElementById("page2");
 
-  // --- helpers ---
-  const pairKey = (a, b) => [a, b].sort().join("&");
-  const gameKey = (p1, p2) =>
-    [pairKey(p1[0], p1[1]), pairKey(p2[0], p2[1])]
-      .sort()
-      .join(" vs ");
+  let result;
 
-  // --- generate all candidate games (ROUND ONLY) ---
-  const candidates = [];
-  for (let i = 0; i < players.length; i++) {
-    for (let j = i + 1; j < players.length; j++) {
-      for (let k = j + 1; k < players.length; k++) {
-        for (let l = k + 1; l < players.length; l++) {
-          const a = players[i], b = players[j];
-          const c = players[k], d = players[l];
-          candidates.push({ pair1: [a, b], pair2: [c, d] });
-          candidates.push({ pair1: [a, c], pair2: [b, d] });
-          candidates.push({ pair1: [a, d], pair2: [b, c] });
-        }
+  // Determine if competitive condition is satisfied
+  const canStartCompetitive =
+    activeplayers.length > 0 &&
+    activeplayers.every(p => (PlayedCount.get(p) || 0) >= 50);
+
+  // --------------------------------------------------
+  // RANDOM MODE
+  // --------------------------------------------------
+  if (playmode === "random" || !canStartCompetitive) {
+
+    // If switching FROM competitive TO random → reset random memory if needed
+    if (schedulerState._lastMode === "competitive") {
+      // Optional: reset if you want fresh random after comp
+      // resetForRandomPhase(schedulerState);
+    }
+
+    result = RandomRound(schedulerState);
+
+    page2.classList.remove("competitive-mode");
+    page2.classList.add("random-mode");
+
+    schedulerState._lastMode = "random";
+  }
+
+  // --------------------------------------------------
+  // COMPETITIVE MODE
+  // --------------------------------------------------
+  else {
+
+    // 🔥 RESET ONLY ONCE when entering competitive
+    if (schedulerState._lastMode !== "competitive") {
+      resetForCompetitivePhase(schedulerState);
+    }
+
+    result = CompetitiveRound(schedulerState);
+
+    page2.classList.remove("random-mode");
+    page2.classList.add("competitive-mode");
+
+    schedulerState._lastMode = "competitive";
+  }
+
+  return result;
+}
+
+function resetForCompetitivePhase(state) {
+
+  // Clear pair uniqueness memory
+  state.pairPlayedSet.clear();
+  state.playedTogether.clear();
+  state.gamesMap.clear();
+  state.pairCooldownMap.clear();
+
+  // Reset opponent tracking
+  state.opponentMap = new Map();
+  for (const p1 of state.activeplayers) {
+    const inner = new Map();
+    for (const p2 of state.activeplayers) {
+      if (p1 !== p2) inner.set(p2, 0);
+    }
+    state.opponentMap.set(p1, inner);
+  }
+
+  // DO NOT TOUCH:
+  // winCount
+  // rankPoints
+  // PlayedCount
+  // restCount
+  // restQueue
+}
+
+function getPlayingAndResting(state) {
+
+  const totalPlayers = state.activeplayers.length;
+  const playersPerRound = state.courts * 4;
+
+  let resting = [];
+  let playing = [];
+
+  if (totalPlayers > playersPerRound) {
+    const needRest = totalPlayers - playersPerRound;
+    resting = selectRestPlayers(state, needRest); // your LIFO logic
+  }
+
+  const restSet = new Set(resting);
+  playing = state.activeplayers.filter(p => !restSet.has(p));
+
+  return { playing, resting };
+}
+
+function extractActiveFixedPairs(state, playing) {
+
+  const activePairs = [];
+  const lockedPlayers = new Set();
+
+  for (const pair of state.fixedPairs || []) {
+    const [a, b] = pair;
+
+    if (playing.includes(a) && playing.includes(b)) {
+      activePairs.push([a, b]);
+      lockedPlayers.add(a);
+      lockedPlayers.add(b);
+    }
+  }
+
+  return { activePairs, lockedPlayers };
+}
+
+function groupByTier(state, players) {
+
+  const strong = [];
+  const inter = [];
+  const weak = [];
+
+  for (const p of players) {
+    const rating = state.winCount.get(p) || 0;
+
+    if (rating >= state.strongThreshold) strong.push(p);
+    else if (rating >= state.interThreshold) inter.push(p);
+    else weak.push(p);
+  }
+
+  return { strong, inter, weak };
+}
+
+function buildBestTeam(state, pool) {
+
+  for (let i = 0; i < pool.length; i++) {
+    for (let j = i + 1; j < pool.length; j++) {
+
+      const p1 = pool[i];
+      const p2 = pool[j];
+
+      const key = createSortedKey(p1, p2);
+
+      if (!state.pairPlayedSet.has(key)) {
+        return [p1, p2];
       }
     }
   }
 
-  // --- score by YOUR priority ---
-  const scored = candidates.map(g => {
-    let score = 0;
-    const pk1 = pairKey(...g.pair1);
-    const pk2 = pairKey(...g.pair2);
-    const gk = gameKey(g.pair1, g.pair2);
+  // fallback if no unique pair
+  return [pool[0], pool[1]];
+}
 
-    if (schedulerState.gamePlayedSet.has(gk)) score += 1000; // worst
-    if (schedulerState.pairPlayedSet.has(pk1)) score += 100;
-    if (schedulerState.pairPlayedSet.has(pk2)) score += 100;
+function CompetitiveRound(state) {
 
-    return { ...g, score };
-  });
+  const { playing, resting } = getPlayingAndResting(state);
 
-  scored.sort((a, b) => a.score - b.score);
-
-  // --- select games ---
   const games = [];
-  const usedPlayers = new Set();
+  const used = new Set();
 
-  for (const g of scored) {
-    const all = [...g.pair1, ...g.pair2];
-    if (all.some(p => usedPlayers.has(p))) continue;
+  // Step 1: Handle fixed pairs
+  const { activePairs, lockedPlayers } =
+      extractActiveFixedPairs(state, playing);
 
-    games.push({
-      court: games.length + 1,
-      pair1: g.pair1,
-      pair2: g.pair2,
-    });
+  // Add locked teams first
+  const lockedTeams = [...activePairs];
 
-    all.forEach(p => usedPlayers.add(p));
-    if (games.length >= numCourts) break;
+  // Remove locked players from free pool
+  const freePool = playing.filter(p => !lockedPlayers.has(p));
+
+  // Step 2: Resolve locked teams first
+  while (lockedTeams.length > 0) {
+
+    const team1 = lockedTeams.shift();
+
+    const opponent = buildBestTeam(state, freePool);
+
+    games.push([team1, opponent]);
+
+    team1.forEach(p => used.add(p));
+    opponent.forEach(p => used.add(p));
+
+    removePlayersFromArray(freePool, opponent);
   }
 
-  const playing = [...usedPlayers];
-  const resting = players.filter(p => !usedPlayers.has(p));
+  // Step 3: Pair remaining free pool
+  const tierGroups = groupByTier(state, freePool);
 
-  // --- persist history ---
-  for (const g of games) {
-    schedulerState.pairPlayedSet.add(pairKey(...g.pair1));
-    schedulerState.pairPlayedSet.add(pairKey(...g.pair2));
-    schedulerState.gamePlayedSet.add(gameKey(g.pair1, g.pair2));
-    schedulerState.gameHistory.push(gameKey(g.pair1, g.pair2));
+  const remaining = [...freePool];
+
+  while (remaining.length >= 4) {
+
+    const team1 = buildBestTeam(state, remaining);
+    removePlayersFromArray(remaining, team1);
+
+    const team2 = buildBestTeam(state, remaining);
+    removePlayersFromArray(remaining, team2);
+
+    games.push([team1, team2]);
   }
 
-  schedulerState.roundIndex++;
+  // Step 4: Update memory
+  updateAfterRound(state, games);
 
   return {
-    round: schedulerState.roundIndex,
-    playing,
-    resting: resting.map(p => {
-      const c = restCount.get(p) || 0;
-      return `${p}#${c + 1}`;
-    }),
     games,
+    resting
   };
 }
 
-function oldAischedulerNextRound(schedulerState) {
-  const {
-    activeplayers,
-    numCourts,
-    fixedPairs,
-    restCount,
-    opponentMap,
-    lastRound,
-    playCount,
-    pairPlayedSet,
-  } = schedulerState;
+function updateAfterRound(state, games) {
 
-  const PLAYERS_PER_ROUND = numCourts * 4;
+  for (const [team1, team2] of games) {
 
-  const getPlayCount = p => playCount.get(p) || 0;
+    const key1 = createSortedKey(team1[0], team1[1]);
+    const key2 = createSortedKey(team2[0], team2[1]);
 
-  // ---------- generate all possible pairs ----------
-  const pairs = [];
-  for (let i = 0; i < activeplayers.length; i++) {
-    for (let j = i + 1; j < activeplayers.length; j++) {
-      pairs.push([activeplayers[i], activeplayers[j]]);
+    state.pairPlayedSet.add(key1);
+    state.pairPlayedSet.add(key2);
+
+    // update opponent map
+    for (const p1 of team1) {
+      for (const p2 of team2) {
+        state.opponentMap.get(p1).set(
+          p2,
+          state.opponentMap.get(p1).get(p2) + 1
+        );
+        state.opponentMap.get(p2).set(
+          p1,
+          state.opponentMap.get(p2).get(p1) + 1
+        );
+      }
     }
   }
-
-  // ---------- generate all possible games ----------
-  const games = [];
-  for (let i = 0; i < pairs.length; i++) {
-    for (let j = i + 1; j < pairs.length; j++) {
-      const p1 = pairs[i];
-      const p2 = pairs[j];
-
-      const used = new Set([...p1, ...p2]);
-      if (used.size !== 4) continue;
-
-      const pairKey1 = p1.join("&");
-      const pairKey2 = p2.join("&");
-
-      const freshPairs =
-        !pairPlayedSet.has(pairKey1) &&
-        !pairPlayedSet.has(pairKey2);
-
-      const fairness = Math.max(
-        ...[...used].map(getPlayCount)
-      );
-
-      games.push({
-        pair1: p1,
-        pair2: p2,
-        freshness: freshPairs ? 1 : 0,
-        fairness,
-      });
-    }
-  }
-
-  // ---------- SORT (THIS IS THE ALGORITHM) ----------
-  games.sort((a, b) => {
-    // 1️⃣ freshness first
-    if (a.freshness !== b.freshness)
-      return b.freshness - a.freshness;
-
-    // 2️⃣ fewer-played players win
-    if (a.fairness !== b.fairness)
-      return a.fairness - b.fairness;
-
-    return 0;
-  });
-
-  // ---------- select games ----------
-  const selectedGames = [];
-  const usedPlayers = new Set();
-
-  for (const g of games) {
-    const players = [...g.pair1, ...g.pair2];
-    if (players.some(p => usedPlayers.has(p))) continue;
-
-    selectedGames.push({
-      court: selectedGames.length + 1,
-      pair1: g.pair1,
-      pair2: g.pair2,
-    });
-
-    players.forEach(p => usedPlayers.add(p));
-
-    if (selectedGames.length === numCourts) break;
-  }
-
-  const playing = [...usedPlayers];
-  const resting = activeplayers.filter(p => !usedPlayers.has(p));
-
-  return {
-    playing,
-    resting,
-    games: selectedGames,
-  };
 }
 
-// OLD function (unchanged)
-function existingAischedulerNextRound(schedulerState) {
 
+
+function RandomRound(schedulerState) {
   const {
     activeplayers,
     numCourts,
@@ -1342,6 +1299,339 @@ function chkrenderRestingPlayers(data, index) {
   return restDiv;
 }
 
+function renderGames(data, roundIndex) {
+  const wrapper = document.createElement('div');
+  const playmode = getPlayMode();
+
+  data.games.forEach((game, gameIndex) => {
+    const courtDiv = document.createElement('div');
+    courtDiv.className = 'courtcard';
+
+    const courtName = document.createElement('div');
+    courtName.classList.add('courtname');
+    courtName.textContent = `Court ${gameIndex + 1}`;
+
+    const teamsDiv = document.createElement('div');
+    teamsDiv.className = 'teams';
+
+    const makeTeamDiv = (teamSide) => {
+      const teamDiv = document.createElement('div');
+      teamDiv.className = 'team';
+      teamDiv.dataset.teamSide = teamSide;
+      teamDiv.dataset.gameIndex = gameIndex;
+
+      // 🔁 Swap icon
+      const swapIcon = document.createElement('div');
+      swapIcon.className = 'swap-icon';
+      swapIcon.innerHTML = '🔁';
+      teamDiv.appendChild(swapIcon);
+
+      // 👥 Players
+      const teamPairs = teamSide === 'L' ? game.pair1 : game.pair2;
+      teamPairs.forEach((p, i) => {
+        teamDiv.appendChild(
+          makePlayerButton(p, teamSide, gameIndex, i, data, roundIndex)
+        );
+      });
+
+      // 🏆 Win cup (created hidden)
+      const winCup = document.createElement('img');
+      winCup.src = 'win-cup.png';
+      winCup.className = 'win-cup blinking';
+      winCup.title = 'Mark winner';
+      winCup.style.visibility = 'hidden';
+      winCup.style.pointerEvents = 'none';
+
+      // Restore winner state
+      if (game.winner === teamSide) {
+        winCup.classList.add('active');
+        winCup.classList.remove('blinking');
+      }
+
+      // 🏆 Winner toggle logic (minimal, correct)
+      const toggleWinner = (e) => {
+        if (currentState === "idle") return;
+        e.stopPropagation();
+        e.preventDefault();
+
+        const allCups = teamDiv.parentElement.querySelectorAll('.win-cup');
+        const allSwapIcons = teamDiv.parentElement.querySelectorAll('.swap-icon');
+        const isActive = winCup.classList.contains('active');
+
+        if (!isActive) {
+          // 👉 Mark this team
+          allCups.forEach(cup => {
+            cup.classList.remove('active', 'blinking');
+            cup.style.visibility = 'hidden';
+            cup.style.pointerEvents = 'none';
+          });
+          
+          winCup.classList.add('active');
+          winCup.classList.remove('blinking');
+          winCup.style.visibility = 'visible';
+          winCup.style.pointerEvents = 'auto';
+
+          allSwapIcons.forEach(icon => {
+            icon.style.visibility = 'hidden';
+            icon.style.pointerEvents = 'none';
+          });
+
+          game.winner = teamSide;
+          game.winners = teamPairs.slice();
+        } else {
+          // 👉 Unmark → show BOTH cups again
+          allCups.forEach(cup => {
+            cup.classList.remove('active');
+            cup.classList.add('blinking');
+            cup.style.visibility = 'visible';
+            cup.style.pointerEvents = 'auto';
+          });
+
+          allSwapIcons.forEach(icon => {
+            icon.style.visibility = 'visible';
+            icon.style.pointerEvents = 'auto';
+          });
+
+          game.winner = undefined;
+          game.winners = [];
+        }
+      };
+
+      // Attach to BOTH team and cup
+      winCup.addEventListener('click', toggleWinner);
+      teamDiv.addEventListener('click', toggleWinner);
+
+      teamDiv.appendChild(winCup);
+
+      // 🔁 Swap logic (unchanged)
+      const isLatestRound = roundIndex === allRounds.length - 1;
+      if (isLatestRound) {
+        swapIcon.addEventListener('click', (e) => {
+          e.stopPropagation();
+          e.preventDefault();
+
+          if (game.winner) return; // Busy → no swap
+
+          if (window.selectedTeam) {
+            const src = window.selectedTeam;
+            if (src.gameIndex !== gameIndex) {
+              handleTeamSwapAcrossCourts(
+                src,
+                { teamSide, gameIndex },
+                data,
+                roundIndex
+              );
+            }
+            window.selectedTeam = null;
+            document.querySelectorAll('.selected-team').forEach(b => b.classList.remove('selected-team'));
+          } else {
+            window.selectedTeam = { teamSide, gameIndex };
+            teamDiv.classList.add('selected-team');
+          }
+        });
+      }
+
+      return teamDiv;
+    };
+
+    const teamLeft = makeTeamDiv('L');
+    const teamRight = makeTeamDiv('R');
+
+    const vs = document.createElement('span');
+    vs.className = 'vs';
+    vs.innerText = '  ';
+
+    teamsDiv.append(teamLeft, vs, teamRight);
+    courtDiv.append(courtName, teamsDiv);
+    wrapper.appendChild(courtDiv);
+  });
+
+  return wrapper;
+}
+
+
+function renderGames2(data, index) {
+  const wrapper = document.createElement('div');
+  const playmode = getPlayMode(); // "competitive" or "random"
+
+  data.games.forEach((game, gameIndex) => {
+    const courtDiv = document.createElement('div');
+    courtDiv.className = 'courtcard';
+
+    const courtName = document.createElement('div');
+    courtName.classList.add('courtname');
+    courtName.textContent = `Court ${gameIndex + 1}`;
+
+    const teamsDiv = document.createElement('div');
+    teamsDiv.className = 'teams';
+
+    const makeTeamDiv = (teamSide) => {
+      const teamDiv = document.createElement('div');
+      teamDiv.className = 'team';
+      teamDiv.dataset.teamSide = teamSide;
+      teamDiv.dataset.gameIndex = gameIndex;
+
+      // 🔁 Swap icon
+      const swapIcon = document.createElement('div');
+      swapIcon.className = 'swap-icon';
+      swapIcon.innerHTML = '🔁';
+      teamDiv.appendChild(swapIcon);
+
+      // 👥 Players
+      const teamPairs = teamSide === 'L' ? game.pair1 : game.pair2;
+      teamPairs.forEach((p, i) => {
+        teamDiv.appendChild(
+          makePlayerButton(p, teamSide, gameIndex, i, data, index)
+        );
+      });
+
+      // 🏆 Win cup
+      const winCup = document.createElement('img');
+      winCup.src = 'win-cup.png';
+      winCup.className = 'win-cup blinking';
+      winCup.title = 'Mark winner';
+
+      // Start hidden
+      winCup.style.visibility = 'hidden';
+      winCup.style.pointerEvents = 'none';
+
+      // Restore state
+      if (game.winner === teamSide) {
+        winCup.classList.add('active');
+        winCup.classList.remove('blinking');
+        winCup.style.visibility = 'visible';
+        winCup.style.pointerEvents = 'auto';
+      }
+
+      // 🏆 Win-cup logic (competitive mode only)
+      if (playmode === 'competitive') {
+        winCup.addEventListener('click', (e) => {
+          e.stopPropagation();
+          e.preventDefault();
+
+          const allCups = teamDiv.parentElement.querySelectorAll('.win-cup');
+          const allSwapIcons = teamDiv.parentElement.querySelectorAll('.swap-icon');
+          const isActive = winCup.classList.contains('active');
+
+          if (!isActive) {
+            // ---- ACTIVATE THIS TEAM ----
+            allCups.forEach(cup => {
+              cup.classList.remove('active', 'blinking');
+              cup.style.visibility = 'hidden';
+              cup.style.pointerEvents = 'none';
+            });
+
+            winCup.classList.add('active');
+            winCup.style.visibility = 'visible';
+            winCup.style.pointerEvents = 'auto';
+
+            // Disable swaps while busy
+            allSwapIcons.forEach(icon => {
+              icon.style.visibility = 'hidden';
+              icon.style.pointerEvents = 'none';
+            });
+
+            game.winner = teamSide;
+            game.winners = teamPairs.slice();
+          } else {
+            // ---- RESET TO IDLE ----
+            allCups.forEach(cup => {
+              cup.classList.remove('active');
+              cup.classList.add('blinking');
+              cup.style.visibility = 'hidden';
+              cup.style.pointerEvents = 'none';
+            });
+
+            // Re-enable swaps
+            allSwapIcons.forEach(icon => {
+              icon.style.visibility = 'visible';
+              icon.style.pointerEvents = 'auto';
+            });
+
+            game.winner = undefined;
+            game.winners = [];
+          }
+        });
+      }
+
+      teamDiv.appendChild(winCup);
+
+      // 🔁 Swap logic (EXACTLY like renderGamesold)
+      const isLatestRound = index === allRounds.length - 1;
+      if (isLatestRound) {
+        swapIcon.addEventListener('click', (e) => {
+          e.stopPropagation();
+          e.preventDefault();
+
+          if (game.winner) return; // Busy → no swap
+
+          if (window.selectedTeam) {
+            const src = window.selectedTeam;
+
+            if (src.gameIndex !== gameIndex) {
+              handleTeamSwapAcrossCourts(
+                src,
+                { teamSide, gameIndex },
+                data,
+                index
+              );
+            }
+
+            window.selectedTeam = null;
+            document
+              .querySelectorAll('.selected-team')
+              .forEach(b => b.classList.remove('selected-team'));
+
+          } else {
+            window.selectedTeam = { teamSide, gameIndex };
+            teamDiv.classList.add('selected-team');
+          }
+        });
+      }
+
+      return teamDiv;
+    };
+
+    const teamLeft = makeTeamDiv('L');
+    const teamRight = makeTeamDiv('R');
+
+    const vs = document.createElement('span');
+    vs.className = 'vs';
+    vs.innerText = '  ';
+
+    teamsDiv.append(teamLeft, vs, teamRight);
+    courtDiv.append(courtName, teamsDiv);
+    wrapper.appendChild(courtDiv);
+
+    // Restore visibility if winner exists
+    if (playmode === 'competitive' && game.winner) {
+      teamsDiv.querySelectorAll('.win-cup').forEach(cup => {
+        if (!cup.classList.contains('active')) {
+          cup.style.visibility = 'hidden';
+          cup.style.pointerEvents = 'none';
+        }
+      });
+      teamsDiv.querySelectorAll('.swap-icon').forEach(icon => {
+        icon.style.visibility = 'hidden';
+        icon.style.pointerEvents = 'none';
+      });
+    }
+  });
+
+  return wrapper;
+}
+
+
+
+
+
+function updateWinCupVisibility() {
+  const playmode = getPlayMode();
+  document.querySelectorAll('.win-cup').forEach(cup => {
+    cup.style.display = playmode === "competitive" ? "" : "none";
+  });
+}
+
 
 function renderRestingPlayers(data, index) {
   const restDiv = document.createElement('div');
@@ -1388,83 +1678,7 @@ restDiv.appendChild(title);
 }
 
 
-function renderGamestmp(data, index) {
-  const wrapper = document.createElement('div');
 
-  data.games.forEach((game, gameIndex) => {
-    const teamsDiv = document.createElement('div');
-    teamsDiv.className = 'teams';
-
-    const makeTeamDiv = (teamSide) => {
-      const teamDiv = document.createElement('div');
-      teamDiv.className = 'team';
-      teamDiv.dataset.teamSide = teamSide;
-      teamDiv.dataset.gameIndex = gameIndex;
-
-      const swapIcon = document.createElement('div');
-      swapIcon.className = 'swap-icon';
-      swapIcon.innerHTML = '🔁';
-      teamDiv.appendChild(swapIcon);
-
-      // 👥 Players
-      const teamPairs = teamSide === 'L' ? game.pair1 : game.pair2;
-      const playerNames = [];
-
-      teamPairs.forEach((p, i) => {
-        playerNames.push(p);
-        teamDiv.appendChild(
-          makePlayerButton(p, teamSide, gameIndex, i, data, index)
-        );
-      });
-
-      // 🎨 SET TEAM TYPE (men / women / mixed)
-      const teamType = getTeamTypeFromPairs(playerNames);
-      teamDiv.dataset.teamType = teamType;
-      
-      // 🔁 Swap logic (latest round only)
-      const isLatestRound = index === allRounds.length - 1;
-      if (isLatestRound) {
-        swapIcon.addEventListener('click', (e) => {
-          e.stopPropagation();
-          e.preventDefault();
-
-          if (window.selectedTeam) {
-            const src = window.selectedTeam;
-            if (src.gameIndex !== gameIndex) {
-              handleTeamSwapAcrossCourts(
-                src,
-                { teamSide, gameIndex },
-                data,
-                index
-              );
-            }
-            window.selectedTeam = null;
-            document
-              .querySelectorAll('.selected-team')
-              .forEach(el => el.classList.remove('selected-team'));
-          } else {
-            window.selectedTeam = { teamSide, gameIndex };
-            teamDiv.classList.add('selected-team');
-          }
-        });
-      }
-
-      return teamDiv;
-    };
-
-    const team1 = makeTeamDiv('L');
-    const team2 = makeTeamDiv('R');
-
-    const vs = document.createElement('span');
-    vs.className = 'vs';
-    vs.innerText = '  ';
-
-    teamsDiv.append(team1, vs, team2);
-    wrapper.appendChild(teamsDiv);
-  });
-
-  return wrapper;
-}
 
 function getGenderByName(playerName) {
   const p = schedulerState.allPlayers.find(pl => pl.name === playerName);
@@ -1488,174 +1702,7 @@ function getTeamTypeFromPairs(playerNames) {
 
   return "unknown";
 }
-function renderGames(data, index) {
-  const wrapper = document.createElement('div');
 
-  data.games.forEach((game, gameIndex) => {
-
-    // 🟦 Create the main container for the court
-    const courtDiv = document.createElement('div');
-    courtDiv.className = 'courtcard';
-
-    // 🏟️ Court name / number (TOP)
-    const courtName = document.createElement('div');
-    courtName.classList.add('courtname');
-    courtName.textContent = `Court ${gameIndex + 1}`;
-
-    // 🟨 Teams container (BELOW court name)
-    const teamsDiv = document.createElement('div');
-    teamsDiv.className = 'teams';
-
-    // Helper → Team letters (A, B, C, D...)
-    const getTeamLetter = (gameIndex, teamSide) => {
-      const teamNumber = gameIndex * 2 + (teamSide === 'L' ? 0 : 1);
-      return String.fromCharCode(65 + teamNumber);
-    };
-
-    // 🧩 Create a team block
-    const makeTeamDiv = (teamSide) => {
-      const teamDiv = document.createElement('div');
-      teamDiv.className = 'team';
-      teamDiv.dataset.teamSide = teamSide;
-      teamDiv.dataset.gameIndex = gameIndex;
-
-      // 🔁 Swap icon
-      const swapIcon = document.createElement('div');
-      swapIcon.className = 'swap-icon';
-      swapIcon.innerHTML = '🔁';
-      teamDiv.appendChild(swapIcon);
-
-      // 👥 Add player buttons
-      const teamPairs = teamSide === 'L' ? game.pair1 : game.pair2;
-      teamPairs.forEach((p, i) => {
-        teamDiv.appendChild(
-          makePlayerButton(p, teamSide, gameIndex, i, data, index)
-        );
-      });
-
-      // ✅ Swap logic (only for latest round)
-      const isLatestRound = index === allRounds.length - 1;
-      if (isLatestRound) {
-        swapIcon.addEventListener('click', (e) => {
-          e.stopPropagation();
-          e.preventDefault();
-
-          if (window.selectedTeam) {
-            const src = window.selectedTeam;
-
-            if (src.gameIndex !== gameIndex) {
-              handleTeamSwapAcrossCourts(
-                src,
-                { teamSide, gameIndex },
-                data,
-                index
-              );
-            }
-
-            window.selectedTeam = null;
-            document
-              .querySelectorAll('.selected-team')
-              .forEach(b => b.classList.remove('selected-team'));
-
-          } else {
-            window.selectedTeam = { teamSide, gameIndex };
-            teamDiv.classList.add('selected-team');
-          }
-        });
-      }
-
-      return teamDiv;
-    };
-
-    // 🟢 Create left & right teams
-    const teamLeft = makeTeamDiv('L');
-    const teamRight = makeTeamDiv('R');
-
-    // ⚪ VS label
-    const vs = document.createElement('span');
-    vs.className = 'vs';
-    vs.innerText = '  ';
-
-    // 🧱 Build structure (ORDER MATTERS)
-    teamsDiv.append(teamLeft, vs, teamRight);
-    courtDiv.append(courtName, teamsDiv);
-    wrapper.appendChild(courtDiv);
-  });
-
-  return wrapper;
-}
-
-
-function renderGamesxxx(data, index) {
-  const wrapper = document.createElement('div');
-  data.games.forEach((game, gameIndex) => {
-    // 🟦 Create the main container for the match
-    const courtDiv = document.createElement('div');
-    courtDiv.className = 'courtcard';
-    
-    const teamsDiv = document.createElement('div');
-    teamsDiv.className = 'teams';
-    // Helper → Team letters (A, B, C, D...)
-    const getTeamLetter = (gameIndex, teamSide) => {
-      const teamNumber = gameIndex * 2 + (teamSide === 'L' ? 0 : 1);
-      return String.fromCharCode(65 + teamNumber);
-    };
-    const makeTeamDiv = (teamSide) => {
-      const teamDiv = document.createElement('div');
-      teamDiv.className = 'team';
-      teamDiv.dataset.teamSide = teamSide;
-      teamDiv.dataset.gameIndex = gameIndex;
-      // 🔁 Swap icon
-      const swapIcon = document.createElement('div');
-      swapIcon.className = 'swap-icon';
-      swapIcon.innerHTML = '🔁';
-      teamDiv.appendChild(swapIcon);
-      // 👥 Add player buttons
-      const teamPairs = teamSide === 'L' ? game.pair1 : game.pair2;
-      teamPairs.forEach((p, i) => {
-        teamDiv.appendChild(makePlayerButton(p, teamSide, gameIndex, i, data, index));
-      });
-      // ✅ Swap logic (only for latest round)
-      const isLatestRound = index === allRounds.length - 1;
-      if (isLatestRound) {
-        swapIcon.addEventListener('click', (e) => {
-          e.stopPropagation();
-          e.preventDefault();
-          if (window.selectedTeam) {
-            const src = window.selectedTeam;
-            if (src.gameIndex !== gameIndex) {
-              handleTeamSwapAcrossCourts(src, { teamSide, gameIndex }, data, index);
-            }
-            window.selectedTeam = null;
-            document
-              .querySelectorAll('.selected-team')
-              .forEach(b => b.classList.remove('selected-team'));
-          } else {
-            window.selectedTeam = { teamSide, gameIndex };
-            teamDiv.classList.add('selected-team');
-          }
-        });
-      }
-      return teamDiv;
-    };
-    // 🟢 Create left & right sides
-    const team1 = makeTeamDiv('L');
-    const team2 = makeTeamDiv('R');
-    // ⚪ VS label
-    const vs = document.createElement('span');
-    vs.className = 'vs';
-    vs.innerText = '  ';
-    // Add everything to container
-    teamsDiv.append(team1, vs, team2);
-    // 🔑 wrap teams inside courtcard
-courtDiv.appendChild(teamsDiv);
-
-// 🔑 add courtcard to wrapper
-wrapper.appendChild(courtDiv);
-    //wrapper.appendChild(teamsDiv);
-  });
-  return wrapper;
-}
 
 function makeRestButton(player, data, index) {
   const btn = document.createElement('button');
@@ -2199,7 +2246,44 @@ lockBtn.addEventListener('click', () => {
   document.body.classList.toggle('locked', interactionLocked);
 
   // Update icon text
-  lockBtn.textContent = interactionLocked ? '🔒' : '🔓';
+  //lockBtn.textContent = interactionLocked ? '🔒' : '🔓';
 });
+
+
+
+
+
+
+
+
+
+function getPlayMode() {
+  return document.getElementById("modeToggle").checked
+    ? "competitive"
+    : "random";
+}
+
+const modeToggle = document.getElementById("modeToggle");
+const modeLabel  = document.getElementById("modeLabel");
+
+// Restore saved mode
+modeToggle.checked = localStorage.getItem("playMode") === "competitive";
+updateModeLabel();
+
+modeToggle.addEventListener("change", () => {
+  localStorage.setItem("playMode", getPlayMode());
+  updateModeLabel();
+  //updateWinCupVisibility(); // <-- update cups visibility when mode changes
+});
+
+
+
+
+function updateModeLabel() {
+  modeLabel.textContent =
+    getPlayMode() === "competitive"
+      ? "🏆"
+      : "🎲";
+}
 
 
