@@ -174,7 +174,7 @@ function hideImportModal() {
 /* =========================
    ADD SINGLE PLAYER
 ========================= */
-function addPlayer() {
+function addPlayerokd() {
 
   const textarea = document.getElementById("players-names");
   if (!textarea) return;
@@ -1700,7 +1700,115 @@ function newImportAddIfNotExists(list, player) {
   return false;
 }
 
+function addPlayer() {
 
+  const textarea = document.getElementById("players-names");
+  if (!textarea) return;
+
+  const text = textarea.value.trim();
+  if (!text) return;
+
+  const defaultGender =
+    document.getElementById("player-gender")?.value || "Male";
+
+  const lines = text.split(/\r?\n/);
+
+  // ======================
+  // GENDER LOOKUP (multi-language)
+  // ======================
+  const genderLookup = {};
+
+  if (typeof translations !== "undefined") {
+    Object.values(translations).forEach(langObj => {
+      if (langObj.male)
+        genderLookup[langObj.male.toLowerCase()] = "Male";
+
+      if (langObj.female)
+        genderLookup[langObj.female.toLowerCase()] = "Female";
+    });
+  }
+
+  // fallback English
+  genderLookup["male"] = "Male";
+  genderLookup["m"] = "Male";
+  genderLookup["female"] = "Female";
+  genderLookup["f"] = "Female";
+
+  const extractedPlayers = [];
+
+  for (let line of lines) {
+
+    line = line.trim();
+    if (!line) continue;
+
+    let gender = defaultGender;
+
+    // Remove numbering (1. John → John)
+    const match = line.match(/^(\d+\.?\s*)?(.*)$/);
+    if (match) line = match[2].trim();
+
+    // name, gender
+    if (line.includes(",")) {
+      const parts = line.split(",").map(p => p.trim());
+      line = parts[0];
+
+      if (parts[1]) {
+        const g = parts[1].toLowerCase();
+        if (genderLookup[g]) gender = genderLookup[g];
+      }
+    }
+
+    // name (gender)
+    const parenMatch = line.match(/\(([^)]+)\)/);
+    if (parenMatch) {
+      const inside = parenMatch[1].trim().toLowerCase();
+      if (genderLookup[inside]) gender = genderLookup[inside];
+      line = line.replace(/\([^)]+\)/, "").trim();
+    }
+
+    if (!line) continue;
+
+    const normalized = line.toLowerCase();
+
+    // prevent duplicates ONLY inside selectedPlayers
+    const exists =
+      newImportState.selectedPlayers.some(
+        p => p.displayName.trim().toLowerCase() === normalized
+      ) ||
+      extractedPlayers.some(
+        p => p.displayName.trim().toLowerCase() === normalized
+      );
+
+    if (!exists) {
+      extractedPlayers.push({
+        displayName: line,
+        gender: gender
+      });
+    }
+  }
+
+  if (!extractedPlayers.length) return;
+
+  // ======================
+  // ADD TO SELECTED PLAYERS ONLY
+  // ======================
+  extractedPlayers.forEach(player => {
+    newImportAddIfNotExists(
+      newImportState.selectedPlayers,
+      player
+    );
+  });
+
+  newImportRefreshSelectedCards();
+  newImportRefreshSelectCards();
+
+  // ======================
+  // RESET UI
+  // ======================
+  textarea.value = "";
+  textarea.style.height = "40px";
+  textarea.focus();
+}
 // ================= CLEAR LISTS =================
 function newImportClearHistory(){
   if(!confirm("Clear history?")) return;
