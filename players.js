@@ -1789,18 +1789,40 @@ function addPlayer() {
 
   if (!extractedPlayers.length) return;
 
-  // ======================
-  // ADD TO SELECTED PLAYERS ONLY
-  // ======================
-  extractedPlayers.forEach(player => {
-    newImportAddIfNotExists(
-      newImportState.selectedPlayers,
-      player
-    );
-  });
+// ======================
+// ADD TO SELECTED + HISTORY
+// ======================
+extractedPlayers.forEach(player => {
 
-  newImportRefreshSelectedCards();
-  newImportRefreshSelectCards();
+  // Add to selected
+  newImportAddIfNotExists(
+    newImportState.selectedPlayers,
+    player
+  );
+
+  // Add to history
+  if (newImportAddIfNotExists(
+        newImportState.historyPlayers,
+        {...player}
+      )) {
+    // keep newest on top
+    newImportState.historyPlayers.unshift(player);
+  }
+
+});
+
+// keep max 50
+newImportState.historyPlayers =
+  newImportState.historyPlayers.slice(0, 50);
+
+// save history
+localStorage.setItem(
+  "newImportHistory",
+  JSON.stringify(newImportState.historyPlayers)
+);
+
+newImportRefreshSelectedCards();
+newImportRefreshSelectCards();
 
   // ======================
   // RESET UI
