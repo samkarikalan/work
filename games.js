@@ -132,6 +132,9 @@ function toggleRound() {
       cup.style.visibility = playmode === "competitive" ? "visible" : "hidden";
     });
 
+    
+    page2.classList.add("active-mode");
+
   } else {
     // ---- RETURN TO IDLE MODE ----   
     if (playmode === "competitive") {     
@@ -146,7 +149,7 @@ function toggleRound() {
     }
     currentState = "idle";
     nextRound();
-
+    page2.classList.remove("active-mode");
     
    // Re-enable everything previously disabled
     document.querySelectorAll(".disabled").forEach(el => {

@@ -12,7 +12,14 @@
 #page2.competitive-mode {
   background-color: #fff3e6;   /* light orange */
 }
+#page2.idle-mode {
+  background-color: none;   /* light blue */
+}
 
+/* Competitive Mode */
+#page2.active-mode {
+  background-color: #d0d89a;   /* light orange */
+}
 
 
 
@@ -82,12 +89,13 @@
 
 
 .repeated-pair {
-  border: 2px dashed orange;
-  background: rgba(255, 165, 0, 0.08);
+   outline: 1px solid rgba(255, 0, 0, 0.4);
+  background: #e6a5a559 !important;
 }
 
 .repeated-game {
   outline: 3px solid rgba(255, 0, 0, 0.4);
+ background: #ebd5d5 !important;
 }
 
 
