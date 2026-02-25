@@ -138,25 +138,30 @@
 <!--           PAGE 1              -->
 <!--         Players Page          -->
 <!-- ============================= -->
+<!-- ============================= -->
+<!--           PAGE 1              -->
+<!--         Players Page          -->
+<!-- ============================= -->
 <div id="page1" class="page">
 
-  <div class="card">
-    <button onclick="newImportShowModal()"></button>
-  </div>
+  <div class="card">    
+    <button onclick="newImportShowModal()" data-i18n="importPlayers"></button>
+  </div> 
 
   <div class="card">
     <div id="playerList" class="player-list"></div>
   </div>
 
   <div class="card">
-    <h3></h3>
+    <h3 data-i18n="fixedPairs"></h3>
     <select id="fixed-pair-1"></select>
     <select id="fixed-pair-2"></select>
-    <button onclick="modifyFixedPair()"></button>
+    <button onclick="modifyFixedPair()" data-i18n="add"></button>
+
     <div id="fixed-pair-list" class="fixed-pairs-list"></div>
   </div>
 
-</div>
+</div> <!-- page1 -->
   <!-- ✅ page1 closes HERE --> <!-- page1 -->
 
 <!-- ============================= -->
