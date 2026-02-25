@@ -52,6 +52,7 @@ const translations = {
     confirmResetGames: "Do you want to reset games only?",
     endRoundsConfirm: "Do you want to end the rounds?",
     yes: "Yes",
+    browsePlayersSub: "Select from saved players",
     statusReady: "Status: Ready",
     statusProgress: "Status: Progress..."
 
