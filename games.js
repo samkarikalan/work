@@ -18,6 +18,53 @@ const roundStates = {
   }
 };
 
+function getPairKey(a, b) {
+  return [a, b].sort().join("|");
+}
+
+function getGameKey(arr) {
+  return arr.slice().sort().join("|");
+}
+
+const repetitionHistory = {
+  pairSet: new Set(),
+  gameSet: new Set(),
+  builtUntilRound: -1
+};
+
+function updatePreviousHistory(currentRoundIndex) {
+
+  // Safety reset if user goes backwards or reset happens
+  if (repetitionHistory.builtUntilRound >= currentRoundIndex - 1) {
+    repetitionHistory.pairSet.clear();
+    repetitionHistory.gameSet.clear();
+    repetitionHistory.builtUntilRound = -1;
+  }
+
+  // Build only missing rounds
+  for (let i = repetitionHistory.builtUntilRound + 1; i < currentRoundIndex; i++) {
+
+    const round = allRounds[i];
+    if (!round?.games) continue;
+
+    for (const game of round.games) {
+      const t1 = game.team1;
+      const t2 = game.team2;
+
+      repetitionHistory.pairSet.add(getPairKey(t1[0], t1[1]));
+      repetitionHistory.pairSet.add(getPairKey(t2[0], t2[1]));
+
+      repetitionHistory.gameSet.add(getGameKey([...t1, ...t2]));
+    }
+  }
+
+  repetitionHistory.builtUntilRound = currentRoundIndex - 1;
+}
+
+
+
+
+
 function toggleRound() {
   const btn = document.getElementById("nextBtn");
   const textEl = document.getElementById("btnText");
@@ -1299,7 +1346,89 @@ function chkrenderRestingPlayers(data, index) {
   return restDiv;
 }
 
-function renderGames(data, roundIndex) {
+function renderGames(roundIndex) {
+
+  const round = allRounds[roundIndex];
+  if (!round || !round.games) return;
+
+  const gamesContainer = document.getElementById("games-container");
+  gamesContainer.innerHTML = "";
+
+  // ===============================
+  // BUILD PREVIOUS HISTORY
+  // ===============================
+
+  const previousPairSet = new Set();
+  const previousGameSet = new Set();
+
+  for (let i = 0; i < roundIndex; i++) {
+    const prevRound = allRounds[i];
+    if (!prevRound?.games) continue;
+
+    for (const g of prevRound.games) {
+      const t1 = g.team1;
+      const t2 = g.team2;
+
+      previousPairSet.add(getPairKey(t1[0], t1[1]));
+      previousPairSet.add(getPairKey(t2[0], t2[1]));
+
+      previousGameSet.add(getGameKey([...t1, ...t2]));
+    }
+  }
+
+  // ===============================
+  // RENDER CURRENT ROUND GAMES
+  // ===============================
+
+  round.games.forEach((game, gameIndex) => {
+
+    const team1 = game.team1;
+    const team2 = game.team2;
+
+    const gameDiv = document.createElement("div");
+    gameDiv.className = "game";
+
+    const team1Div = document.createElement("div");
+    team1Div.className = "team team1";
+    team1Div.textContent = team1.join(" & ");
+
+    const team2Div = document.createElement("div");
+    team2Div.className = "team team2";
+    team2Div.textContent = team2.join(" & ");
+
+    // ===============================
+    // CHECK REPETITION
+    // ===============================
+
+    const pair1Key = getPairKey(team1[0], team1[1]);
+    const pair2Key = getPairKey(team2[0], team2[1]);
+    const gameKey  = getGameKey([...team1, ...team2]);
+
+    if (previousPairSet.has(pair1Key)) {
+      team1Div.classList.add("repeated-pair");
+    }
+
+    if (previousPairSet.has(pair2Key)) {
+      team2Div.classList.add("repeated-pair");
+    }
+
+    if (previousGameSet.has(gameKey)) {
+      gameDiv.classList.add("repeated-game");
+    }
+
+    // ===============================
+    // APPEND
+    // ===============================
+
+    gameDiv.appendChild(team1Div);
+    gameDiv.appendChild(team2Div);
+
+    gamesContainer.appendChild(gameDiv);
+  });
+}
+
+
+function goodrenderGames(data, roundIndex) {
   const wrapper = document.createElement('div');
   const playmode = getPlayMode();
 
