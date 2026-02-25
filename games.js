@@ -1346,85 +1346,193 @@ function chkrenderRestingPlayers(data, index) {
   return restDiv;
 }
 
-function renderGames(roundIndex) {
+function renderGames(data, roundIndex) {
 
-  const round = allRounds[roundIndex];
-  if (!round || !round.games) return;
+  const wrapper = document.createElement('div');
+  const playmode = getPlayMode();
 
-  const gamesContainer = document.getElementById("games-container");
-  gamesContainer.innerHTML = "";
-
-  // ===============================
-  // BUILD PREVIOUS HISTORY
-  // ===============================
-
+  // ⭐ ADDED — Build previous history
   const previousPairSet = new Set();
   const previousGameSet = new Set();
 
   for (let i = 0; i < roundIndex; i++) {
-    const prevRound = allRounds[i];
-    if (!prevRound?.games) continue;
+    const prev = allRounds[i];
+    if (!prev?.games) continue;
 
-    for (const g of prevRound.games) {
-      const t1 = g.team1;
-      const t2 = g.team2;
+    prev.games.forEach(g => {
+      if (!g?.pair1 || !g?.pair2) return;
 
-      previousPairSet.add(getPairKey(t1[0], t1[1]));
-      previousPairSet.add(getPairKey(t2[0], t2[1]));
+      previousPairSet.add(getPairKey(g.pair1[0], g.pair1[1]));
+      previousPairSet.add(getPairKey(g.pair2[0], g.pair2[1]));
 
-      previousGameSet.add(getGameKey([...t1, ...t2]));
-    }
+      previousGameSet.add(
+        getGameKey([...g.pair1, ...g.pair2])
+      );
+    });
   }
 
-  // ===============================
-  // RENDER CURRENT ROUND GAMES
-  // ===============================
+  data.games.forEach((game, gameIndex) => {
 
-  round.games.forEach((game, gameIndex) => {
+    const courtDiv = document.createElement('div');
+    courtDiv.className = 'courtcard';
 
-    const team1 = game.team1;
-    const team2 = game.team2;
+    const courtName = document.createElement('div');
+    courtName.classList.add('courtname');
+    courtName.textContent = `Court ${gameIndex + 1}`;
 
-    const gameDiv = document.createElement("div");
-    gameDiv.className = "game";
+    const teamsDiv = document.createElement('div');
+    teamsDiv.className = 'teams';
 
-    const team1Div = document.createElement("div");
-    team1Div.className = "team team1";
-    team1Div.textContent = team1.join(" & ");
+    const makeTeamDiv = (teamSide) => {
 
-    const team2Div = document.createElement("div");
-    team2Div.className = "team team2";
-    team2Div.textContent = team2.join(" & ");
+      const teamDiv = document.createElement('div');
+      teamDiv.className = 'team';
+      teamDiv.dataset.teamSide = teamSide;
+      teamDiv.dataset.gameIndex = gameIndex;
 
-    // ===============================
-    // CHECK REPETITION
-    // ===============================
+      // ⭐ ADDED — Pair repetition detection
+      const teamPairs = teamSide === 'L' ? game.pair1 : game.pair2;
 
-    const pair1Key = getPairKey(team1[0], team1[1]);
-    const pair2Key = getPairKey(team2[0], team2[1]);
-    const gameKey  = getGameKey([...team1, ...team2]);
+      if (teamPairs) {
+        const pairKey = getPairKey(teamPairs[0], teamPairs[1]);
+        if (previousPairSet.has(pairKey)) {
+          teamDiv.classList.add('repeated-pair');
+        }
+      }
 
-    if (previousPairSet.has(pair1Key)) {
-      team1Div.classList.add("repeated-pair");
+      // 🔁 Swap icon
+      const swapIcon = document.createElement('div');
+      swapIcon.className = 'swap-icon';
+      swapIcon.innerHTML = '🔁';
+      teamDiv.appendChild(swapIcon);
+
+      // 👥 Players
+      teamPairs.forEach((p, i) => {
+        teamDiv.appendChild(
+          makePlayerButton(p, teamSide, gameIndex, i, data, roundIndex)
+        );
+      });
+
+      // 🏆 Win cup (created hidden)
+      const winCup = document.createElement('img');
+      winCup.src = 'win-cup.png';
+      winCup.className = 'win-cup blinking';
+      winCup.title = 'Mark winner';
+      winCup.style.visibility = 'hidden';
+      winCup.style.pointerEvents = 'none';
+
+      if (game.winner === teamSide) {
+        winCup.classList.add('active');
+        winCup.classList.remove('blinking');
+      }
+
+      const toggleWinner = (e) => {
+        if (currentState === "idle") return;
+        e.stopPropagation();
+        e.preventDefault();
+
+        const allCups = teamDiv.parentElement.querySelectorAll('.win-cup');
+        const allSwapIcons = teamDiv.parentElement.querySelectorAll('.swap-icon');
+        const isActive = winCup.classList.contains('active');
+
+        if (!isActive) {
+          allCups.forEach(cup => {
+            cup.classList.remove('active', 'blinking');
+            cup.style.visibility = 'hidden';
+            cup.style.pointerEvents = 'none';
+          });
+
+          winCup.classList.add('active');
+          winCup.classList.remove('blinking');
+          winCup.style.visibility = 'visible';
+          winCup.style.pointerEvents = 'auto';
+
+          allSwapIcons.forEach(icon => {
+            icon.style.visibility = 'hidden';
+            icon.style.pointerEvents = 'none';
+          });
+
+          game.winner = teamSide;
+          game.winners = teamPairs.slice();
+        } else {
+          allCups.forEach(cup => {
+            cup.classList.remove('active');
+            cup.classList.add('blinking');
+            cup.style.visibility = 'visible';
+            cup.style.pointerEvents = 'auto';
+          });
+
+          allSwapIcons.forEach(icon => {
+            icon.style.visibility = 'visible';
+            icon.style.pointerEvents = 'auto';
+          });
+
+          game.winner = undefined;
+          game.winners = [];
+        }
+      };
+
+      winCup.addEventListener('click', toggleWinner);
+      teamDiv.addEventListener('click', toggleWinner);
+
+      teamDiv.appendChild(winCup);
+
+      const isLatestRound = roundIndex === allRounds.length - 1;
+      if (isLatestRound) {
+        swapIcon.addEventListener('click', (e) => {
+          e.stopPropagation();
+          e.preventDefault();
+
+          if (game.winner) return;
+
+          if (window.selectedTeam) {
+            const src = window.selectedTeam;
+            if (src.gameIndex !== gameIndex) {
+              handleTeamSwapAcrossCourts(
+                src,
+                { teamSide, gameIndex },
+                data,
+                roundIndex
+              );
+            }
+            window.selectedTeam = null;
+            document.querySelectorAll('.selected-team')
+              .forEach(b => b.classList.remove('selected-team'));
+          } else {
+            window.selectedTeam = { teamSide, gameIndex };
+            teamDiv.classList.add('selected-team');
+          }
+        });
+      }
+
+      return teamDiv;
+    };
+
+    const teamLeft = makeTeamDiv('L');
+    const teamRight = makeTeamDiv('R');
+
+    // ⭐ ADDED — Full game repetition detection
+    if (game?.pair1 && game?.pair2) {
+      const fullGameKey = getGameKey([
+        ...game.pair1,
+        ...game.pair2
+      ]);
+
+      if (previousGameSet.has(fullGameKey)) {
+        courtDiv.classList.add('repeated-game');
+      }
     }
 
-    if (previousPairSet.has(pair2Key)) {
-      team2Div.classList.add("repeated-pair");
-    }
+    const vs = document.createElement('span');
+    vs.className = 'vs';
+    vs.innerText = '  ';
 
-    if (previousGameSet.has(gameKey)) {
-      gameDiv.classList.add("repeated-game");
-    }
-
-    // ===============================
-    // APPEND
-    // ===============================
-
-    gameDiv.appendChild(team1Div);
-    gameDiv.appendChild(team2Div);
-
-    gamesContainer.appendChild(gameDiv);
+    teamsDiv.append(teamLeft, vs, teamRight);
+    courtDiv.append(courtName, teamsDiv);
+    wrapper.appendChild(courtDiv);
   });
+
+  return wrapper;
 }
 
 
