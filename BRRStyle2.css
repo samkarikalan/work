@@ -81,6 +81,18 @@
 }
 
 
+.repeated-pair {
+  border: 2px dashed orange;
+  background: rgba(255, 165, 0, 0.08);
+}
+
+.repeated-game {
+  outline: 3px solid rgba(255, 0, 0, 0.4);
+}
+
+
+
+
 .mode-card {
   display: flex;
   align-items: center;
