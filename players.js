@@ -1268,6 +1268,26 @@ function debounce(func, delay = 250) {
 // ======================
 // MODAL
 // ======================
+// ======================
+// REMOVE DUPLICATES (GLOBAL SAFE)
+// ======================
+function newImportDeduplicate(list) {
+
+  const map = new Map();
+
+  list.forEach(player => {
+    const key = player.displayName.trim().toLowerCase();
+
+    if (!map.has(key)) {
+      map.set(key, player);
+    } else {
+      // If duplicate found, prefer latest data (keeps updated gender)
+      map.set(key, player);
+    }
+  });
+
+  return Array.from(map.values());
+}
 
 // ================= STATE =================
 const newImportState = {
@@ -1383,14 +1403,29 @@ function newImportShowSelectModeor(mode){
 
 // ================= STORAGE =================
 function newImportLoadHistory(){
-  const data=localStorage.getItem("newImportHistory");
-  newImportState.historyPlayers=data?JSON.parse(data):[];
+  const data = localStorage.getItem("newImportHistory");
+  newImportState.historyPlayers = data
+    ? newImportDeduplicate(JSON.parse(data))
+    : [];
+
+  localStorage.setItem(
+    "newImportHistory",
+    JSON.stringify(newImportState.historyPlayers)
+  );
 }
 
 function newImportLoadFavorites(){
-  const data=localStorage.getItem("newImportFavorites");
-  newImportState.favoritePlayers=data?JSON.parse(data):[];
+  const data = localStorage.getItem("newImportFavorites");
+  newImportState.favoritePlayers = data
+    ? newImportDeduplicate(JSON.parse(data))
+    : [];
+
+  localStorage.setItem(
+    "newImportFavorites",
+    JSON.stringify(newImportState.favoritePlayers)
+  );
 }
+
 
 function newImportSaveFavorites(){
   localStorage.setItem(
