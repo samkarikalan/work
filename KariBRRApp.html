@@ -144,9 +144,16 @@
 <!-- ============================= -->
 <div id="page1" class="page">
 
-  <div class="card">    
-    <button onclick="newImportShowModal()" data-i18n="importPlayers"></button>
-  </div> 
+  <div class="card browse-card" onclick="newImportShowModal()">
+  
+  <div class="browse-left">
+    <span class="browse-title" data-i18n="importPlayers"></span>
+    <span class="browse-sub" data-i18n="browsePlayersSub"></span>
+  </div>
+
+  <div class="browse-arrow">›</div>
+
+</div> 
 
   <div class="card">
     <div id="playerList" class="player-list"></div>
