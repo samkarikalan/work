@@ -17,13 +17,13 @@ const roundStates = {
     class: "end"
   }
 };
-
 function getPairKey(a, b) {
   return [a, b].sort().join("|");
 }
 
-function getGameKey(arr) {
-  return arr.slice().sort().join("|");
+// Game identity must be based on PAIR vs PAIR (not 4 flattened players)
+function getGameKey(pair1Key, pair2Key) {
+  return [pair1Key, pair2Key].sort().join("|");
 }
 
 const repetitionHistory = {
@@ -34,7 +34,7 @@ const repetitionHistory = {
 
 function updatePreviousHistory(currentRoundIndex) {
 
-  // Safety reset if user goes backwards or reset happens
+  // Safety reset (if reset/back navigation happens)
   if (repetitionHistory.builtUntilRound >= currentRoundIndex - 1) {
     repetitionHistory.pairSet.clear();
     repetitionHistory.gameSet.clear();
@@ -42,56 +42,54 @@ function updatePreviousHistory(currentRoundIndex) {
   }
 
   // Build only missing rounds
-  for (let i = repetitionHistory.builtUntilRound + 1; i < currentRoundIndex; i++) {
+  for (
+    let i = repetitionHistory.builtUntilRound + 1;
+    i < currentRoundIndex;
+    i++
+  ) {
 
     const round = allRounds[i];
     if (!round?.games) continue;
 
     for (const game of round.games) {
-      const t1 = game.team1;
-      const t2 = game.team2;
 
-      repetitionHistory.pairSet.add(getPairKey(t1[0], t1[1]));
-      repetitionHistory.pairSet.add(getPairKey(t2[0], t2[1]));
+      const t1 = game.pair1;
+      const t2 = game.pair2;
 
-      repetitionHistory.gameSet.add(getGameKey([...t1, ...t2]));
+      if (!t1 || !t2) continue;
+
+      const pair1Key = getPairKey(t1[0], t1[1]);
+      const pair2Key = getPairKey(t2[0], t2[1]);
+
+      // Store pair history
+      repetitionHistory.pairSet.add(pair1Key);
+      repetitionHistory.pairSet.add(pair2Key);
+
+      // Store exact game history (pair vs pair)
+      const gameKey = getGameKey(pair1Key, pair2Key);
+      repetitionHistory.gameSet.add(gameKey);
     }
   }
 
   repetitionHistory.builtUntilRound = currentRoundIndex - 1;
 }
 
-function isExactMatchRepeatedLatest(game) {
+function isPairRepeated(pair) {
+  if (!pair) return false;
 
+  const pairKey = getPairKey(pair[0], pair[1]);
+  return repetitionHistory.pairSet.has(pairKey);
+}
+
+function isGameRepeated(game) {
   if (!game?.pair1 || !game?.pair2) return false;
-
-  const latestIndex = allRounds.length - 1;
 
   const pair1Key = getPairKey(game.pair1[0], game.pair1[1]);
   const pair2Key = getPairKey(game.pair2[0], game.pair2[1]);
 
-  for (let i = 0; i < latestIndex; i++) {
+  const gameKey = getGameKey(pair1Key, pair2Key);
 
-    const prevRound = allRounds[i];
-    if (!prevRound?.games) continue;
-
-    for (const prevGame of prevRound.games) {
-
-      if (!prevGame?.pair1 || !prevGame?.pair2) continue;
-
-      const prevPair1Key = getPairKey(prevGame.pair1[0], prevGame.pair1[1]);
-      const prevPair2Key = getPairKey(prevGame.pair2[0], prevGame.pair2[1]);
-
-      if (
-        (prevPair1Key === pair1Key && prevPair2Key === pair2Key) ||
-        (prevPair1Key === pair2Key && prevPair2Key === pair1Key)
-      ) {
-        return true;
-      }
-    }
-  }
-
-  return false;
+  return repetitionHistory.gameSet.has(gameKey);
 }
 
 
@@ -1387,7 +1385,7 @@ function renderGames(data, roundIndex) {
   const wrapper = document.createElement('div');
   const playmode = getPlayMode();
 
-  // ⭐ ADDED — Build previous history
+  // ⭐ Build previous history
   const previousPairSet = new Set();
   const previousGameSet = new Set();
 
@@ -1398,12 +1396,15 @@ function renderGames(data, roundIndex) {
     prev.games.forEach(g => {
       if (!g?.pair1 || !g?.pair2) return;
 
-      previousPairSet.add(getPairKey(g.pair1[0], g.pair1[1]));
-      previousPairSet.add(getPairKey(g.pair2[0], g.pair2[1]));
+      const pair1Key = getPairKey(g.pair1[0], g.pair1[1]);
+      const pair2Key = getPairKey(g.pair2[0], g.pair2[1]);
 
-      previousGameSet.add(
-        getGameKey([...g.pair1, ...g.pair2])
-      );
+      previousPairSet.add(pair1Key);
+      previousPairSet.add(pair2Key);
+
+      // ✅ FIXED — store game as pair-vs-pair (NOT 4 flattened players)
+      const gameKey = [pair1Key, pair2Key].sort().join("|");
+      previousGameSet.add(gameKey);
     });
   }
 
@@ -1426,9 +1427,9 @@ function renderGames(data, roundIndex) {
       teamDiv.dataset.teamSide = teamSide;
       teamDiv.dataset.gameIndex = gameIndex;
 
-      // ⭐ ADDED — Pair repetition detection
       const teamPairs = teamSide === 'L' ? game.pair1 : game.pair2;
 
+      // ⭐ Pair repetition detection
       if (teamPairs) {
         const pairKey = getPairKey(teamPairs[0], teamPairs[1]);
         if (previousPairSet.has(pairKey)) {
@@ -1436,20 +1437,17 @@ function renderGames(data, roundIndex) {
         }
       }
 
-      // 🔁 Swap icon
       const swapIcon = document.createElement('div');
       swapIcon.className = 'swap-icon';
       swapIcon.innerHTML = '🔁';
       teamDiv.appendChild(swapIcon);
 
-      // 👥 Players
       teamPairs.forEach((p, i) => {
         teamDiv.appendChild(
           makePlayerButton(p, teamSide, gameIndex, i, data, roundIndex)
         );
       });
 
-      // 🏆 Win cup (created hidden)
       const winCup = document.createElement('img');
       winCup.src = 'win-cup.png';
       winCup.className = 'win-cup blinking';
@@ -1547,16 +1545,17 @@ function renderGames(data, roundIndex) {
     const teamLeft = makeTeamDiv('L');
     const teamRight = makeTeamDiv('R');
 
-    // ⭐ ADDED — Full game repetition detection
+    // ⭐ FIXED — Exact game repetition detection
     if (game?.pair1 && game?.pair2) {
-      const fullGameKey = getGameKey([
-        ...game.pair1,
-        ...game.pair2
-      ]);
 
-      if (isExactMatchRepeatedLatest(game)) {
-         courtDiv.classList.add('repeated-game');
-       }
+      const pair1Key = getPairKey(game.pair1[0], game.pair1[1]);
+      const pair2Key = getPairKey(game.pair2[0], game.pair2[1]);
+
+      const currentGameKey = [pair1Key, pair2Key].sort().join("|");
+
+      if (previousGameSet.has(currentGameKey)) {
+        courtDiv.classList.add('repeated-game');
+      }
     }
 
     const vs = document.createElement('span');
@@ -1570,8 +1569,6 @@ function renderGames(data, roundIndex) {
 
   return wrapper;
 }
-
-
 function goodrenderGames(data, roundIndex) {
   const wrapper = document.createElement('div');
   const playmode = getPlayMode();
