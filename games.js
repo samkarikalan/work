@@ -61,6 +61,39 @@ function updatePreviousHistory(currentRoundIndex) {
   repetitionHistory.builtUntilRound = currentRoundIndex - 1;
 }
 
+function isExactMatchRepeatedLatest(game) {
+
+  if (!game?.pair1 || !game?.pair2) return false;
+
+  const latestIndex = allRounds.length - 1;
+
+  const pair1Key = getPairKey(game.pair1[0], game.pair1[1]);
+  const pair2Key = getPairKey(game.pair2[0], game.pair2[1]);
+
+  for (let i = 0; i < latestIndex; i++) {
+
+    const prevRound = allRounds[i];
+    if (!prevRound?.games) continue;
+
+    for (const prevGame of prevRound.games) {
+
+      if (!prevGame?.pair1 || !prevGame?.pair2) continue;
+
+      const prevPair1Key = getPairKey(prevGame.pair1[0], prevGame.pair1[1]);
+      const prevPair2Key = getPairKey(prevGame.pair2[0], prevGame.pair2[1]);
+
+      if (
+        (prevPair1Key === pair1Key && prevPair2Key === pair2Key) ||
+        (prevPair1Key === pair2Key && prevPair2Key === pair1Key)
+      ) {
+        return true;
+      }
+    }
+  }
+
+  return false;
+}
+
 
 
 
@@ -1518,9 +1551,9 @@ function renderGames(data, roundIndex) {
         ...game.pair2
       ]);
 
-      if (previousGameSet.has(fullGameKey)) {
-        courtDiv.classList.add('repeated-game');
-      }
+      if (isExactMatchRepeatedLatest(game)) {
+         courtDiv.classList.add('repeated-game');
+       }
     }
 
     const vs = document.createElement('span');
