@@ -1410,11 +1410,15 @@ function newImportRefreshSelectCards(){
 
   newImportSelectCards.innerHTML = "";
 
-  const source =
-    newImportState.currentSelectMode === "favorites"
-      ? newImportState.favoritePlayers
-      : newImportState.historyPlayers;
+const source =
+  newImportState.currentSelectMode === "favorites"
+    ? [...newImportState.favoritePlayers]
+    : [...newImportState.historyPlayers];
 
+// ✅ Sort ascending A → Z
+source.sort((a, b) =>
+  a.displayName.localeCompare(b.displayName, undefined, { sensitivity: "base" })
+);
   const search = newImportSearch.value.toLowerCase();
 
   source
