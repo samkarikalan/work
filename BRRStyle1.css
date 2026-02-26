@@ -1,1057 +1,1224 @@
-:root {
-  --base-font-size: 14px; /* Default Medium — change here to resize everything */
-  --player-font-size: 1rem;
+# /* ============================================================
+BRRStyle1 — Enhanced with Dark / Light Mode
+
+MATCHES YOUR EXISTING JS — NO CHANGES TO JS NEEDED.
+
+Your applyTheme() toggles  .app-dark  on <body>.
+CSS uses  :root:has(body.app-dark)  to override the token
+variables, so every –var() in the file flips automatically.
+
+Your JS keys to keep matching:
+localStorage key : ‘app-theme’
+body class       : ‘app-dark’  (dark) / no class (light)
+button IDs       : #theme_light  /  #theme_dark
+
+System preference (@media prefers-color-scheme: dark) fires
+only on first visit before JS has run — once initTheme()
+executes it takes over completely.
+============================================================ */
+
+/* ============================================================
+
+1. DESIGN TOKENS — Light (default)
+   ============================================================ */
+   :root {
+   –base-font-size: 14px;
+   –player-font-size: 1rem;
+
+/* ── Page ── */
+–bg-page:          #f2eef9;
+–bg-body:          #f7f7f9;
+–color-text:       #222222;
+–color-text-muted: #6b7280;
+
+/* ── Cards ── */
+–bg-card:          #ffffff;
+–bg-card-hover:    #f8f8ff;
+–card-border:      #e5e7eb;
+–card-shadow:      0 1px 5px rgba(0,0,0,0.07);
+
+/* ── Top bar / Tabs ── */
+–bg-topbar:        linear-gradient(135deg, #009ffd, #2a6eff);
+–topbar-shadow:    0 2px 8px rgba(0,0,0,0.10);
+–tab-color:        #ffffff;
+–tab-active-bg:    #800080;
+–tab-active-shadow:0 3px 7px rgba(93,37,235,0.35);
+
+/* ── Inputs ── */
+–input-bg:         #ffffff;
+–input-border:     #cccccc;
+–input-focus-ring: rgba(79,140,255,0.2);
+–select-bg:        #f5f7fa;
+
+/* ── Buttons ── */
+–btn-primary:      linear-gradient(135deg, #7c3aed, #6366f1);
+–btn-primary-active: #800080;
+–btn-warn:         linear-gradient(135deg, #fb923c, #f97316);
+–btn-danger:       linear-gradient(135deg, #ef4444, #dc2626);
+–btn-text:         #ffffff;
+
+/* ── Status ── */
+–status-ready:     #28a745;
+–status-progress:  #ffc107;
+–status-progress-text: #000000;
+–status-error:     #dc3545;
+
+/* ── Player cards ── */
+–player-male-bg:   #e3f2fd;
+–player-male-border:#90caf9;
+–player-female-bg: #fce4ec;
+–player-female-border:#f48fb1;
+–player-inactive-bg:#f1f1f1;
+–player-inactive-border:#cccccc;
+
+/* ── Help ── */
+–help-card-bg:     #ffffff;
+–help-card-border: #cccccc;
+–help-btn-color:   #2a2a72;
+–help-btn-border:  #2a2a72;
+–help-btn-hover:   rgba(42,42,114,0.08);
+–help-btn-active-bg: linear-gradient(135deg, #2a2a72, #009ffd);
+
+/* ── Modal ── */
+–modal-overlay:    rgba(0,0,0,0.45);
+–modal-bg:         #ffffff;
+–modal-section-bg: #f4f8ff;
+–modal-section-border: #dbe7ff;
+–modal-alt-bg:     #fafafa;
+–modal-alt-border: #eeeeee;
+–modal-search-border: #dddddd;
+
+/* ── Misc ── */
+–lang-menu-bg:     #ffffff;
+–lang-menu-hover:  #f0f4ff;
+–toast-bg:         #333333;
+–toast-text:       #ffffff;
+–subtab-border:    #e5e5e5;
+–subtab-color:     #666666;
+–subtab-active:    #2b7cff;
+–browse-sub-color: #888888;
+–browse-arrow-color:#bbbbbb;
+–section-title-color: #374151;
+
+/* ── Card tints ── */
+–card-language-bg: linear-gradient(180deg, #ffffff, #eef2ff);
+–card-font-bg:     linear-gradient(180deg, #ffffff, #f5f3ff);
+–card-theme-bg:    linear-gradient(180deg, #ffffff, #f1f5f9);
+–card-reset-bg:    linear-gradient(180deg, #fff7ed, #ffffff);
+–card-timer-bg:    linear-gradient(180deg, #f0f9ff, #ffffff);
+
+/* ── Theme toggle button ── */
+–theme-toggle-bg:  rgba(255,255,255,0.25);
+–theme-toggle-border: rgba(255,255,255,0.5);
+–theme-toggle-color: #ffffff;
 }
 
-* {
-  -webkit-tap-highlight-color: transparent;
+/* ============================================================
+2. DESIGN TOKENS — Dark
+Your JS does: document.body.classList.toggle(‘app-dark’, …)
+:root:has(body.app-dark) is the correct way to re-scope
+:root CSS variables when the trigger class lives on <body>.
+============================================================ */
+:root:has(body.app-dark) {
+–bg-page:          #0f0f13;
+–bg-body:          #0f0f13;
+–color-text:       #e8e8f0;
+–color-text-muted: #9ca3af;
+
+–bg-card:          #1c1c26;
+–bg-card-hover:    #232333;
+–card-border:      #2e2e42;
+–card-shadow:      0 1px 8px rgba(0,0,0,0.4);
+
+–bg-topbar:        linear-gradient(135deg, #1a1a2e, #16213e);
+–topbar-shadow:    0 2px 12px rgba(0,0,0,0.5);
+–tab-color:        #c8c8e8;
+–tab-active-bg:    #9d00d0;
+–tab-active-shadow:0 3px 10px rgba(157,0,208,0.45);
+
+–input-bg:         #1c1c26;
+–input-border:     #3a3a52;
+–input-focus-ring: rgba(99,102,241,0.3);
+–select-bg:        #252535;
+
+–btn-primary:      linear-gradient(135deg, #6d28d9, #4f46e5);
+–btn-primary-active: #7c00a0;
+–btn-warn:         linear-gradient(135deg, #c2410c, #ea580c);
+–btn-danger:       linear-gradient(135deg, #b91c1c, #dc2626);
+–btn-text:         #ffffff;
+
+–status-ready:     #16a34a;
+–status-progress:  #d97706;
+–status-progress-text: #ffffff;
+–status-error:     #dc2626;
+
+–player-male-bg:   #0d2136;
+–player-male-border:#1e4a6e;
+–player-female-bg: #2a0d18;
+–player-female-border:#6b2139;
+–player-inactive-bg:#1a1a24;
+–player-inactive-border:#2e2e42;
+
+–help-card-bg:     #1c1c26;
+–help-card-border: #2e2e42;
+–help-btn-color:   #8b8bcc;
+–help-btn-border:  #4a4a7a;
+–help-btn-hover:   rgba(139,139,204,0.12);
+–help-btn-active-bg: linear-gradient(135deg, #4a3a8a, #0070bb);
+
+–modal-overlay:    rgba(0,0,0,0.7);
+–modal-bg:         #1c1c26;
+–modal-section-bg: #141420;
+–modal-section-border: #2a2a40;
+–modal-alt-bg:     #181820;
+–modal-alt-border: #2a2a38;
+–modal-search-border: #3a3a52;
+
+–lang-menu-bg:     #1c1c26;
+–lang-menu-hover:  #252535;
+–toast-bg:         #1c1c26;
+–toast-text:       #e8e8f0;
+–subtab-border:    #2e2e42;
+–subtab-color:     #9ca3af;
+–subtab-active:    #6366f1;
+–browse-sub-color: #6b7280;
+–browse-arrow-color:#4b5563;
+–section-title-color: #c8c8e8;
+
+–card-language-bg: linear-gradient(180deg, #1c1c26, #1a1a2e);
+–card-font-bg:     linear-gradient(180deg, #1c1c26, #1c1828);
+–card-theme-bg:    linear-gradient(180deg, #1c1c26, #192030);
+–card-reset-bg:    linear-gradient(180deg, #201810, #1c1c26);
+–card-timer-bg:    linear-gradient(180deg, #121c28, #1c1c26);
+
+–theme-toggle-bg:  rgba(255,255,255,0.1);
+–theme-toggle-border: rgba(255,255,255,0.2);
+–theme-toggle-color: #e8e8f0;
 }
+
+/* Auto dark via OS preference — fires before JS runs on first visit.
+Once initTheme() executes it adds/removes .app-dark on body,
+which activates the :root:has(body.app-dark) block above. */
+@media (prefers-color-scheme: dark) {
+:root:not(:has(body.app-dark)) {
+–bg-page:          #0f0f13;
+–bg-body:          #0f0f13;
+–color-text:       #e8e8f0;
+–color-text-muted: #9ca3af;
+–bg-card:          #1c1c26;
+–bg-card-hover:    #232333;
+–card-border:      #2e2e42;
+–card-shadow:      0 1px 8px rgba(0,0,0,0.4);
+–bg-topbar:        linear-gradient(135deg, #1a1a2e, #16213e);
+–topbar-shadow:    0 2px 12px rgba(0,0,0,0.5);
+–tab-color:        #c8c8e8;
+–tab-active-bg:    #9d00d0;
+–tab-active-shadow:0 3px 10px rgba(157,0,208,0.45);
+–input-bg:         #1c1c26;
+–input-border:     #3a3a52;
+–input-focus-ring: rgba(99,102,241,0.3);
+–select-bg:        #252535;
+–btn-primary:      linear-gradient(135deg, #6d28d9, #4f46e5);
+–btn-primary-active: #7c00a0;
+–btn-warn:         linear-gradient(135deg, #c2410c, #ea580c);
+–btn-danger:       linear-gradient(135deg, #b91c1c, #dc2626);
+–btn-text:         #ffffff;
+–status-ready:     #16a34a;
+–status-progress:  #d97706;
+–status-progress-text: #ffffff;
+–status-error:     #dc2626;
+–player-male-bg:   #0d2136;
+–player-male-border:#1e4a6e;
+–player-female-bg: #2a0d18;
+–player-female-border:#6b2139;
+–player-inactive-bg:#1a1a24;
+–player-inactive-border:#2e2e42;
+–help-card-bg:     #1c1c26;
+–help-card-border: #2e2e42;
+–help-btn-color:   #8b8bcc;
+–help-btn-border:  #4a4a7a;
+–help-btn-hover:   rgba(139,139,204,0.12);
+–help-btn-active-bg: linear-gradient(135deg, #4a3a8a, #0070bb);
+–modal-overlay:    rgba(0,0,0,0.7);
+–modal-bg:         #1c1c26;
+–modal-section-bg: #141420;
+–modal-section-border: #2a2a40;
+–modal-alt-bg:     #181820;
+–modal-alt-border: #2a2a38;
+–modal-search-border: #3a3a52;
+–lang-menu-bg:     #1c1c26;
+–lang-menu-hover:  #252535;
+–toast-bg:         #1c1c26;
+–toast-text:       #e8e8f0;
+–subtab-border:    #2e2e42;
+–subtab-color:     #9ca3af;
+–subtab-active:    #6366f1;
+–browse-sub-color: #6b7280;
+–browse-arrow-color:#4b5563;
+–section-title-color: #c8c8e8;
+–card-language-bg: linear-gradient(180deg, #1c1c26, #1a1a2e);
+–card-font-bg:     linear-gradient(180deg, #1c1c26, #1c1828);
+–card-theme-bg:    linear-gradient(180deg, #1c1c26, #192030);
+–card-reset-bg:    linear-gradient(180deg, #201810, #1c1c26);
+–card-timer-bg:    linear-gradient(180deg, #121c28, #1c1c26);
+–theme-toggle-bg:  rgba(255,255,255,0.1);
+–theme-toggle-border: rgba(255,255,255,0.2);
+–theme-toggle-color: #e8e8f0;
+}
+}
+
+/* ============================================================
+3. BASE
+============================================================ */
+
+- {
+  -webkit-tap-highlight-color: transparent;
+  }
 
 html {
-  font-size: var(--base-font-size);
+font-size: var(–base-font-size);
+color-scheme: light dark;
 }
+
 body {
-  margin: 0;
-  padding: 0;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  background: #f7f7f9;
-  color: #222;
-}
-body {
-  background: #f2eef9;
+margin: 0;
+padding: 0;
+font-family: -apple-system, BlinkMacSystemFont, “Segoe UI”, Roboto, sans-serif;
+background: var(–bg-page);
+color: var(–color-text);
+transition: background 0.3s ease, color 0.3s ease;
 }
 
+/* ============================================================
+4. THEME TOGGLE BUTTON
+Place <button id="theme-toggle"> anywhere — top bar recommended
+============================================================ */
+#theme-toggle {
+display: inline-flex;
+align-items: center;
+justify-content: center;
+width: 36px;
+height: 36px;
+border-radius: 50%;
+border: 1.5px solid var(–theme-toggle-border);
+background: var(–theme-toggle-bg);
+color: var(–theme-toggle-color);
+font-size: 1.1rem;
+cursor: pointer;
+transition: background 0.2s, transform 0.2s, border-color 0.2s;
+user-select: none;
+flex-shrink: 0;
+}
+
+#theme-toggle:hover {
+transform: scale(1.1) rotate(15deg);
+background: rgba(255,255,255,0.3);
+}
+
+#theme-toggle:active {
+transform: scale(0.95);
+}
+
+/* Show correct icon — JS sets data-theme on <html> */
+#theme-toggle .icon-sun  { display: none; }
+#theme-toggle .icon-moon { display: inline; }
+
+[data-theme=“dark”] #theme-toggle .icon-sun  { display: inline; }
+[data-theme=“dark”] #theme-toggle .icon-moon { display: none; }
+
+.app-dark #theme-toggle .icon-sun  { display: inline; }
+.app-dark #theme-toggle .icon-moon { display: none; }
+
+/* ============================================================
+5. APP LOGO
+============================================================ */
 .app-logo-premium {
-  position: absolute;          /* REQUIRED */
-  left: 50%;
-  transform: translateX(-50%); /* FIX */
-
-  font-size: 2.2rem;
-  font-weight: 800;
-  background: #1f2933;  
-  );
-
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-
-  text-shadow: 2px 4px 8px rgba(0,0,0,0.15);
-  letter-spacing: -1px;
-  white-space: nowrap;
-  pointer-events: none;
+position: absolute;
+left: 50%;
+transform: translateX(-50%);
+font-size: 2.2rem;
+font-weight: 800;
+background: var(–color-text);
+-webkit-background-clip: text;
+background-clip: text;
+color: transparent;
+text-shadow: none; /* transparent text can’t use text-shadow */
+filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.2));
+letter-spacing: -1px;
+white-space: nowrap;
+pointer-events: none;
+justify-self: center;
+transition: filter 0.3s ease;
 }
 
-.app-logo-premium {
-  justify-self: center;
+[data-theme=“dark”] .app-logo-premium,
+.app-dark .app-logo-premium {
+background: linear-gradient(135deg, #a78bfa, #60a5fa);
+-webkit-background-clip: text;
+background-clip: text;
 }
 
-/* ===== TOP TABS (Updated Style) ===== */
-
-
+/* ============================================================
+6. TOP BAR
+============================================================ */
 .top-bar {
-  display: grid;
-  grid-template-columns: auto 1fr auto;
-  align-items: center;
-  overflow: visible;
-  height: 60px;
-  padding: 0 12px;
+display: flex;
+align-items: center;
+padding: 8px 12px;
+overflow: visible;
+height: 60px;
+box-sizing: border-box;
 }
-
 
 .menu-btn {
-  font-size: 1.4rem;  
-  cursor: pointer;
-  user-select: none;
-  -webkit-tap-highlight-color: transparent;
+font-size: 1.4rem;
+cursor: pointer;
+user-select: none;
+color: var(–tab-color);
+-webkit-tap-highlight-color: transparent;
+}
+
+.lang-wrapper {
+margin-left: auto;
+position: relative;
 }
 
 .lang-btn {
-  font-size: 1.4rem;
-  cursor: pointer;
-  padding:10px;
-  user-select: none; 
+width: 40px;
+height: 40px;
+border-radius: 50%;
+border: none;
+background: transparent;
+display: flex;
+align-items: center;
+justify-content: center;
+font-size: 1.4rem;
+cursor: pointer;
+padding: 10px;
+user-select: none;
+transition: background 0.2s;
+}
+
+.lang-btn:hover {
+background: rgba(255,255,255,0.15);
+border-radius: 50%;
 }
 
 .lang-menu {
 position: absolute;
+top: calc(100% + 8px);
 right: 0;
-top: 36px;
+left: auto;
 width: 120px;
-background: #fff;
+background: var(–lang-menu-bg);
 border-radius: 12px;
-box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+border: 1px solid var(–card-border);
 display: none;
+overflow: hidden;
 z-index: 1000;
-}
-
-
-.lang-menu {
-  left: auto;
-  right: 0;   /* aligns menu edge with button edge */
-}
-
-
-.lang-menu div {
-  padding: 10px 14px;
-  cursor: pointer;
-}
-
-.lang-menu div:hover {
-  background: #f0f4ff;
+transition: background 0.3s;
 }
 
 .lang-menu.show {
-  display: block;
-}
-
-
-
-
-.top-bar {
-  display: flex;
-  align-items: center;
-  padding: 8px 12px;
-}
-
-.lang-wrapper {
-  margin-left: auto;
-  position: relative;
-}
-
-/* Flag icon button */
-.lang-btn {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  border: none;
-  background: transparent;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  font-size: 1.4rem;
-  cursor: pointer;
-}
-
-/* Dropdown */
-.lang-menu {
-  position: absolute;
-  top: calc(100% + 8px);
-  right: 0;
-
-  background: #fff;
-  border-radius: 12px;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.15);
-
-  display: none;
-  overflow: hidden;
+display: block;
 }
 
 .lang-menu div {
-  padding: 10px 14px;
-  cursor: pointer;
+padding: 10px 14px;
+cursor: pointer;
+color: var(–color-text);
+transition: background 0.15s;
 }
 
 .lang-menu div:hover {
-  background: #f2f4ff;
+background: var(–lang-menu-hover);
 }
 
-/* ===== TOP BAR ===== */
+/* ============================================================
+7. TOP TABS / NAV BAR
+============================================================ */
 .top-tabs {
-  position: sticky;
-  top: 0;
-
-  display: flex;
-  align-items: center;
-
-  margin: 0;
-  padding: 5px 12px;
-
-  background: linear-gradient(135deg, #009ffd);
-  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-  border: none;
-  border-radius: 0;
-
-  z-index: 999;
+position: sticky;
+top: 0;
+display: flex;
+align-items: center;
+margin: 0;
+padding: 5px 12px;
+background: var(–bg-topbar);
+box-shadow: var(–topbar-shadow);
+border: none;
+border-radius: 0;
+z-index: 999;
+transition: background 0.3s, box-shadow 0.3s;
 }
 
-
-
-
-
-/* ===== TABS CONTAINER (CENTERED) ===== */
 .tabs-container {
-  flex: 1;                       /* take remaining width */
-  display: flex;
-  justify-content: space-evenly; /* âœ… equal spacing */
-  align-items: center;
+flex: 1;
+display: flex;
+justify-content: space-evenly;
+align-items: center;
 }
 
-/* ===== TAB BUTTONS ===== */
 .tab-btn {
-  background: none;
-  color: #ffffff;
-  border: none;
-  font-weight: 600;
-
-  cursor: pointer;
-  transition: background 0.25s, transform 0.15s;
-
-  padding: 7px 16px;
-  border-radius: 16px;
-
-  font-size: 1rem;
-  text-align: center;
-
-  display: inline-flex;        /* âœ… prevents canvas shrink */
-  align-items: center;
-  justify-content: center;
+background: none;
+color: var(–tab-color);
+border: none;
+font-weight: 600;
+cursor: pointer;
+transition: background 0.25s, transform 0.15s, color 0.2s;
+padding: 7px 16px;
+border-radius: 16px;
+font-size: 1rem;
+text-align: center;
+display: inline-flex;
+align-items: center;
+justify-content: center;
+opacity: 0.8;
 }
 
-/* ===== ACTIVE TAB ONLY ===== */
+.tab-btn:hover {
+opacity: 1;
+background: rgba(255,255,255,0.15);
+}
+
 .tab-btn.active {
-  background:  #800080;
-  color: #ffffff;
-  box-shadow: 0 3px 7px rgba(93, 37, 235, 0.35);
+background: var(–tab-active-bg);
+color: #ffffff;
+box-shadow: var(–tab-active-shadow);
+opacity: 1;
 }
 
-
-
-
-/* ===============================
-   SETTINGS LAYOUT
-================================ */
+/* ============================================================
+8. SETTINGS / CARDS
+============================================================ */
 .settings-wrap {
-  display: grid;
-  gap: 10px;          /* compact */
-  padding: 6px;
+display: grid;
+gap: 10px;
+padding: 6px;
 }
 
-/* ===============================
-   SECTION TITLE
-================================ */
 .sec {
-  font-weight: 700;
-  font-size: 0.9rem;
-  text-align: center;
-  color: #374151;
-  margin-bottom: 6px;
-  letter-spacing: .2px;
+font-weight: 700;
+font-size: 0.9rem;
+text-align: center;
+color: var(–section-title-color);
+margin-bottom: 6px;
+letter-spacing: .2px;
+transition: color 0.3s;
 }
 
-/* ===============================
-   ROW
-================================ */
 .row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 13px;
+display: flex;
+flex-wrap: wrap;
+gap: 13px;
 }
 
-/* ===============================
-   CARD BACKGROUNDS (LIGHT)
-================================ */
-.card-language { background: linear-gradient(180deg, #ffffff, #eef2ff); }
-.card-font     { background: linear-gradient(180deg, #ffffff, #f5f3ff); }
-.card-theme    { background: linear-gradient(180deg, #ffffff, #f1f5f9); }
-.card-reset    { background: linear-gradient(180deg, #fff7ed, #ffffff); }
-.card-timer    { background: linear-gradient(180deg, #f0f9ff, #ffffff); }
+/* Card tinted backgrounds */
+.card-language { background: var(–card-language-bg); }
+.card-font     { background: var(–card-font-bg); }
+.card-theme    { background: var(–card-theme-bg); }
+.card-reset    { background: var(–card-reset-bg); }
+.card-timer    { background: var(–card-timer-bg); }
 
-/* ===============================
-   BUTTONS
-================================ */
-.btn {
-  flex: 1;
-  min-width: 50px;
-  padding: 9px 6px;          /* compact */
-  border-radius: 10px;
-  background: linear-gradient(135deg, #7c3aed, #6366f1);
-  color: #ffffff;
-  font-weight: 600;
-  font-size: 0.9rem;
-  text-align: center;
-  cursor: pointer;
-  user-select: none;
-  transition: transform .15s ease, box-shadow .15s ease;
+.settings-card {
+padding: 9px 6px;
+border-radius: 10px;
+transition: background 0.3s, box-shadow 0.3s;
 }
 
-.btn:active {
-  transform: scale(.96);
+.card,
+.card-col {
+background: var(–bg-card);
+padding: 14px;
+margin: 12px 0;
+border-radius: 12px;
+box-shadow: var(–card-shadow);
+border: 1px solid var(–card-border);
+transition: background 0.3s, border-color 0.3s, box-shadow 0.3s;
 }
 
-.btn.active {
-  background: #800080;
-  box-shadow: 0 4px 12px rgba(79,70,229,.45);
-}
-
-/* Reset buttons */
-.btn.warn {
-  background: linear-gradient(135deg, #fb923c, #f97316);
-}
-
-.btn.danger {
-  background: linear-gradient(135deg, #ef4444, #dc2626);
-}
-
-
-/* ===============================
-   DIM / NIGHT MODE (SOFT)
-   same theme, just darker
-================================ */
- .settings-card {
-  padding: 9px 6px;
-  border-radius: 10px;
-}
-
-.app-dark {
-  background: #a0a0a9;          /* slightly darker page */
-  color: #1f2937;
-}
-
- .app-dark .settings-card {
-  background: #b8e0f85e;          /* soft grey */
-  box-shadow: 0 5px 14px rgba(55,65,81,.18);
-}
-
-
-.app-dark .card {
-  background: #b8e0f85e;          /* soft grey */
-  box-shadow: 0 5px 14px rgba(55,65,81,.18);
-}
-.app-dark .sec {
-  color: #374151;
-}
-
-
-.lang-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 5px;
-}
-
-
-
-/* Select container */
-.select-wrapper {
-  position: relative;
-  display: flex;
-  align-items: center;
-  background: #f5f7fa;
-  border-radius: 12px;
-  padding: 0 36px 0 38px;
-  height: 44px;
-  min-width: 160px;
-}
-
-/* Native select */
-
-
-/* Globe icon */
-.globe {
-  position: absolute;
-  left: 12px;
-  font-size: 16px;
-  opacity: 0.8;
-}
-
-/* Dropdown arrow */
-.arrow {
-  position: absolute;
-  right: 12px;
-  font-size: 14px;
-  pointer-events: none;
-  opacity: 0.6;
-}
-
-/* Focus effect */
-.lang-select:focus {
-  outline: none;
-}
-.select-wrapper:has(.lang-select:focus) {
-  box-shadow: 0 0 0 2px #4f8cff33;
-}
-
-
-
-.page {
-  font-size: 1.0rem;
-  animation: fadeIn 0.2s ease-out;
-}
-
-/* Player Card Container */
-.player-edit-card {
-  display: grid;
-  grid-template-columns: 20px 20px 35px 1fr 55px;
-  /*   chk    sl    gender  name  delete  */
-
-  align-items: center;
-  gap: 5px;
-
-  font-size: 1rem;
-  padding: 6px 15px;
-  border-radius: 1.5rem;
-  border: 1px solid #ddd;
-  transition: all 0.3s;
-  margin: 4px 0;
-}
-
-/* Gender-based background */
-.player-edit-card.male {
-  background-color: #e3f2fd;
-  border-color: #90caf9;
-}
-
-.player-edit-card.female {
-  background-color: #fce4ec;
-  border-color: #f48fb1;
-}
-.gender-icon { cursor: pointer; }
-
-/* Inactive state */
-.player-edit-card.inactive {
-  opacity: 0.45;
-  background-color: #f1f1f1 !important;
-  border-color: #ccc !important;
-  filter: grayscale(0.8);
-}
-
-/* Keep controls clickable even when inactive */
-.player-edit-card.inactive button,
-.player-edit-card.inactive select,
-.player-edit-card.inactive input[type="checkbox"] {
-  opacity: 1 !important;
-  pointer-events: auto !important;
-  filter: none !important;
-}
-
-.player-edit-card {
-  cursor: grab;
-}
-
-.player-edit-card:active {
-  cursor: grabbing;
-  opacity: 0.85;
-}
-
-.pec-name {
-  cursor: pointer;
-}
-
-
-/* Columns */
-.pec-active {
-  text-align: center;
-}
-
-.pec-sl {
-  text-align: center;
-  font-weight: 600;
-}
-
-/* Gender icon column */
-.pec-gender {
-  text-align: center;
-}
-
-/* Gender icon style */
-.gender-icon {
-  font-size: 1.25rem;
-}
-
-
-
-/* Name column â€“ wraps to second line */
-.pec-name {
-  white-space: normal;
-  overflow: visible;
-  text-overflow: clip;
-  line-height: 1.25rem;
-  word-break: break-word;
-  margin-left: -4px; /* reduce gap between gender â†’ name */
-}
-
-/* Delete column */
-.pec-delete {
-  text-align: right;
-}
-
-.pec-delete .delete {
-  all: unset;
-  font-size: 25px;
-  cursor: pointer;
-  line-height: 1;
-}
-
-
-.fixed-card {
-  display: grid;
-  grid-template-columns: 1fr 55px;
-  /*   sl    name   delete  */
-
-  align-items: center;
-  gap: 8px;
-
-  font-size: 1.25rem;
-  padding: 8px 15px;
-  border-radius: 1.5rem;
-  border: 1px solid #ccc;
-  margin: 5px 0;
-  background: B5EBDD;
-  transition: 0.25s ease;
-}
-
-/* Serial number (or bullet) */
-.fixed-sl {
-  text-align: center;
-  font-weight: 600;
-}
-
-/* Name */
-.fixed-name {
-  white-space: normal;
-  word-break: break-word;
-  line-height: 1.3rem;
-}
-
-/* Delete button container */
-.fixed-delete {
-  text-align: right;
-}
-
-/* Use your existing delete style */
-.fixed-delete .delete {
-  all: unset;
-  font-size: 25px;
-  cursor: pointer;
-  line-height: 1;
-}
-.row-addplayer {
-  display: flex;
-  gap: 10px;
-  flex-wrap: nowrap; /* âŒ stop wrapping */
-  align-items: center; /* vertical alignment */
-}
-
-.card, .card-col {
-  background: #fff;
-  padding: 14px;
-  margin: 12px 0;
-  border-radius: 12px;  
-  box-shadow: 0 1px 5px rgba(0,0,0,0.07);
-}
-
-.card  {
-  width: 98%;
-  padding: 0.5rem;
-  margin: 0.5rem;
-  font-size: 1.15rem;
-  border-radius: 1rem;
-  box-sizing: border-box;
+.card {
+width: 98%;
+padding: 0.5rem;
+margin: 0.5rem;
+font-size: 1.15rem;
+border-radius: 1rem;
+box-sizing: border-box;
 }
 
 .card input,
 .card select {
-  border: 0.0625rem solid #ccc;
+border: 0.0625rem solid var(–input-border);
+background: var(–input-bg);
+color: var(–color-text);
+transition: background 0.3s, border-color 0.3s, color 0.3s;
 }
+
 .card select {
-  font-size: 1rem;
-  width: 100%;
-  padding: 0.5rem;
-  margin: 0.5rem 0;  
-  border-radius: 8px;
-  box-sizing: border-box;
+font-size: 1rem;
+width: 100%;
+padding: 0.5rem;
+margin: 0.5rem 0;
+border-radius: 8px;
+box-sizing: border-box;
 }
+
 .card input {
-  font-size: 1rem;
-  width: 100%;
-  padding: 0.5rem;
-  margin: 0.5rem 0;  
-  border-radius: 8px;
-  box-sizing: border-box;
+font-size: 1rem;
+width: 100%;
+padding: 0.5rem;
+margin: 0.5rem 0;
+border-radius: 8px;
+box-sizing: border-box;
 }
 
 .card button {
 display: block;
-  margin: 0 auto;
-  background: #800080;
-  font-size: 1rem;
-  padding:6px;
-  color: white;
-  border: none;
-  font-weight: bold;
-  cursor: pointer;
-  border-radius: 8px;
-  padding: 0.75rem;
-  width: 98%;  
-  transition: background 0.3s, transform 0.2s;
+margin: 0 auto;
+background: var(–btn-primary-active);
+font-size: 1rem;
+color: var(–btn-text);
+border: none;
+font-weight: bold;
+cursor: pointer;
+border-radius: 8px;
+padding: 0.75rem;
+width: 98%;
+transition: background 0.3s, transform 0.2s;
 }
 
-.card button:hover {  
-  transform: scale(1.02);
+.card button:hover {
+transform: scale(1.02);
+filter: brightness(1.1);
 }
 
+/* ============================================================
+9. BUTTONS
+============================================================ */
+.btn {
+flex: 1;
+min-width: 50px;
+padding: 9px 6px;
+border-radius: 10px;
+background: var(–btn-primary);
+color: var(–btn-text);
+font-weight: 600;
+font-size: 0.9rem;
+text-align: center;
+cursor: pointer;
+user-select: none;
+transition: transform .15s ease, box-shadow .15s ease, background 0.3s;
+}
+
+.btn:active {
+transform: scale(.96);
+}
+
+.btn.active {
+background: var(–btn-primary-active);
+box-shadow: 0 4px 12px rgba(79,70,229,.45);
+}
+
+.btn.warn {
+background: var(–btn-warn);
+}
+
+.btn.danger {
+background: var(–btn-danger);
+}
+
+/* ============================================================
+10. FORM ELEMENTS
+============================================================ */
+.lang-row {
+display: flex;
+align-items: center;
+justify-content: space-between;
+gap: 12px;
+padding: 5px;
+}
+
+.select-wrapper {
+position: relative;
+display: flex;
+align-items: center;
+background: var(–select-bg);
+border-radius: 12px;
+padding: 0 36px 0 38px;
+height: 44px;
+min-width: 160px;
+border: 1px solid var(–input-border);
+transition: background 0.3s, border-color 0.3s;
+}
+
+.select-wrapper:has(.lang-select:focus) {
+box-shadow: 0 0 0 2px var(–input-focus-ring);
+}
+
+.lang-select {
+background: transparent;
+color: var(–color-text);
+border: none;
+outline: none;
+width: 100%;
+font-size: 0.9rem;
+}
+
+.globe {
+position: absolute;
+left: 12px;
+font-size: 16px;
+opacity: 0.8;
+}
+
+.arrow {
+position: absolute;
+right: 12px;
+font-size: 14px;
+pointer-events: none;
+opacity: 0.6;
+}
+
+/* ============================================================
+11. PAGE TRANSITIONS
+============================================================ */
+.page {
+font-size: 1.0rem;
+animation: fadeIn 0.2s ease-out;
+color: var(–color-text);
+}
+
+@keyframes fadeIn {
+from { opacity: 0; transform: translateY(4px); }
+to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ============================================================
+12. PLAYER CARDS
+============================================================ */
+.player-edit-card {
+display: grid;
+grid-template-columns: 20px 20px 35px 1fr 55px;
+align-items: center;
+gap: 5px;
+font-size: 1rem;
+padding: 6px 15px;
+border-radius: 1.5rem;
+border: 1px solid var(–card-border);
+transition: background 0.3s, border-color 0.3s, opacity 0.3s;
+margin: 4px 0;
+}
+
+.player-edit-card.male {
+background-color: var(–player-male-bg);
+border-color: var(–player-male-border);
+}
+
+.player-edit-card.female {
+background-color: var(–player-female-bg);
+border-color: var(–player-female-border);
+}
+
+.player-edit-card.inactive {
+opacity: 0.45;
+background-color: var(–player-inactive-bg) !important;
+border-color: var(–player-inactive-border) !important;
+filter: grayscale(0.8);
+}
+
+.player-edit-card.inactive button,
+.player-edit-card.inactive select,
+.player-edit-card.inactive input[type=“checkbox”] {
+opacity: 1 !important;
+pointer-events: auto !important;
+filter: none !important;
+}
+
+.player-edit-card { cursor: grab; }
+.player-edit-card:active { cursor: grabbing; opacity: 0.85; }
+
+.gender-icon { cursor: pointer; font-size: 1.25rem; }
+.pec-active  { text-align: center; }
+.pec-sl      { text-align: center; font-weight: 600; }
+.pec-gender  { text-align: center; }
+.pec-name    {
+cursor: pointer;
+white-space: normal;
+overflow: visible;
+text-overflow: clip;
+line-height: 1.25rem;
+word-break: break-word;
+margin-left: -4px;
+}
+.pec-delete  { text-align: right; }
+.pec-delete .delete {
+all: unset;
+font-size: 25px;
+cursor: pointer;
+line-height: 1;
+}
+
+/* ── Fixed Cards ── */
+.fixed-card {
+display: grid;
+grid-template-columns: 1fr 55px;
+align-items: center;
+gap: 8px;
+font-size: 1.25rem;
+padding: 8px 15px;
+border-radius: 1.5rem;
+border: 1px solid var(–card-border);
+margin: 5px 0;
+background: var(–bg-card);
+transition: background 0.3s, border-color 0.3s;
+}
+
+.fixed-sl   { text-align: center; font-weight: 600; }
+.fixed-name { white-space: normal; word-break: break-word; line-height: 1.3rem; }
+.fixed-delete { text-align: right; }
+.fixed-delete .delete {
+all: unset;
+font-size: 25px;
+cursor: pointer;
+line-height: 1;
+}
+
+/* ── Add Player Row ── */
+.row-addplayer {
+display: flex;
+gap: 10px;
+flex-wrap: nowrap;
+align-items: center;
+}
+
+/* ── Player Names Textarea ── */
 #players-names {
-  width: 95%;
-  font-size: 1rem;
-  min-height:fit-content
+width: 95%;
+font-size: 1rem;
+min-height: fit-content;
+background: var(–input-bg);
+color: var(–color-text);
+border: 1px solid var(–input-border);
+border-radius: 8px;
+padding: 0.5rem;
+transition: background 0.3s, color 0.3s, border-color 0.3s;
 }
 
+/* ============================================================
+13. STATUS
+============================================================ */
 .status-card {
-  padding: 12px 16px;
-  border-radius: 10px;
-  width: fit-content;
-  font-weight: 400;
-  font-size: 1rem;
-   
+padding: 12px 16px;
+border-radius: 10px;
+width: fit-content;
+font-weight: 400;
+font-size: 1rem;
 }
 
 .status-display {
-  display: inline-block; /* ðŸ”‘ this is the fix */
-  padding: 6px 12px;
-  border-radius: 6px;
-  color: white;
-  text-align: center;
-  min-width: 150px; /* constant width */
+display: inline-block;
+padding: 6px 12px;
+border-radius: 6px;
+color: white;
+text-align: center;
+min-width: 150px;
 }
 
-/* Status colors */
-.status-ready {
-  background-color: #28a745;
-}
+.status-ready    { background-color: var(–status-ready); }
+.status-progress { background-color: var(–status-progress); color: var(–status-progress-text); }
+.status-error    { background-color: var(–status-error); }
 
-.status-progress {
-  background-color: #ffc107;
-  color: #000;
-}
+.primary { background-color: var(–status-ready); color: white; }
+.primary.end { background-color: var(–status-error); }
 
-.status-error {
-  background-color: #dc3545;
-}
-
-
-.primary {
-  background-color: #28a745; /* green */
-  color: white;
-}
-
-.primary.end {
-  background-color: #dc3545; /* red */
-}
-
+/* ============================================================
+14. DISABLED / BLINK STATE
+============================================================ */
 body.disabled {
-  pointer-events: none;
-  opacity: 0.9;
-  animation: blinkBorder 1s infinite;
-  border: 4px solid #ffc107; /* yellow/orange for in progress */
-  box-sizing: border-box;
+pointer-events: none;
+opacity: 0.9;
+animation: blinkBorder 1s infinite;
+border: 4px solid #ffc107;
+box-sizing: border-box;
 }
 
 @keyframes blinkBorder {
-  0%   { border-color: #ffc107; }
-  50%  { border-color: transparent; }
-  100% { border-color: #ffc107; }
+0%   { border-color: #ffc107; }
+50%  { border-color: transparent; }
+100% { border-color: #ffc107; }
 }
 
-/* Re-enable the toggle button */
 #nextBtn {
-  pointer-events: auto;
-  opacity: 1;
+pointer-events: auto;
+opacity: 1;
 }
 
-
-
-
+/* ============================================================
+15. TOAST
+============================================================ */
 .toast {
-  position: fixed;
-  bottom: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: #333;
-  color: #fff;
-  padding: 10px 16px;
-  border-radius: 8px;
-  z-index: 9999;
+position: fixed;
+bottom: 20px;
+left: 50%;
+transform: translateX(-50%);
+background: var(–toast-bg);
+color: var(–toast-text);
+padding: 10px 16px;
+border-radius: 8px;
+z-index: 9999;
+border: 1px solid var(–card-border);
+box-shadow: 0 4px 16px rgba(0,0,0,0.25);
+transition: background 0.3s, color 0.3s;
 }
+
 .hidden { display: none; }
 
-
+/* ============================================================
+16. PAGE 4 / HELP
+============================================================ */
 #page4 {
-  padding: 16px;
-  box-sizing: border-box;
+padding: 16px;
+box-sizing: border-box;
 }
 
-.player-help section {
-  display: none;
-}
+.player-help section { display: none; }
 
-.player-help.lang-en section[data-lang="en"],
-.player-help.lang-jp section[data-lang="jp"],
-.player-help.lang-kr section[data-lang="kr"],
-.player-help.lang-vi section[data-lang="vi"] {
-  display: block;
+.player-help.lang-en section[data-lang=“en”],
+.player-help.lang-jp section[data-lang=“jp”],
+.player-help.lang-kr section[data-lang=“kr”],
+.player-help.lang-vi section[data-lang=“vi”] {
+display: block;
 }
 
 .help-buttons {
-  display: flex;
-  justify-content: center;
-  gap: 0.75rem;
-  margin-bottom: 1rem;
+display: flex;
+justify-content: center;
+gap: 0.75rem;
+margin-bottom: 1rem;
 }
 
-/* Base button style */
 .help-btn {
-  padding: 0.5rem 1.1rem;
-  border-radius: 0.5rem;
-  border: 1.5px solid #2a2a72;
-  background: #ffffff;
-  color: #2a2a72;
-  font-size: 0.9rem;
-  font-weight: 100;
-  cursor: pointer;
-  transition: all 0.25s ease;
-  user-select: none;
+padding: 0.5rem 1.1rem;
+border-radius: 0.5rem;
+border: 1.5px solid var(–help-btn-border);
+background: var(–bg-card);
+color: var(–help-btn-color);
+font-size: 0.9rem;
+font-weight: 100;
+cursor: pointer;
+transition: all 0.25s ease;
+user-select: none;
 }
 
-/* Hover state */
 .help-btn:hover {
-  background: rgba(42, 42, 114, 0.08);
+background: var(–help-btn-hover);
 }
 
-/* Active button */
 .help-btn.active {
-  background: linear-gradient(135deg, #2a2a72, #009ffd);
-  color: #ffffff;
-  border-color: transparent;
-  box-shadow: 0 0.25rem 0.6rem rgba(0, 0, 0, 0.2);
+background: var(–help-btn-active-bg);
+color: #ffffff;
+border-color: transparent;
+box-shadow: 0 0.25rem 0.6rem rgba(0,0,0,0.2);
 }
 
-/* Pressed effect */
 .help-btn:active {
-  transform: scale(0.97);
+transform: scale(0.97);
 }
 
 .help-card {
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  margin: 16px 0;
-  padding: 16px;
-  background: #fff;
+border: 1px solid var(–help-card-border);
+border-radius: 8px;
+margin: 16px 0;
+padding: 16px;
+background: var(–help-card-bg);
+color: var(–color-text);
+transition: background 0.3s, border-color 0.3s, color 0.3s;
 }
-.help-card h3 { margin-top: 0; }
-.help-btn.active { background: #1976d2; color: #fff; }
 
-/* MODAL BASE */
-/* Modal background */
+.help-card h3 {
+margin-top: 0;
+color: var(–color-text);
+}
 
-/* =========================
-   MODAL FULLSCREEN
-========================= */
+/* ============================================================
+17. MODAL
+============================================================ */
 .newImport-modal {
-  position: fixed;
-  inset: 0;
-  width: 100vw;
-  height: 100vh;
-
-  background: rgba(0,0,0,0.45);
-  z-index: 9999;
-
-  display: flex;
+position: fixed;
+inset: 0;
+width: 100vw;
+height: 100vh;
+background: var(–modal-overlay);
+z-index: 9999;
+display: flex;
+transition: background 0.3s;
 }
+
 .newImport-container {
-  background: white;
-
-  width: 100%;
-  height: 100%;        /* fill screen */
-  max-width: none;     /* remove box look */
-  border-radius: 0;    /* full screen style */
-
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-
-  padding: 6px;
-
-  overflow-y: auto;    /* scroll INSIDE modal */
+background: var(–modal-bg);
+width: 100%;
+height: 100%;
+max-width: none;
+border-radius: 0;
+display: flex;
+flex-direction: column;
+gap: 10px;
+padding: 6px;
+overflow-y: auto;
+color: var(–color-text);
+transition: background 0.3s, color 0.3s;
 }
 
-/* ===== Selected Players Section ===== */
-.newImport-selected-section{
-  background: #f4f8ff;      /* light blue */
-  border: 1px solid #dbe7ff;
-  border-radius: 12px;
-  padding: 8px;
-  
+.newImport-selected-section {
+background: var(–modal-section-bg);
+border: 1px solid var(–modal-section-border);
+border-radius: 12px;
+padding: 8px;
+transition: background 0.3s, border-color 0.3s;
 }
 
-/* ===== History / Favorites Section ===== */
-.newImport-select-section{
-  background: #fafafa;      /* light gray */
-  border: 1px solid #eee;
-  border-radius: 12px;
-  padding: 8px;
-  
+.newImport-select-section {
+background: var(–modal-alt-bg);
+border: 1px solid var(–modal-alt-border);
+border-radius: 12px;
+padding: 8px;
+transition: background 0.3s, border-color 0.3s;
 }
 
-
-
-/* ---------- cards row ---------- */
 .newImport-cards-container {
-  display: flex;
-  flex-wrap: nowrap;
-  gap: 10px;
-  overflow-x: auto;
-  padding: 10px 0;
-}
-
-/* ---------- selected section ---------- */
-.newImport-selected-actions {
-  margin-top: 10px;
+display: flex;
+flex-wrap: wrap;
+gap: 5px;
+overflow-y: auto;
+padding-right: 5px;
 }
 
 .newImport-footer {
-  display: flex;
-  gap: 10px;
-  margin-top: 12px;
+display: flex;
+gap: 10px;
+margin-top: 12px;
 }
 
-/* ---------- tabs ---------- */
-.newImport-subtabs {
-  display: flex;
-  gap: 8px;
- 
+/* ── Modal Buttons ── */
+.newImport-clear-btn,
+.newImport-ok-btn,
+.newImport-cancel-btn {
+padding: 6px 12px;
+cursor: pointer;
+font-size: 0.9rem;
+border-radius: 6px;
+border: 1px solid var(–card-border);
+transition: background 0.2s, color 0.2s, border-color 0.2s;
 }
 
-
-
-/* ---------- buttons ---------- */
-.newImport-clear-btn {
-  padding: 6px 12px;
-  cursor: pointer;
-  font-size: 0.9rem;
-  
-}
-.newImport-ok-btn{
-  padding: 6px 12px;
-  cursor: pointer;
-  font-size: 0.9rem;
-  background:azure;
+.newImport-ok-btn {
+background: var(–modal-section-bg);
+color: var(–color-text);
 }
 
-.newImport-cancel-btn{
-  padding: 6px 12px;
-  cursor: pointer;
-  font-size: 0.9rem;
-  background: #ffd7d7;
+.newImport-cancel-btn {
+background: #ffd7d7;
+color: #7f0000;
+}
+
+[data-theme=“dark”] .newImport-cancel-btn,
+.app-dark .newImport-cancel-btn {
+background: #3d1010;
+color: #ff9999;
 }
 
 .newImport-search {
-  padding: 8px;
-  border: 1px solid #ddd;
-  margin-top: 10px;
-  margin-bottom: 10px;
-  width:95%;
-  font-size:0.9rem;
-  
-}
-/* Cards container */
-.newImport-cards-container {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 5px;
-  overflow-y: auto;
- 
-  padding-right: 5px; /* prevent scrollbar overlap */
+padding: 8px;
+border: 1px solid var(–modal-search-border);
+background: var(–input-bg);
+color: var(–color-text);
+margin-top: 10px;
+margin-bottom: 10px;
+width: 95%;
+font-size: 0.9rem;
+border-radius: 6px;
+transition: background 0.3s, color 0.3s, border-color 0.3s;
 }
 
-
-/* ================= PLAYER CARD ================= */
+/* ── Player Card in Modal ── */
 .newImport-player-card {
-  width: 100%;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  padding: 8px 10px;
-  background: #fff;
-
-  /* CHANGE → horizontal layout */
-  display: flex;
-  align-items: center;
-  gap: 10px;
+width: 100%;
+border: 1px solid var(–card-border);
+border-radius: 8px;
+padding: 8px 10px;
+background: var(–bg-card);
+display: flex;
+align-items: center;
+gap: 10px;
+transition: background 0.3s, border-color 0.3s;
 }
 
-/* icon + name container */
 .newImport-player-top {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex: 1; /* takes all available space */
+display: flex;
+align-items: center;
+gap: 8px;
+flex: 1;
 }
 
-/* player icon */
 .newImport-player-top img {
-  width: 28px;
-  height: 28px;
-  cursor: pointer;
+width: 28px;
+height: 28px;
+cursor: pointer;
 }
 
-/* player name */
 .newImport-player-name {
-  flex: 1;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
+flex: 1;
+overflow: hidden;
+white-space: nowrap;
+text-overflow: ellipsis;
+color: var(–color-text);
 }
 
-/* buttons on right side */
 .newImport-player-actions {
-  display: flex;
-  align-items: center;
-  gap: 6px;
+display: flex;
+align-items: center;
+gap: 6px;
 }
 
+.newImport-player-actions button {
+transition: transform 0.2s;
+}
 
-/* Circular buttons */
+.newImport-player-actions button:hover {
+transform: scale(1.08);
+}
+
+.newImport-player-actions button[data-action=“delete”] {
+background: #ff5252;
+color: white;
+}
+
+.newImport-player-actions button[data-action=“favorite”].active {
+background: gold;
+color: white;
+}
+
+.newImport-player-actions button[data-action=“add”].active {
+background: #2196f3;
+color: white;
+}
+
+.newImport-player-actions button:disabled {
+opacity: .6;
+cursor: not-allowed;
+}
+
+/* ── Circular Buttons ── */
 .circle-btn {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  border: none;
-  background: #eee;
-  cursor: pointer;
-  font-size: 1.1rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s ease;
+width: 40px;
+height: 40px;
+border-radius: 50%;
+border: none;
+background: var(–select-bg);
+color: var(–color-text);
+cursor: pointer;
+font-size: 1.1rem;
+display: flex;
+align-items: center;
+justify-content: center;
+transition: all 0.2s ease;
 }
 
-.circle-btn:hover {
-  transform: scale(1.1);
+.circle-btn:hover { transform: scale(1.1); }
+.circle-btn.active-favorite { background: gold; color: white; }
+.circle-btn.active-added    { background: #2196f3; color: white; }
+.circle-btn.delete          { background: #ff5252; color: white; }
+.circle-btn:disabled        { opacity: 0.7; cursor: not-allowed; }
+
+/* ── Sub Tabs ── */
+.newImport-subtabs {
+display: flex;
+border-bottom: 2px solid var(–subtab-border);
+margin-bottom: 10px;
+transition: border-color 0.3s;
 }
 
-.circle-btn.active-favorite {
-  background: gold;
-  color: white;
+.newImport-subtab-btn {
+padding: 10px 15px;
+border: none;
+background: none;
+cursor: pointer;
+font-weight: 600;
+color: var(–subtab-color);
+font-size: 1rem;
+border-bottom: 3px solid transparent;
+transition: all .2s ease;
 }
 
-.circle-btn.active-added {
-  background: #2196f3;
-  color: white;
+.newImport-subtab-btn:hover { color: var(–subtab-active); }
+
+.newImport-subtab-btn.active {
+background: none;
+color: var(–subtab-active);
+border-bottom: 3px solid var(–subtab-active);
 }
 
-.circle-btn.delete {
-  background: #ff5252;
-  color: white;
-}
-
-.circle-btn:disabled {
-  opacity: 0.7;
-  cursor: not-allowed;
-}
-
-
-.newImport-subtabs{
-  display:flex;
-  border-bottom:2px solid #e5e5e5;
-  margin-bottom:10px;
-}
-
-.newImport-subtab-btn{
-  padding:10px 15px;
-  border:none;
-  background:none;
-  cursor:pointer;
-  font-weight:600;
-  color:#666;
-  font-size:1rem;
-  border-bottom:3px solid transparent;
-  transition:all .2s ease;
-}
-
-/* hover */
-.newImport-subtab-btn:hover{
-  color:#2b7cff;
-}
-
-/* active → underline only */
-.newImport-subtab-btn.active{
-  background:none;
-  color:#2b7cff;
-  border-bottom:3px solid #2b7cff;
-}
-/* ---------- player action buttons ---------- */
-
-/* container */
-.newImport-player-actions {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-
-/* hover effect */
-.newImport-player-actions button:hover{
-  transform: scale(1.08);
-}
-
-/* delete button → red */
-.newImport-player-actions button[data-action="delete"]{
-  background:#ff5252;
-  color:white;
-}
-
-/* favorite selected → yellow */
-.newImport-player-actions button[data-action="favorite"].active{
-  background: gold;
-  color:white;
-}
-
-/* added selected → blue */
-.newImport-player-actions button[data-action="add"].active{
-  background:#2196f3;
-  color:white;
-}
-
-/* disabled state */
-.newImport-player-actions button:disabled{
-  opacity:.6;
-  cursor:not-allowed;
-}
-
-/* Browse Players Card */
-
+/* ============================================================
+18. BROWSE CARD
+============================================================ */
 .browse-card {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 18px 20px;
-  cursor: pointer;
-  transition: transform 0.15s ease;
+display: flex;
+justify-content: space-between;
+align-items: center;
+padding: 18px 20px;
+cursor: pointer;
+transition: transform 0.15s ease, background 0.3s;
+background: var(–bg-card);
+border-radius: 12px;
+border: 1px solid var(–card-border);
 }
 
-.browse-card:active {
-  transform: scale(0.98);
+.browse-card:active { transform: scale(0.98); }
+.browse-left { display: flex; flex-direction: column; }
+.browse-title { font-size: 18px; font-weight: 600; color: var(–color-text); }
+.browse-sub   { font-size: 13px; color: var(–browse-sub-color); margin-top: 4px; }
+.browse-arrow { font-size: 22px; color: var(–browse-arrow-color); }
+
+/* ============================================================
+19. .app-dark — structural rules
+Token overrides are handled by :root:has(body.app-dark).
+These rules handle anything that needs explicit dark-class
+targeting (e.g. body background directly).
+============================================================ */
+body.app-dark {
+background: var(–bg-page);
+color: var(–color-text);
 }
 
-.browse-left {
-  display: flex;
-  flex-direction: column;
+/* ============================================================
+20. SMOOTH TRANSITIONS on all interactive elements
+============================================================ */
+button, input, select, textarea, a {
+transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
 }
 
-.browse-title {
-  font-size: 18px;
-  font-weight: 600;
+/* ============================================================
+21. SCROLLBAR THEMING (Webkit)
+============================================================ */
+::-webkit-scrollbar {
+width: 6px;
+height: 6px;
 }
 
-.browse-sub {
-  font-size: 13px;
-  color: #888;
-  margin-top: 4px;
+::-webkit-scrollbar-track {
+background: var(–bg-page);
 }
 
-.browse-arrow {
-  font-size: 22px;
-  color: #bbb;
+::-webkit-scrollbar-thumb {
+background: var(–card-border);
+border-radius: 3px;
 }
+
+::-webkit-scrollbar-thumb:hover {
+background: var(–color-text-muted);
+}
+
+/* ============================================================
+END OF FILE
+============================================================ */
