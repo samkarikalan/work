@@ -1,275 +1,21 @@
-# /* ============================================================
-BRRStyle1 — Enhanced with Dark / Light Mode
+/* ============================================================
+BRRStyle1 — with Dark / Light Mode
 
-MATCHES YOUR EXISTING JS — NO CHANGES TO JS NEEDED.
+HOW IT WORKS (matches your JS exactly):
 
-Your applyTheme() toggles  .app-dark  on <body>.
-CSS uses  :root:has(body.app-dark)  to override the token
-variables, so every –var() in the file flips automatically.
+- Light mode = default styles below
+- Dark mode  = body.app-dark overrides at the bottom
 
-Your JS keys to keep matching:
-localStorage key : ‘app-theme’
-body class       : ‘app-dark’  (dark) / no class (light)
-button IDs       : #theme_light  /  #theme_dark
+Your JS already does:
+document.body.classList.toggle(‘app-dark’, mode === ‘dark’)
 
-System preference (@media prefers-color-scheme: dark) fires
-only on first visit before JS has run — once initTheme()
-executes it takes over completely.
+That’s ALL that’s needed. No changes to your JS or HTML.
 ============================================================ */
 
-/* ============================================================
-
-1. DESIGN TOKENS — Light (default)
-   ============================================================ */
-   :root {
-   –base-font-size: 14px;
-   –player-font-size: 1rem;
-
-/* ── Page ── */
-–bg-page:          #f2eef9;
-–bg-body:          #f7f7f9;
-–color-text:       #222222;
-–color-text-muted: #6b7280;
-
-/* ── Cards ── */
-–bg-card:          #ffffff;
-–bg-card-hover:    #f8f8ff;
-–card-border:      #e5e7eb;
-–card-shadow:      0 1px 5px rgba(0,0,0,0.07);
-
-/* ── Top bar / Tabs ── */
-–bg-topbar:        linear-gradient(135deg, #009ffd, #2a6eff);
-–topbar-shadow:    0 2px 8px rgba(0,0,0,0.10);
-–tab-color:        #ffffff;
-–tab-active-bg:    #800080;
-–tab-active-shadow:0 3px 7px rgba(93,37,235,0.35);
-
-/* ── Inputs ── */
-–input-bg:         #ffffff;
-–input-border:     #cccccc;
-–input-focus-ring: rgba(79,140,255,0.2);
-–select-bg:        #f5f7fa;
-
-/* ── Buttons ── */
-–btn-primary:      linear-gradient(135deg, #7c3aed, #6366f1);
-–btn-primary-active: #800080;
-–btn-warn:         linear-gradient(135deg, #fb923c, #f97316);
-–btn-danger:       linear-gradient(135deg, #ef4444, #dc2626);
-–btn-text:         #ffffff;
-
-/* ── Status ── */
-–status-ready:     #28a745;
-–status-progress:  #ffc107;
-–status-progress-text: #000000;
-–status-error:     #dc3545;
-
-/* ── Player cards ── */
-–player-male-bg:   #e3f2fd;
-–player-male-border:#90caf9;
-–player-female-bg: #fce4ec;
-–player-female-border:#f48fb1;
-–player-inactive-bg:#f1f1f1;
-–player-inactive-border:#cccccc;
-
-/* ── Help ── */
-–help-card-bg:     #ffffff;
-–help-card-border: #cccccc;
-–help-btn-color:   #2a2a72;
-–help-btn-border:  #2a2a72;
-–help-btn-hover:   rgba(42,42,114,0.08);
-–help-btn-active-bg: linear-gradient(135deg, #2a2a72, #009ffd);
-
-/* ── Modal ── */
-–modal-overlay:    rgba(0,0,0,0.45);
-–modal-bg:         #ffffff;
-–modal-section-bg: #f4f8ff;
-–modal-section-border: #dbe7ff;
-–modal-alt-bg:     #fafafa;
-–modal-alt-border: #eeeeee;
-–modal-search-border: #dddddd;
-
-/* ── Misc ── */
-–lang-menu-bg:     #ffffff;
-–lang-menu-hover:  #f0f4ff;
-–toast-bg:         #333333;
-–toast-text:       #ffffff;
-–subtab-border:    #e5e5e5;
-–subtab-color:     #666666;
-–subtab-active:    #2b7cff;
-–browse-sub-color: #888888;
-–browse-arrow-color:#bbbbbb;
-–section-title-color: #374151;
-
-/* ── Card tints ── */
-–card-language-bg: linear-gradient(180deg, #ffffff, #eef2ff);
-–card-font-bg:     linear-gradient(180deg, #ffffff, #f5f3ff);
-–card-theme-bg:    linear-gradient(180deg, #ffffff, #f1f5f9);
-–card-reset-bg:    linear-gradient(180deg, #fff7ed, #ffffff);
-–card-timer-bg:    linear-gradient(180deg, #f0f9ff, #ffffff);
-
-/* ── Theme toggle button ── */
-–theme-toggle-bg:  rgba(255,255,255,0.25);
-–theme-toggle-border: rgba(255,255,255,0.5);
-–theme-toggle-color: #ffffff;
+:root {
+–base-font-size: 14px;
+–player-font-size: 1rem;
 }
-
-/* ============================================================
-2. DESIGN TOKENS — Dark
-Your JS does: document.body.classList.toggle(‘app-dark’, …)
-:root:has(body.app-dark) is the correct way to re-scope
-:root CSS variables when the trigger class lives on <body>.
-============================================================ */
-:root:has(body.app-dark) {
-–bg-page:          #0f0f13;
-–bg-body:          #0f0f13;
-–color-text:       #e8e8f0;
-–color-text-muted: #9ca3af;
-
-–bg-card:          #1c1c26;
-–bg-card-hover:    #232333;
-–card-border:      #2e2e42;
-–card-shadow:      0 1px 8px rgba(0,0,0,0.4);
-
-–bg-topbar:        linear-gradient(135deg, #1a1a2e, #16213e);
-–topbar-shadow:    0 2px 12px rgba(0,0,0,0.5);
-–tab-color:        #c8c8e8;
-–tab-active-bg:    #9d00d0;
-–tab-active-shadow:0 3px 10px rgba(157,0,208,0.45);
-
-–input-bg:         #1c1c26;
-–input-border:     #3a3a52;
-–input-focus-ring: rgba(99,102,241,0.3);
-–select-bg:        #252535;
-
-–btn-primary:      linear-gradient(135deg, #6d28d9, #4f46e5);
-–btn-primary-active: #7c00a0;
-–btn-warn:         linear-gradient(135deg, #c2410c, #ea580c);
-–btn-danger:       linear-gradient(135deg, #b91c1c, #dc2626);
-–btn-text:         #ffffff;
-
-–status-ready:     #16a34a;
-–status-progress:  #d97706;
-–status-progress-text: #ffffff;
-–status-error:     #dc2626;
-
-–player-male-bg:   #0d2136;
-–player-male-border:#1e4a6e;
-–player-female-bg: #2a0d18;
-–player-female-border:#6b2139;
-–player-inactive-bg:#1a1a24;
-–player-inactive-border:#2e2e42;
-
-–help-card-bg:     #1c1c26;
-–help-card-border: #2e2e42;
-–help-btn-color:   #8b8bcc;
-–help-btn-border:  #4a4a7a;
-–help-btn-hover:   rgba(139,139,204,0.12);
-–help-btn-active-bg: linear-gradient(135deg, #4a3a8a, #0070bb);
-
-–modal-overlay:    rgba(0,0,0,0.7);
-–modal-bg:         #1c1c26;
-–modal-section-bg: #141420;
-–modal-section-border: #2a2a40;
-–modal-alt-bg:     #181820;
-–modal-alt-border: #2a2a38;
-–modal-search-border: #3a3a52;
-
-–lang-menu-bg:     #1c1c26;
-–lang-menu-hover:  #252535;
-–toast-bg:         #1c1c26;
-–toast-text:       #e8e8f0;
-–subtab-border:    #2e2e42;
-–subtab-color:     #9ca3af;
-–subtab-active:    #6366f1;
-–browse-sub-color: #6b7280;
-–browse-arrow-color:#4b5563;
-–section-title-color: #c8c8e8;
-
-–card-language-bg: linear-gradient(180deg, #1c1c26, #1a1a2e);
-–card-font-bg:     linear-gradient(180deg, #1c1c26, #1c1828);
-–card-theme-bg:    linear-gradient(180deg, #1c1c26, #192030);
-–card-reset-bg:    linear-gradient(180deg, #201810, #1c1c26);
-–card-timer-bg:    linear-gradient(180deg, #121c28, #1c1c26);
-
-–theme-toggle-bg:  rgba(255,255,255,0.1);
-–theme-toggle-border: rgba(255,255,255,0.2);
-–theme-toggle-color: #e8e8f0;
-}
-
-/* Auto dark via OS preference — fires before JS runs on first visit.
-Once initTheme() executes it adds/removes .app-dark on body,
-which activates the :root:has(body.app-dark) block above. */
-@media (prefers-color-scheme: dark) {
-:root:not(:has(body.app-dark)) {
-–bg-page:          #0f0f13;
-–bg-body:          #0f0f13;
-–color-text:       #e8e8f0;
-–color-text-muted: #9ca3af;
-–bg-card:          #1c1c26;
-–bg-card-hover:    #232333;
-–card-border:      #2e2e42;
-–card-shadow:      0 1px 8px rgba(0,0,0,0.4);
-–bg-topbar:        linear-gradient(135deg, #1a1a2e, #16213e);
-–topbar-shadow:    0 2px 12px rgba(0,0,0,0.5);
-–tab-color:        #c8c8e8;
-–tab-active-bg:    #9d00d0;
-–tab-active-shadow:0 3px 10px rgba(157,0,208,0.45);
-–input-bg:         #1c1c26;
-–input-border:     #3a3a52;
-–input-focus-ring: rgba(99,102,241,0.3);
-–select-bg:        #252535;
-–btn-primary:      linear-gradient(135deg, #6d28d9, #4f46e5);
-–btn-primary-active: #7c00a0;
-–btn-warn:         linear-gradient(135deg, #c2410c, #ea580c);
-–btn-danger:       linear-gradient(135deg, #b91c1c, #dc2626);
-–btn-text:         #ffffff;
-–status-ready:     #16a34a;
-–status-progress:  #d97706;
-–status-progress-text: #ffffff;
-–status-error:     #dc2626;
-–player-male-bg:   #0d2136;
-–player-male-border:#1e4a6e;
-–player-female-bg: #2a0d18;
-–player-female-border:#6b2139;
-–player-inactive-bg:#1a1a24;
-–player-inactive-border:#2e2e42;
-–help-card-bg:     #1c1c26;
-–help-card-border: #2e2e42;
-–help-btn-color:   #8b8bcc;
-–help-btn-border:  #4a4a7a;
-–help-btn-hover:   rgba(139,139,204,0.12);
-–help-btn-active-bg: linear-gradient(135deg, #4a3a8a, #0070bb);
-–modal-overlay:    rgba(0,0,0,0.7);
-–modal-bg:         #1c1c26;
-–modal-section-bg: #141420;
-–modal-section-border: #2a2a40;
-–modal-alt-bg:     #181820;
-–modal-alt-border: #2a2a38;
-–modal-search-border: #3a3a52;
-–lang-menu-bg:     #1c1c26;
-–lang-menu-hover:  #252535;
-–toast-bg:         #1c1c26;
-–toast-text:       #e8e8f0;
-–subtab-border:    #2e2e42;
-–subtab-color:     #9ca3af;
-–subtab-active:    #6366f1;
-–browse-sub-color: #6b7280;
-–browse-arrow-color:#4b5563;
-–section-title-color: #c8c8e8;
-–card-language-bg: linear-gradient(180deg, #1c1c26, #1a1a2e);
-–card-font-bg:     linear-gradient(180deg, #1c1c26, #1c1828);
-–card-theme-bg:    linear-gradient(180deg, #1c1c26, #192030);
-–card-reset-bg:    linear-gradient(180deg, #201810, #1c1c26);
-–card-timer-bg:    linear-gradient(180deg, #121c28, #1c1c26);
-–theme-toggle-bg:  rgba(255,255,255,0.1);
-–theme-toggle-border: rgba(255,255,255,0.2);
-–theme-toggle-color: #e8e8f0;
-}
-}
-
-/* ============================================================
-3. BASE
-============================================================ */
 
 - {
   -webkit-tap-highlight-color: transparent;
@@ -277,90 +23,39 @@ which activates the :root:has(body.app-dark) block above. */
 
 html {
 font-size: var(–base-font-size);
-color-scheme: light dark;
 }
+
+/* ============================================================
+BASE — LIGHT MODE (default)
+============================================================ */
 
 body {
 margin: 0;
 padding: 0;
 font-family: -apple-system, BlinkMacSystemFont, “Segoe UI”, Roboto, sans-serif;
-background: var(–bg-page);
-color: var(–color-text);
+background: #f2eef9;
+color: #222222;
 transition: background 0.3s ease, color 0.3s ease;
 }
 
-/* ============================================================
-4. THEME TOGGLE BUTTON
-Place <button id="theme-toggle"> anywhere — top bar recommended
-============================================================ */
-#theme-toggle {
-display: inline-flex;
-align-items: center;
-justify-content: center;
-width: 36px;
-height: 36px;
-border-radius: 50%;
-border: 1.5px solid var(–theme-toggle-border);
-background: var(–theme-toggle-bg);
-color: var(–theme-toggle-color);
-font-size: 1.1rem;
-cursor: pointer;
-transition: background 0.2s, transform 0.2s, border-color 0.2s;
-user-select: none;
-flex-shrink: 0;
-}
-
-#theme-toggle:hover {
-transform: scale(1.1) rotate(15deg);
-background: rgba(255,255,255,0.3);
-}
-
-#theme-toggle:active {
-transform: scale(0.95);
-}
-
-/* Show correct icon — JS sets data-theme on <html> */
-#theme-toggle .icon-sun  { display: none; }
-#theme-toggle .icon-moon { display: inline; }
-
-[data-theme=“dark”] #theme-toggle .icon-sun  { display: inline; }
-[data-theme=“dark”] #theme-toggle .icon-moon { display: none; }
-
-.app-dark #theme-toggle .icon-sun  { display: inline; }
-.app-dark #theme-toggle .icon-moon { display: none; }
-
-/* ============================================================
-5. APP LOGO
-============================================================ */
+/* ===== APP LOGO ===== */
 .app-logo-premium {
 position: absolute;
 left: 50%;
 transform: translateX(-50%);
 font-size: 2.2rem;
 font-weight: 800;
-background: var(–color-text);
+background: #1f2933;
 -webkit-background-clip: text;
 background-clip: text;
 color: transparent;
-text-shadow: none; /* transparent text can’t use text-shadow */
-filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.2));
 letter-spacing: -1px;
 white-space: nowrap;
 pointer-events: none;
 justify-self: center;
-transition: filter 0.3s ease;
 }
 
-[data-theme=“dark”] .app-logo-premium,
-.app-dark .app-logo-premium {
-background: linear-gradient(135deg, #a78bfa, #60a5fa);
--webkit-background-clip: text;
-background-clip: text;
-}
-
-/* ============================================================
-6. TOP BAR
-============================================================ */
+/* ===== TOP BAR ===== */
 .top-bar {
 display: flex;
 align-items: center;
@@ -374,7 +69,6 @@ box-sizing: border-box;
 font-size: 1.4rem;
 cursor: pointer;
 user-select: none;
-color: var(–tab-color);
 -webkit-tap-highlight-color: transparent;
 }
 
@@ -396,12 +90,6 @@ font-size: 1.4rem;
 cursor: pointer;
 padding: 10px;
 user-select: none;
-transition: background 0.2s;
-}
-
-.lang-btn:hover {
-background: rgba(255,255,255,0.15);
-border-radius: 50%;
 }
 
 .lang-menu {
@@ -410,14 +98,14 @@ top: calc(100% + 8px);
 right: 0;
 left: auto;
 width: 120px;
-background: var(–lang-menu-bg);
+background: #ffffff;
 border-radius: 12px;
 box-shadow: 0 8px 24px rgba(0,0,0,0.15);
-border: 1px solid var(–card-border);
+border: 1px solid #e5e7eb;
 display: none;
 overflow: hidden;
-z-index: 1000;
-transition: background 0.3s;
+z-index: 200;  /* below modal */
+transition: background 0.3s, border-color 0.3s;
 }
 
 .lang-menu.show {
@@ -427,17 +115,15 @@ display: block;
 .lang-menu div {
 padding: 10px 14px;
 cursor: pointer;
-color: var(–color-text);
+color: #222222;
 transition: background 0.15s;
 }
 
 .lang-menu div:hover {
-background: var(–lang-menu-hover);
+background: #f0f4ff;
 }
 
-/* ============================================================
-7. TOP TABS / NAV BAR
-============================================================ */
+/* ===== TOP TABS / NAV BAR ===== */
 .top-tabs {
 position: sticky;
 top: 0;
@@ -445,12 +131,12 @@ display: flex;
 align-items: center;
 margin: 0;
 padding: 5px 12px;
-background: var(–bg-topbar);
-box-shadow: var(–topbar-shadow);
+background: linear-gradient(135deg, #009ffd, #2a6eff);
+box-shadow: 0 2px 8px rgba(0,0,0,0.10);
 border: none;
 border-radius: 0;
-z-index: 999;
-transition: background 0.3s, box-shadow 0.3s;
+z-index: 100;  /* below modal */
+transition: background 0.3s;
 }
 
 .tabs-container {
@@ -462,11 +148,11 @@ align-items: center;
 
 .tab-btn {
 background: none;
-color: var(–tab-color);
+color: #ffffff;
 border: none;
 font-weight: 600;
 cursor: pointer;
-transition: background 0.25s, transform 0.15s, color 0.2s;
+transition: background 0.25s, transform 0.15s;
 padding: 7px 16px;
 border-radius: 16px;
 font-size: 1rem;
@@ -483,15 +169,13 @@ background: rgba(255,255,255,0.15);
 }
 
 .tab-btn.active {
-background: var(–tab-active-bg);
+background: #800080;
 color: #ffffff;
-box-shadow: var(–tab-active-shadow);
+box-shadow: 0 3px 7px rgba(93,37,235,0.35);
 opacity: 1;
 }
 
-/* ============================================================
-8. SETTINGS / CARDS
-============================================================ */
+/* ===== SETTINGS ===== */
 .settings-wrap {
 display: grid;
 gap: 10px;
@@ -502,7 +186,7 @@ padding: 6px;
 font-weight: 700;
 font-size: 0.9rem;
 text-align: center;
-color: var(–section-title-color);
+color: #374151;
 margin-bottom: 6px;
 letter-spacing: .2px;
 transition: color 0.3s;
@@ -514,27 +198,28 @@ flex-wrap: wrap;
 gap: 13px;
 }
 
-/* Card tinted backgrounds */
-.card-language { background: var(–card-language-bg); }
-.card-font     { background: var(–card-font-bg); }
-.card-theme    { background: var(–card-theme-bg); }
-.card-reset    { background: var(–card-reset-bg); }
-.card-timer    { background: var(–card-timer-bg); }
+/* ===== CARD TINTS ===== */
+.card-language { background: linear-gradient(180deg, #ffffff, #eef2ff); }
+.card-font     { background: linear-gradient(180deg, #ffffff, #f5f3ff); }
+.card-theme    { background: linear-gradient(180deg, #ffffff, #f1f5f9); }
+.card-reset    { background: linear-gradient(180deg, #fff7ed, #ffffff); }
+.card-timer    { background: linear-gradient(180deg, #f0f9ff, #ffffff); }
 
+/* ===== SETTINGS CARD ===== */
 .settings-card {
 padding: 9px 6px;
 border-radius: 10px;
 transition: background 0.3s, box-shadow 0.3s;
 }
 
-.card,
-.card-col {
-background: var(–bg-card);
+/* ===== CARD ===== */
+.card, .card-col {
+background: #ffffff;
 padding: 14px;
 margin: 12px 0;
 border-radius: 12px;
-box-shadow: var(–card-shadow);
-border: 1px solid var(–card-border);
+box-shadow: 0 1px 5px rgba(0,0,0,0.07);
+border: 1px solid #e5e7eb;
 transition: background 0.3s, border-color 0.3s, box-shadow 0.3s;
 }
 
@@ -549,9 +234,9 @@ box-sizing: border-box;
 
 .card input,
 .card select {
-border: 0.0625rem solid var(–input-border);
-background: var(–input-bg);
-color: var(–color-text);
+border: 0.0625rem solid #cccccc;
+background: #ffffff;
+color: #222222;
 transition: background 0.3s, border-color 0.3s, color 0.3s;
 }
 
@@ -576,9 +261,9 @@ box-sizing: border-box;
 .card button {
 display: block;
 margin: 0 auto;
-background: var(–btn-primary-active);
+background: #800080;
 font-size: 1rem;
-color: var(–btn-text);
+color: white;
 border: none;
 font-weight: bold;
 cursor: pointer;
@@ -590,19 +275,16 @@ transition: background 0.3s, transform 0.2s;
 
 .card button:hover {
 transform: scale(1.02);
-filter: brightness(1.1);
 }
 
-/* ============================================================
-9. BUTTONS
-============================================================ */
+/* ===== BUTTONS ===== */
 .btn {
 flex: 1;
 min-width: 50px;
 padding: 9px 6px;
 border-radius: 10px;
-background: var(–btn-primary);
-color: var(–btn-text);
+background: linear-gradient(135deg, #7c3aed, #6366f1);
+color: #ffffff;
 font-weight: 600;
 font-size: 0.9rem;
 text-align: center;
@@ -616,21 +298,19 @@ transform: scale(.96);
 }
 
 .btn.active {
-background: var(–btn-primary-active);
+background: #800080;
 box-shadow: 0 4px 12px rgba(79,70,229,.45);
 }
 
 .btn.warn {
-background: var(–btn-warn);
+background: linear-gradient(135deg, #fb923c, #f97316);
 }
 
 .btn.danger {
-background: var(–btn-danger);
+background: linear-gradient(135deg, #ef4444, #dc2626);
 }
 
-/* ============================================================
-10. FORM ELEMENTS
-============================================================ */
+/* ===== FORM ELEMENTS ===== */
 .lang-row {
 display: flex;
 align-items: center;
@@ -643,27 +323,25 @@ padding: 5px;
 position: relative;
 display: flex;
 align-items: center;
-background: var(–select-bg);
+background: #f5f7fa;
 border-radius: 12px;
 padding: 0 36px 0 38px;
 height: 44px;
 min-width: 160px;
-border: 1px solid var(–input-border);
+border: 1px solid #cccccc;
 transition: background 0.3s, border-color 0.3s;
-}
-
-.select-wrapper:has(.lang-select:focus) {
-box-shadow: 0 0 0 2px var(–input-focus-ring);
 }
 
 .lang-select {
 background: transparent;
-color: var(–color-text);
+color: #222222;
 border: none;
 outline: none;
 width: 100%;
 font-size: 0.9rem;
 }
+
+.lang-select:focus { outline: none; }
 
 .globe {
 position: absolute;
@@ -680,13 +358,12 @@ pointer-events: none;
 opacity: 0.6;
 }
 
-/* ============================================================
-11. PAGE TRANSITIONS
-============================================================ */
+/* ===== PAGE ===== */
 .page {
 font-size: 1.0rem;
 animation: fadeIn 0.2s ease-out;
-color: var(–color-text);
+color: #222222;
+transition: color 0.3s;
 }
 
 @keyframes fadeIn {
@@ -694,9 +371,7 @@ from { opacity: 0; transform: translateY(4px); }
 to   { opacity: 1; transform: translateY(0); }
 }
 
-/* ============================================================
-12. PLAYER CARDS
-============================================================ */
+/* ===== PLAYER CARDS ===== */
 .player-edit-card {
 display: grid;
 grid-template-columns: 20px 20px 35px 1fr 55px;
@@ -705,25 +380,25 @@ gap: 5px;
 font-size: 1rem;
 padding: 6px 15px;
 border-radius: 1.5rem;
-border: 1px solid var(–card-border);
-transition: background 0.3s, border-color 0.3s, opacity 0.3s;
+border: 1px solid #dddddd;
+transition: background 0.3s, border-color 0.3s;
 margin: 4px 0;
 }
 
 .player-edit-card.male {
-background-color: var(–player-male-bg);
-border-color: var(–player-male-border);
+background-color: #e3f2fd;
+border-color: #90caf9;
 }
 
 .player-edit-card.female {
-background-color: var(–player-female-bg);
-border-color: var(–player-female-border);
+background-color: #fce4ec;
+border-color: #f48fb1;
 }
 
 .player-edit-card.inactive {
 opacity: 0.45;
-background-color: var(–player-inactive-bg) !important;
-border-color: var(–player-inactive-border) !important;
+background-color: #f1f1f1 !important;
+border-color: #cccccc !important;
 filter: grayscale(0.8);
 }
 
@@ -742,7 +417,7 @@ filter: none !important;
 .pec-active  { text-align: center; }
 .pec-sl      { text-align: center; font-weight: 600; }
 .pec-gender  { text-align: center; }
-.pec-name    {
+.pec-name {
 cursor: pointer;
 white-space: normal;
 overflow: visible;
@@ -751,7 +426,7 @@ line-height: 1.25rem;
 word-break: break-word;
 margin-left: -4px;
 }
-.pec-delete  { text-align: right; }
+.pec-delete { text-align: right; }
 .pec-delete .delete {
 all: unset;
 font-size: 25px;
@@ -759,7 +434,7 @@ cursor: pointer;
 line-height: 1;
 }
 
-/* ── Fixed Cards ── */
+/* ===== FIXED CARDS ===== */
 .fixed-card {
 display: grid;
 grid-template-columns: 1fr 55px;
@@ -768,9 +443,9 @@ gap: 8px;
 font-size: 1.25rem;
 padding: 8px 15px;
 border-radius: 1.5rem;
-border: 1px solid var(–card-border);
+border: 1px solid #cccccc;
 margin: 5px 0;
-background: var(–bg-card);
+background: #ffffff;
 transition: background 0.3s, border-color 0.3s;
 }
 
@@ -784,7 +459,6 @@ cursor: pointer;
 line-height: 1;
 }
 
-/* ── Add Player Row ── */
 .row-addplayer {
 display: flex;
 gap: 10px;
@@ -792,22 +466,19 @@ flex-wrap: nowrap;
 align-items: center;
 }
 
-/* ── Player Names Textarea ── */
 #players-names {
 width: 95%;
 font-size: 1rem;
 min-height: fit-content;
-background: var(–input-bg);
-color: var(–color-text);
-border: 1px solid var(–input-border);
+background: #ffffff;
+color: #222222;
+border: 1px solid #cccccc;
 border-radius: 8px;
 padding: 0.5rem;
 transition: background 0.3s, color 0.3s, border-color 0.3s;
 }
 
-/* ============================================================
-13. STATUS
-============================================================ */
+/* ===== STATUS ===== */
 .status-card {
 padding: 12px 16px;
 border-radius: 10px;
@@ -825,16 +496,14 @@ text-align: center;
 min-width: 150px;
 }
 
-.status-ready    { background-color: var(–status-ready); }
-.status-progress { background-color: var(–status-progress); color: var(–status-progress-text); }
-.status-error    { background-color: var(–status-error); }
+.status-ready    { background-color: #28a745; }
+.status-progress { background-color: #ffc107; color: #000; }
+.status-error    { background-color: #dc3545; }
 
-.primary { background-color: var(–status-ready); color: white; }
-.primary.end { background-color: var(–status-error); }
+.primary { background-color: #28a745; color: white; }
+.primary.end { background-color: #dc3545; }
 
-/* ============================================================
-14. DISABLED / BLINK STATE
-============================================================ */
+/* ===== DISABLED ===== */
 body.disabled {
 pointer-events: none;
 opacity: 0.9;
@@ -854,29 +523,23 @@ pointer-events: auto;
 opacity: 1;
 }
 
-/* ============================================================
-15. TOAST
-============================================================ */
+/* ===== TOAST ===== */
 .toast {
 position: fixed;
 bottom: 20px;
 left: 50%;
 transform: translateX(-50%);
-background: var(–toast-bg);
-color: var(–toast-text);
+background: #333333;
+color: #ffffff;
 padding: 10px 16px;
 border-radius: 8px;
 z-index: 9999;
-border: 1px solid var(–card-border);
-box-shadow: 0 4px 16px rgba(0,0,0,0.25);
 transition: background 0.3s, color 0.3s;
 }
 
 .hidden { display: none; }
 
-/* ============================================================
-16. PAGE 4 / HELP
-============================================================ */
+/* ===== HELP ===== */
 #page4 {
 padding: 16px;
 box-sizing: border-box;
@@ -901,9 +564,9 @@ margin-bottom: 1rem;
 .help-btn {
 padding: 0.5rem 1.1rem;
 border-radius: 0.5rem;
-border: 1.5px solid var(–help-btn-border);
-background: var(–bg-card);
-color: var(–help-btn-color);
+border: 1.5px solid #2a2a72;
+background: #ffffff;
+color: #2a2a72;
 font-size: 0.9rem;
 font-weight: 100;
 cursor: pointer;
@@ -911,76 +574,67 @@ transition: all 0.25s ease;
 user-select: none;
 }
 
-.help-btn:hover {
-background: var(–help-btn-hover);
-}
+.help-btn:hover { background: rgba(42,42,114,0.08); }
 
 .help-btn.active {
-background: var(–help-btn-active-bg);
+background: linear-gradient(135deg, #2a2a72, #009ffd);
 color: #ffffff;
 border-color: transparent;
 box-shadow: 0 0.25rem 0.6rem rgba(0,0,0,0.2);
 }
 
-.help-btn:active {
-transform: scale(0.97);
-}
+.help-btn:active { transform: scale(0.97); }
 
 .help-card {
-border: 1px solid var(–help-card-border);
+border: 1px solid #cccccc;
 border-radius: 8px;
 margin: 16px 0;
 padding: 16px;
-background: var(–help-card-bg);
-color: var(–color-text);
+background: #ffffff;
 transition: background 0.3s, border-color 0.3s, color 0.3s;
 }
 
-.help-card h3 {
-margin-top: 0;
-color: var(–color-text);
-}
+.help-card h3 { margin-top: 0; }
 
-/* ============================================================
-17. MODAL
-============================================================ */
+/* ===== MODAL ===== */
 .newImport-modal {
 position: fixed;
 inset: 0;
 width: 100vw;
 height: 100vh;
-background: var(–modal-overlay);
-z-index: 9999;
+background: rgba(0,0,0,0.45); /* overlay behind container */
+z-index: 99999;  /* above top-bar, tabs, lang-menu */
 display: flex;
-transition: background 0.3s;
 }
 
 .newImport-container {
-background: var(–modal-bg);
+background: #ffffff;
 width: 100%;
 height: 100%;
-max-width: none;
-border-radius: 0;
+max-width: 100%;          /* never constrained */
+max-height: 100%;
 display: flex;
 flex-direction: column;
 gap: 10px;
 padding: 6px;
 overflow-y: auto;
-color: var(–color-text);
-transition: background 0.3s, color 0.3s;
+transition: background 0.3s;
+/* Ensure it sits above the overlay and fully covers page behind */
+position: relative;
+z-index: 1;
 }
 
 .newImport-selected-section {
-background: var(–modal-section-bg);
-border: 1px solid var(–modal-section-border);
+background: #f4f8ff;
+border: 1px solid #dbe7ff;
 border-radius: 12px;
 padding: 8px;
 transition: background 0.3s, border-color 0.3s;
 }
 
 .newImport-select-section {
-background: var(–modal-alt-bg);
-border: 1px solid var(–modal-alt-border);
+background: #fafafa;
+border: 1px solid #eeeeee;
 border-radius: 12px;
 padding: 8px;
 transition: background 0.3s, border-color 0.3s;
@@ -1000,7 +654,32 @@ gap: 10px;
 margin-top: 12px;
 }
 
-/* ── Modal Buttons ── */
+.newImport-subtabs {
+display: flex;
+border-bottom: 2px solid #e5e5e5;
+margin-bottom: 10px;
+transition: border-color 0.3s;
+}
+
+.newImport-subtab-btn {
+padding: 10px 15px;
+border: none;
+background: none;
+cursor: pointer;
+font-weight: 600;
+color: #666666;
+font-size: 1rem;
+border-bottom: 3px solid transparent;
+transition: all .2s ease;
+}
+
+.newImport-subtab-btn:hover { color: #2b7cff; }
+
+.newImport-subtab-btn.active {
+color: #2b7cff;
+border-bottom: 3px solid #2b7cff;
+}
+
 .newImport-clear-btn,
 .newImport-ok-btn,
 .newImport-cancel-btn {
@@ -1008,31 +687,18 @@ padding: 6px 12px;
 cursor: pointer;
 font-size: 0.9rem;
 border-radius: 6px;
-border: 1px solid var(–card-border);
-transition: background 0.2s, color 0.2s, border-color 0.2s;
+border: 1px solid #e5e7eb;
+transition: background 0.2s;
 }
 
-.newImport-ok-btn {
-background: var(–modal-section-bg);
-color: var(–color-text);
-}
-
-.newImport-cancel-btn {
-background: #ffd7d7;
-color: #7f0000;
-}
-
-[data-theme=“dark”] .newImport-cancel-btn,
-.app-dark .newImport-cancel-btn {
-background: #3d1010;
-color: #ff9999;
-}
+.newImport-ok-btn     { background: azure; }
+.newImport-cancel-btn { background: #ffd7d7; }
 
 .newImport-search {
 padding: 8px;
-border: 1px solid var(–modal-search-border);
-background: var(–input-bg);
-color: var(–color-text);
+border: 1px solid #dddddd;
+background: #ffffff;
+color: #222222;
 margin-top: 10px;
 margin-bottom: 10px;
 width: 95%;
@@ -1041,13 +707,12 @@ border-radius: 6px;
 transition: background 0.3s, color 0.3s, border-color 0.3s;
 }
 
-/* ── Player Card in Modal ── */
 .newImport-player-card {
 width: 100%;
-border: 1px solid var(–card-border);
+border: 1px solid #dddddd;
 border-radius: 8px;
 padding: 8px 10px;
-background: var(–bg-card);
+background: #ffffff;
 display: flex;
 align-items: center;
 gap: 10px;
@@ -1061,18 +726,13 @@ gap: 8px;
 flex: 1;
 }
 
-.newImport-player-top img {
-width: 28px;
-height: 28px;
-cursor: pointer;
-}
+.newImport-player-top img { width: 28px; height: 28px; cursor: pointer; }
 
 .newImport-player-name {
 flex: 1;
 overflow: hidden;
 white-space: nowrap;
 text-overflow: ellipsis;
-color: var(–color-text);
 }
 
 .newImport-player-actions {
@@ -1081,42 +741,19 @@ align-items: center;
 gap: 6px;
 }
 
-.newImport-player-actions button {
-transition: transform 0.2s;
-}
+.newImport-player-actions button:hover { transform: scale(1.08); }
+.newImport-player-actions button[data-action=“delete”]          { background: #ff5252; color: white; }
+.newImport-player-actions button[data-action=“favorite”].active { background: gold; color: white; }
+.newImport-player-actions button[data-action=“add”].active      { background: #2196f3; color: white; }
+.newImport-player-actions button:disabled                       { opacity: .6; cursor: not-allowed; }
 
-.newImport-player-actions button:hover {
-transform: scale(1.08);
-}
-
-.newImport-player-actions button[data-action=“delete”] {
-background: #ff5252;
-color: white;
-}
-
-.newImport-player-actions button[data-action=“favorite”].active {
-background: gold;
-color: white;
-}
-
-.newImport-player-actions button[data-action=“add”].active {
-background: #2196f3;
-color: white;
-}
-
-.newImport-player-actions button:disabled {
-opacity: .6;
-cursor: not-allowed;
-}
-
-/* ── Circular Buttons ── */
 .circle-btn {
 width: 40px;
 height: 40px;
 border-radius: 50%;
 border: none;
-background: var(–select-bg);
-color: var(–color-text);
+background: #eeeeee;
+color: #222222;
 cursor: pointer;
 font-size: 1.1rem;
 display: flex;
@@ -1125,100 +762,303 @@ justify-content: center;
 transition: all 0.2s ease;
 }
 
-.circle-btn:hover { transform: scale(1.1); }
+.circle-btn:hover          { transform: scale(1.1); }
 .circle-btn.active-favorite { background: gold; color: white; }
-.circle-btn.active-added    { background: #2196f3; color: white; }
-.circle-btn.delete          { background: #ff5252; color: white; }
-.circle-btn:disabled        { opacity: 0.7; cursor: not-allowed; }
+.circle-btn.active-added   { background: #2196f3; color: white; }
+.circle-btn.delete         { background: #ff5252; color: white; }
+.circle-btn:disabled       { opacity: 0.7; cursor: not-allowed; }
 
-/* ── Sub Tabs ── */
-.newImport-subtabs {
-display: flex;
-border-bottom: 2px solid var(–subtab-border);
-margin-bottom: 10px;
-transition: border-color 0.3s;
-}
-
-.newImport-subtab-btn {
-padding: 10px 15px;
-border: none;
-background: none;
-cursor: pointer;
-font-weight: 600;
-color: var(–subtab-color);
-font-size: 1rem;
-border-bottom: 3px solid transparent;
-transition: all .2s ease;
-}
-
-.newImport-subtab-btn:hover { color: var(–subtab-active); }
-
-.newImport-subtab-btn.active {
-background: none;
-color: var(–subtab-active);
-border-bottom: 3px solid var(–subtab-active);
-}
-
-/* ============================================================
-18. BROWSE CARD
-============================================================ */
+/* ===== BROWSE CARD ===== */
 .browse-card {
 display: flex;
 justify-content: space-between;
 align-items: center;
 padding: 18px 20px;
 cursor: pointer;
-transition: transform 0.15s ease, background 0.3s;
-background: var(–bg-card);
+background: #ffffff;
 border-radius: 12px;
-border: 1px solid var(–card-border);
+border: 1px solid #e5e7eb;
+transition: background 0.3s, border-color 0.3s, transform 0.15s;
 }
 
 .browse-card:active { transform: scale(0.98); }
-.browse-left { display: flex; flex-direction: column; }
-.browse-title { font-size: 18px; font-weight: 600; color: var(–color-text); }
-.browse-sub   { font-size: 13px; color: var(–browse-sub-color); margin-top: 4px; }
-.browse-arrow { font-size: 22px; color: var(–browse-arrow-color); }
+.browse-left        { display: flex; flex-direction: column; }
+.browse-title       { font-size: 18px; font-weight: 600; color: #222222; }
+.browse-sub         { font-size: 13px; color: #888888; margin-top: 4px; }
+.browse-arrow       { font-size: 22px; color: #bbbbbb; }
+
+/* ===== SCROLLBAR ===== */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: #f2eef9; }
+::-webkit-scrollbar-thumb { background: #cccccc; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #999999; }
 
 /* ============================================================
-19. .app-dark — structural rules
-Token overrides are handled by :root:has(body.app-dark).
-These rules handle anything that needs explicit dark-class
-targeting (e.g. body background directly).
+DARK MODE — body.app-dark overrides everything above
+Your JS sets this class. These rules override each section.
 ============================================================ */
+
 body.app-dark {
-background: var(–bg-page);
-color: var(–color-text);
+background: #0f0f13;
+color: #e8e8f0;
 }
 
-/* ============================================================
-20. SMOOTH TRANSITIONS on all interactive elements
-============================================================ */
-button, input, select, textarea, a {
-transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+/* Page background */
+body.app-dark {
+background: #0f0f13;
+color: #e8e8f0;
 }
 
-/* ============================================================
-21. SCROLLBAR THEMING (Webkit)
-============================================================ */
-::-webkit-scrollbar {
-width: 6px;
-height: 6px;
+/* App logo */
+body.app-dark .app-logo-premium {
+background: linear-gradient(135deg, #a78bfa, #60a5fa);
+-webkit-background-clip: text;
+background-clip: text;
 }
 
-::-webkit-scrollbar-track {
-background: var(–bg-page);
+/* Nav bar */
+body.app-dark .top-tabs {
+background: linear-gradient(135deg, #1a1a2e, #16213e);
+box-shadow: 0 2px 12px rgba(0,0,0,0.5);
 }
 
-::-webkit-scrollbar-thumb {
-background: var(–card-border);
-border-radius: 3px;
+body.app-dark .tab-btn {
+color: #c8c8e8;
 }
 
-::-webkit-scrollbar-thumb:hover {
-background: var(–color-text-muted);
+body.app-dark .tab-btn.active {
+background: #9d00d0;
+box-shadow: 0 3px 10px rgba(157,0,208,0.45);
 }
 
-/* ============================================================
-END OF FILE
-============================================================ */
+/* Lang menu */
+body.app-dark .lang-menu {
+background: #1c1c26;
+border-color: #2e2e42;
+}
+
+body.app-dark .lang-menu div {
+color: #e8e8f0;
+}
+
+body.app-dark .lang-menu div:hover {
+background: #252535;
+}
+
+/* Section titles */
+body.app-dark .sec {
+color: #c8c8e8;
+}
+
+/* Card tints */
+body.app-dark .card-language { background: linear-gradient(180deg, #1c1c26, #1a1a2e); }
+body.app-dark .card-font     { background: linear-gradient(180deg, #1c1c26, #1c1828); }
+body.app-dark .card-theme    { background: linear-gradient(180deg, #1c1c26, #192030); }
+body.app-dark .card-reset    { background: linear-gradient(180deg, #201810, #1c1c26); }
+body.app-dark .card-timer    { background: linear-gradient(180deg, #121c28, #1c1c26); }
+
+/* Cards */
+body.app-dark .card,
+body.app-dark .card-col,
+body.app-dark .settings-card {
+background: #1c1c26;
+border-color: #2e2e42;
+box-shadow: 0 1px 8px rgba(0,0,0,0.4);
+}
+
+body.app-dark .card input,
+body.app-dark .card select {
+background: #252535;
+color: #e8e8f0;
+border-color: #3a3a52;
+}
+
+body.app-dark .card button {
+background: #7c00a0;
+}
+
+/* Buttons */
+body.app-dark .btn {
+background: linear-gradient(135deg, #6d28d9, #4f46e5);
+}
+
+body.app-dark .btn.active {
+background: #7c00a0;
+}
+
+body.app-dark .btn.warn {
+background: linear-gradient(135deg, #c2410c, #ea580c);
+}
+
+body.app-dark .btn.danger {
+background: linear-gradient(135deg, #b91c1c, #dc2626);
+}
+
+/* Select wrapper */
+body.app-dark .select-wrapper {
+background: #252535;
+border-color: #3a3a52;
+}
+
+body.app-dark .lang-select {
+color: #e8e8f0;
+}
+
+/* Page text */
+body.app-dark .page {
+color: #e8e8f0;
+}
+
+/* Player cards */
+body.app-dark .player-edit-card.male {
+background-color: #0d2136;
+border-color: #1e4a6e;
+}
+
+body.app-dark .player-edit-card.female {
+background-color: #2a0d18;
+border-color: #6b2139;
+}
+
+body.app-dark .player-edit-card.inactive {
+background-color: #1a1a24 !important;
+border-color: #2e2e42 !important;
+}
+
+/* Fixed cards */
+body.app-dark .fixed-card {
+background: #1c1c26;
+border-color: #2e2e42;
+color: #e8e8f0;
+}
+
+/* Players names textarea */
+body.app-dark #players-names {
+background: #1c1c26;
+color: #e8e8f0;
+border-color: #3a3a52;
+}
+
+/* Status */
+body.app-dark .status-ready    { background-color: #16a34a; }
+body.app-dark .status-progress { background-color: #d97706; color: #ffffff; }
+body.app-dark .status-error    { background-color: #dc2626; }
+
+/* Toast */
+body.app-dark .toast {
+background: #1c1c26;
+color: #e8e8f0;
+border: 1px solid #2e2e42;
+}
+
+/* Help */
+body.app-dark .help-btn {
+background: #1c1c26;
+color: #8b8bcc;
+border-color: #4a4a7a;
+}
+
+body.app-dark .help-btn:hover {
+background: rgba(139,139,204,0.12);
+}
+
+body.app-dark .help-btn.active {
+background: linear-gradient(135deg, #4a3a8a, #0070bb);
+color: #ffffff;
+}
+
+body.app-dark .help-card {
+background: #1c1c26;
+border-color: #2e2e42;
+color: #e8e8f0;
+}
+
+body.app-dark .help-card h3 {
+color: #e8e8f0;
+}
+
+/* Modal */
+body.app-dark .newImport-modal {
+background: rgba(0,0,0,0.7);
+}
+
+body.app-dark .newImport-container {
+background: #1c1c26;
+color: #e8e8f0;
+/* Must stay fully opaque so page behind doesn’t bleed through */
+opacity: 1;
+}
+
+body.app-dark .newImport-selected-section {
+background: #141420;
+border-color: #2a2a40;
+}
+
+body.app-dark .newImport-select-section {
+background: #181820;
+border-color: #2a2a38;
+}
+
+body.app-dark .newImport-subtabs {
+border-bottom-color: #2e2e42;
+}
+
+body.app-dark .newImport-subtab-btn {
+color: #9ca3af;
+}
+
+body.app-dark .newImport-subtab-btn:hover,
+body.app-dark .newImport-subtab-btn.active {
+color: #6366f1;
+}
+
+body.app-dark .newImport-subtab-btn.active {
+border-bottom-color: #6366f1;
+}
+
+body.app-dark .newImport-search {
+background: #1c1c26;
+color: #e8e8f0;
+border-color: #3a3a52;
+}
+
+body.app-dark .newImport-player-card {
+background: #1c1c26;
+border-color: #2e2e42;
+color: #e8e8f0;
+}
+
+body.app-dark .newImport-player-name {
+color: #e8e8f0;
+}
+
+body.app-dark .newImport-ok-btn {
+background: #252535;
+color: #e8e8f0;
+border-color: #3a3a52;
+}
+
+body.app-dark .newImport-cancel-btn {
+background: #3d1010;
+color: #ff9999;
+}
+
+body.app-dark .circle-btn {
+background: #2e2e42;
+color: #e8e8f0;
+}
+
+/* Browse card */
+body.app-dark .browse-card {
+background: #1c1c26;
+border-color: #2e2e42;
+}
+
+body.app-dark .browse-title { color: #e8e8f0; }
+body.app-dark .browse-sub   { color: #6b7280; }
+body.app-dark .browse-arrow { color: #4b5563; }
+
+/* Scrollbar */
+body.app-dark ::-webkit-scrollbar-track { background: #0f0f13; }
+body.app-dark ::-webkit-scrollbar-thumb { background: #3a3a52; }
+body.app-dark ::-webkit-scrollbar-thumb:hover { background: #6b7280; }
