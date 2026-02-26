@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
   <link rel="apple-touch-icon" href="cs.PNG">
@@ -14,116 +13,74 @@
   <link rel="stylesheet" href="Export.css">
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-
   <script src="main.js" defer></script>
-
   <script src="home.js" defer></script>
-
   <script src="players.js" defer></script>
-
   <script src="rounds.js" defer></script>
-
   <script src="games.js" defer></script>
-
   <script src="engjap.js" defer></script>
-
+  
+  <!--<script src="timer.js" defer></script>-->
   <script src="summary.js" defer></script>
-
   <script src="help.js" defer></script>
+  
+  <!--
+  <script src="SaveRestore.js" defer></script> -->
 
-  <style>
-    /* ── Smooth dark/light transition on every element ── */
-    *, *::before, *::after {
-      box-sizing: border-box;
-    }
-
-    body {
-      transition: background 0.35s ease, color 0.35s ease;
-    }
-
-    /* ── Content wrapper — centres & constrains page width ── */
-    .content {
-      max-width: 640px;
-      margin: 0 auto;
-      padding: 8px 12px 24px;
-    }
-
-    /* ── Smooth transition on all cards and interactive elements ── */
-    .card, .settings-card, .player-edit-card,
-    .fixed-card, .newImport-player-card,
-    .help-card, .browse-card,
-    input, select, textarea, button, .btn {
-      transition: background 0.3s ease, border-color 0.3s ease,
-                  color 0.3s ease, box-shadow 0.3s ease;
-    }
-  </style>
-
+  
 </head>
 
 <body>
-
-  <!-- ============================= -->
-
-  <!--           TOP BAR             -->
-
-  <!-- ============================= -->
-
   <div class="top-bar">
-    <span class="menu-btn" onclick="showPage('homePage', this)">☰</span>
+  <span class="menu-btn" onclick="showPage('homePage', this)">☰</span>
 
-```
-<span class="app-logo-premium">CLUB Scheduler</span>
+  <span class="app-logo-premium">CLUB Scheduler</span>
 
-<div class="lang-wrapper">
-  <button class="lang-btn" onclick="toggleLangMenu()" aria-label="Language">
-    <span id="currentFlag">🇺🇸</span>
-  </button>
+  <!-- Flag button ONLY -->
+  <div class="lang-wrapper">
+    <button class="lang-btn" onclick="toggleLangMenu()" aria-label="Language">
+      <span id="currentFlag">🇺🇸</span>
+    </button>
 
-  <div class="lang-menu" id="langMenu">
-    <div data-lang="en" data-flag="🇺🇸">🇺🇸 English</div>
-    <div data-lang="jp" data-flag="🇯🇵">🇯🇵 日本語</div>
-    <div data-lang="kr" data-flag="🇰🇷">🇰🇷 한국어</div>
-    <div data-lang="zh" data-flag="🇨🇳">🇨🇳 中文</div>
-    <div data-lang="vi" data-flag="🇻🇳">🇻🇳 Tiếng Việt</div>
-  </div>
-</div>
-```
-
-  </div>
-
-  <!-- ============================= -->
-
-  <!--       TOP TAB NAVIGATION      -->
-
-  <!-- ============================= -->
-
-  <div class="top-tabs">
-    <div class="tabs-container">
-      <button class="tab-btn active" onclick="showPage('page1', this)" data-i18n="players"></button>
-      <button class="tab-btn"        onclick="showPage('page2', this)" data-i18n="rounds"></button>
-      <button class="tab-btn"        onclick="showPage('page3', this)" data-i18n="summary"></button>
-      <button class="tab-btn"        onclick="showPage('page4', this)" data-i18n="help"></button>
+    <!-- Custom menu -->
+    <div class="lang-menu" id="langMenu">
+      <div data-lang="en" data-flag="🇺🇸">🇺🇸 English</div>
+      <div data-lang="jp" data-flag="🇯🇵">🇯🇵 日本語</div>
+      <div data-lang="kr" data-flag="🇰🇷">🇰🇷 한국어</div>
+      <div data-lang="zh" data-flag="🇨🇳">🇨🇳 中文</div>
+      <div data-lang="vi" data-flag="🇻🇳">🇻🇳 Tiếng Việt</div>
     </div>
   </div>
+</div>
 
-  <!-- ============================= -->
 
-  <!--           HOME PAGE           -->
+<!-- ============================= -->
+<!--       TOP TAB NAVIGATION      -->
+<!-- ============================= -->
+<div class="top-tabs">
+  <!-- Tabs container -->
+  <div class="tabs-container">
+    <button class="tab-btn active" onclick="showPage('page1', this)" data-i18n="players"></button>
+    <button class="tab-btn" onclick="showPage('page2', this)" data-i18n="rounds"></button>
+    <button class="tab-btn" onclick="showPage('page3', this)" data-i18n="summary"></button>
+    <button class="tab-btn" onclick="showPage('page4', this)" data-i18n="help"></button>
+  </div> 
 
-  <!-- ============================= -->
+</div>
 
-  <div id="homePage" class="page" style="display:none;">
-    <div class="content">
-      <div class="settings-wrap">
+<!-- ============================= -->
+<!--           HOME PAGE           -->
+<!-- ============================= -->
+<div id="homePage" class="page" style="display:none;">
+  <div class="settings-wrap">
 
-```
     <!-- Font Size -->
     <div class="settings-card card-font">
       <div class="sec" data-i18n="fontSize"></div>
       <div class="row">
-        <div class="btn active" id="font_small"  onclick="setFontSize('small')"  data-i18n="small"></div>
-        <div class="btn"        id="font_medium" onclick="setFontSize('medium')" data-i18n="medium"></div>
-        <div class="btn"        id="font_large"  onclick="setFontSize('large')"  data-i18n="large"></div>
+        <div class="btn active" id="font_small" onclick="setFontSize('small')" data-i18n="small"></div>
+        <div class="btn" id="font_medium" onclick="setFontSize('medium')" data-i18n="medium"></div>
+        <div class="btn" id="font_large" onclick="setFontSize('large')" data-i18n="large"></div>
       </div>
     </div>
 
@@ -132,70 +89,71 @@
       <div class="sec" data-i18n="theme"></div>
       <div class="row">
         <div class="btn active" id="theme_light" onclick="setTheme('light')" data-i18n="light"></div>
-        <div class="btn"        id="theme_dark"  onclick="setTheme('dark')"  data-i18n="dark"></div>
+        <div class="btn" id="theme_dark" onclick="setTheme('dark')" data-i18n="dark"></div>
       </div>
     </div>
 
+    <!-- Reset -->
     <!-- Reset -->
     <div class="settings-card card-reset">
       <div class="sec" data-i18n="reset"></div>
       <div class="row">
         <div class="btn danger"
-             onclick="showConfirm('confirmResetAll', ResetAll)"
-             data-i18n="resetAll">
+           onclick="showConfirm('confirmResetAll', ResetAll)"
+           data-i18n="resetAll">
         </div>
+
         <div class="btn warn"
-             onclick="showConfirm('confirmResetGames', resetRounds)"
-             data-i18n="resetExcept">
+           onclick="showConfirm('confirmResetGames', resetRounds)"
+           data-i18n="resetExcept">
         </div>
-      </div>
+       </div>
     </div>
 
-    <!-- Export / Save -->
+        <!-- Export / Save -->
     <div class="settings-card card-export">
       <div class="sec" data-i18n="export"></div>
       <div class="row">
-        <div class="btn" onclick="exportBRR2HTML()" data-i18n="exporthtml">📄</div>
+        <div class="btn" onclick="exportBRR2HTML()" 
+          data-i18n="exporthtml">  📄 
+        </div>
       </div>
-    </div>
+    </div>  
 
+    
   </div>
 </div>
-```
 
-  </div>
 
-  <!-- Confirm overlay -->
+<div id="confirmOverlay" class="confirm-overlay hidden">
+  <div class="confirm-box">
+    <div class="confirm-title" id="confirmTitle"></div>
 
-  <div id="confirmOverlay" class="confirm-overlay hidden">
-    <div class="confirm-box">
-      <div class="confirm-title" id="confirmTitle"></div>
-      <div class="confirm-actions">
-        <button class="btn cancel"  id="confirmCancel"></button>
-        <button class="btn danger"  id="confirmYes"></button>
-      </div>
+    <div class="confirm-actions">
+      <button class="btn cancel" id="confirmCancel"></button>
+      <button class="btn danger" id="confirmYes"></button>
     </div>
   </div>
+</div>  
+<!--           PAGE 1              -->
+<!--         Players Page          -->
+<!-- ============================= -->
+<!-- ============================= -->
+<!--           PAGE 1              -->
+<!--         Players Page          -->
+<!-- ============================= -->
+<div id="page1" class="page">
 
-  <!-- ============================= -->
-
-  <!--           PAGE 1              -->
-
-  <!--         Players Page          -->
-
-  <!-- ============================= -->
-
-  <div id="page1" class="page">
-    <div class="content">
-
-```
   <div class="card browse-card" onclick="newImportShowModal()">
-    <div class="browse-left">
-      <span class="browse-title" data-i18n="importPlayers"></span>
-      <span class="browse-sub"   data-i18n="browsePlayersSub"></span>
-    </div>
-    <div class="browse-arrow">›</div>
+  
+  <div class="browse-left">
+    <span class="browse-title" data-i18n="importPlayers"></span>
+    <span class="browse-sub" data-i18n="browsePlayersSub"></span>
   </div>
+
+  <div class="browse-arrow">›</div>
+
+</div> 
 
   <div class="card">
     <div id="playerList" class="player-list"></div>
@@ -206,198 +164,231 @@
     <select id="fixed-pair-1"></select>
     <select id="fixed-pair-2"></select>
     <button onclick="modifyFixedPair()" data-i18n="add"></button>
+
     <div id="fixed-pair-list" class="fixed-pairs-list"></div>
   </div>
 
-</div>
-```
+</div> <!-- page1 -->
+  <!-- ✅ page1 closes HERE --> <!-- page1 -->
 
-  </div>
-
-  <!-- ============================= -->
-
-  <!--           PAGE 2              -->
-
-  <!--           Rounds Page         -->
-
-  <!-- ============================= -->
-
-  <div id="page2" class="page" style="display:none;">
-    <div class="content">
-
-```
+<!-- ============================= -->
+<!--           PAGE 2              -->
+<!--           Rounds Page         -->
+<!-- ============================= -->
+<div id="page2" class="page" style="display:none;">  
   <div class="title-card">
     <div id="roundTitle">R</div>
     <img id="lockToggleBtn" class="lock-icon" src="lock.png" alt="Lock" />
   </div>
+  
+  <div id="game-results"></div>  
+  <div class="row-field">  
+  <div class="court-card">
+    <label for="num-courts" class="row-label" data-i18n="courts"></label>
+    <button class="circle-btn" id="courtMinus">−</button>
+    <span id="num-courts">1</span>
+    <button class="circle-btn" id="courtPlus">+</button>
+  </div>    
+    
+  <!-- Mode Toggle (replaces status-card) -->
+  <div class="mode-card">
+    <span id="modeLabel"></span>
 
-  <div id="game-results"></div>
+    <label class="switch">
+      <input type="checkbox" id="modeToggle">
+      <span class="slider"></span>
+    </label>
 
-  <div class="row-field">
-    <div class="court-card">
-      <label for="num-courts" class="row-label" data-i18n="courts"></label>
-      <button class="circle-btn" id="courtMinus">−</button>
-      <span id="num-courts">1</span>
-      <button class="circle-btn" id="courtPlus">+</button>
-    </div>
-
-    <div class="mode-card">
-      <span id="modeLabel"></span>
-      <label class="switch">
-        <input type="checkbox" id="modeToggle">
-        <span class="slider"></span>
-      </label>
-      <span></span>
-    </div>
+    <span></span>
   </div>
+</div>
 
   <div class="action-card">
+  <!-- LEFT : Mix / Refresh (secondary) --> 
+    
     <button
-      class="action mid small"
-      id="roundShufle"
-      onclick="RefreshRound()"
-      aria-label="Mix round">
-      🎲
-    </button>
+    class="action mid small"
+    id="roundShufle"
+    onclick="RefreshRound()"
+    aria-label="Mix round"
+  >
+    🎲
+  </button>
 
-    <button id="nextBtn" class="action right primary" onclick="toggleRound()">
-      <span id="btnText" data-i18n="nround"></span>
-      <span class="icon"> ▶</span>
-    </button>
-  </div>
+  <!-- RIGHT : Next (primary) -->
+<button id="nextBtn" class="action right primary" onclick="toggleRound()">
+  <span id="btnText" data-i18n="nround"></span>
+  <span class="icon"> ▶</span>
+</button>
+
+
+
 
 </div>
-```
 
+  
+</div>
+
+  
+  
+
+    
+  
+ </div>   
+
+
+
+
+
+
+
+
+ 
+
+<!-- ============================= -->
+<!--           PAGE 3              -->
+<!--        Summary / Report       -->
+<!-- ============================= -->
+<div id="page3" class="page" style="display:none;">
+  <div id="reportContainer"></div>
+  <div id="export"></div>
+</div>
+
+<div id="page4" class="page" style="display:none;">
+  <div class="help-buttons">
+    <button class="help-btn active" onclick="loadHelp('players')" data-i18n="players"></button>
+    <button class="help-btn" onclick="loadHelp('rounds')" data-i18n="rounds"></button>
+    <button class="help-btn" onclick="loadHelp('summary')" data-i18n="summary"></button>
   </div>
+  <div id="helpContainer"></div>
+</div>
+  
+<!-- ============================= -->
+<!--           Import Modal        -->
+<!-- ============================= -->
 
-  <!-- ============================= -->
+<div id="newImportModal"
+     class="newImport-modal"
+     style="display:none;"
+     onclick="if(event.target===this)newImportHideModal()">
 
-  <!--           PAGE 3              -->
+  <div class="newImport-container">
 
-  <!--        Summary / Report       -->
+    <!-- ========================= -->
+    <!-- TOP → SELECTED PLAYERS -->
+    <!-- ========================= -->
+    <div class="newImport-selected-section">
 
-  <!-- ============================= -->
-
-  <div id="page3" class="page" style="display:none;">
-    <div class="content">
-      <div id="reportContainer"></div>
-      <div id="export"></div>
-    </div>
-  </div>
-
-  <!-- ============================= -->
-
-  <!--           PAGE 4              -->
-
-  <!--             Help              -->
-
-  <!-- ============================= -->
-
-  <div id="page4" class="page" style="display:none;">
-    <div class="content">
-      <div class="help-buttons">
-        <button class="help-btn active" onclick="loadHelp('players')"  data-i18n="players"></button>
-        <button class="help-btn"        onclick="loadHelp('rounds')"   data-i18n="rounds"></button>
-        <button class="help-btn"        onclick="loadHelp('summary')"  data-i18n="summary"></button>
+      <div class="newImport-selected-header">
+        <strong>Selected (<span id="newImportSelectedCount">0</span>)</strong>
       </div>
-      <div id="helpContainer"></div>
-    </div>
-  </div>
 
-  <!-- ============================= -->
+      <div id="newImportSelectedCards"
+           class="newImport-cards-container newImport-selected-container">
+      </div>
 
-  <!--           Import Modal        -->
+      <div class="newImport-selected-actions">
+        <button class="newImport-clear-btn"
+                onclick="newImportClearSelected()">Clear</button>
+      </div>
 
-  <!-- ============================= -->
+      <div class="newImport-footer">
+        <button class="newImport-ok-btn"
+                onclick="addPlayersFromInputUI()">OK</button>
 
-  <div id="newImportModal"
-       class="newImport-modal"
-       style="display:none;"
-       onclick="if(event.target===this)newImportHideModal()">
+        <button class="newImport-cancel-btn"
+                onclick="newImportHideModal()">Cancel</button>
+      </div>
 
-```
-<div class="newImport-container">
-
-  <!-- TOP → SELECTED PLAYERS -->
-  <div class="newImport-selected-section">
-    <div class="newImport-selected-header">
-      <strong>Selected (<span id="newImportSelectedCount">0</span>)</strong>
     </div>
 
-    <div id="newImportSelectedCards"
-         class="newImport-cards-container newImport-selected-container">
-    </div>
+    <!-- ========================= -->
+    <!-- BOTTOM → HISTORY / FAVORITES / ADD -->
+    <!-- ========================= -->
+    <div class="newImport-select-section">
 
-    <div class="newImport-selected-actions">
-      <button class="newImport-clear-btn" onclick="newImportClearSelected()">Clear</button>
-    </div>
+      <!-- Tabs -->
+      <div class="newImport-subtabs">
+        <button class="newImport-subtab-btn active"
+                id="newImportHistoryBtn"
+                onclick="newImportShowSelectMode('history')">
+          History
+        </button>
 
-    <div class="newImport-footer">
-      <button class="newImport-ok-btn"     onclick="addPlayersFromInputUI()">OK</button>
-      <button class="newImport-cancel-btn" onclick="newImportHideModal()">Cancel</button>
-    </div>
-  </div>
+        <button class="newImport-subtab-btn"
+                id="newImportFavoritesBtn"
+                onclick="newImportShowSelectMode('favorites')">
+          Favorites
+        </button>
 
-  <!-- BOTTOM → HISTORY / FAVORITES / ADD -->
-  <div class="newImport-select-section">
+        <button class="newImport-subtab-btn"
+                id="newImportAddplayersBtn"
+                onclick="newImportShowSelectMode('addplayers')">
+          Add Players
+        </button>
+      </div>
 
-    <div class="newImport-subtabs">
-      <button class="newImport-subtab-btn active"
-              id="newImportHistoryBtn"
-              onclick="newImportShowSelectMode('history')">History</button>
+      <!-- Search -->
+      <input type="text"
+             id="newImportSearch"
+             class="newImport-search"
+             placeholder="Search players">
 
-      <button class="newImport-subtab-btn"
-              id="newImportFavoritesBtn"
-              onclick="newImportShowSelectMode('favorites')">Favorites</button>
+      <!-- Clear buttons -->
+      <div class="newImport-list-actions">
 
-      <button class="newImport-subtab-btn"
-              id="newImportAddplayersBtn"
-              onclick="newImportShowSelectMode('addplayers')">Add Players</button>
-    </div>
+        <button id="newImportClearHistoryBtn"
+                class="newImport-clear-btn"
+                onclick="newImportClearHistory()">
+          Clear History
+        </button>
 
-    <input type="text"
-           id="newImportSearch"
-           class="newImport-search"
-           placeholder="Search players">
+        <button id="newImportClearFavoritesBtn"
+                class="newImport-clear-btn"
+                onclick="newImportClearFavorites()"
+                style="display:none">
+          Clear Favorites
+        </button>
 
-    <div class="newImport-list-actions">
-      <button id="newImportClearHistoryBtn"
-              class="newImport-clear-btn"
-              onclick="newImportClearHistory()">Clear History</button>
+      </div>
 
-      <button id="newImportClearFavoritesBtn"
-              class="newImport-clear-btn"
-              onclick="newImportClearFavorites()"
-              style="display:none">Clear Favorites</button>
-    </div>
+      <!-- Player List (History / Favorites) -->
+      <div id="newImportSelectCards"
+           class="newImport-cards-container">
+      </div>
 
-    <div id="newImportSelectCards" class="newImport-cards-container"></div>
+      <!-- ========================= -->
+      <!-- ADD PLAYERS SECTION -->
+      <!-- ========================= -->
+      <div id="newImportAddPlayersSection" style="display:none">
 
-    <!-- ADD PLAYERS SECTION -->
-    <div id="newImportAddPlayersSection" style="display:none">
-      <div class="card">
-        <textarea
-          id="players-names"
-          rows="3"
-          placeholder="John, Mike, Sarah">
-        </textarea>
+        <div class="card">
+          <textarea 
+            id="players-names"
+            rows="3"
+            placeholder="John, Mike, Sarah">
+          </textarea>
 
-        <div class="row-addplayer">
-          <select id="player-gender">
-            <option value="Male">Male</option>
-            <option value="Female">Female</option>
-          </select>
-          <button class="add-button" onclick="addPlayer()">Add Player</button>
+          <div class="row-addplayer">  
+            <select id="player-gender">
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
+            </select>
+
+            <button class="add-button" onclick="addPlayer()">
+              Add Player
+            </button>
+          </div>
         </div>
-      </div>
-    </div>
 
+      </div>
+
+    </div>
   </div>
 </div>
-```
-
-  </div>
-
+  
+</div> 
+  
+  
 </body>
 </html>
