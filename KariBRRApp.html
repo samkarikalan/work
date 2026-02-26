@@ -110,15 +110,7 @@
        </div>
     </div>
 
-        <!-- Export / Save -->
-    <div class="settings-card card-export">
-      <div class="sec" data-i18n="export"></div>
-      <div class="row">
-        <div class="btn" onclick="exportBRR2HTML()" 
-          data-i18n="exporthtml">  📄 
-        </div>
-      </div>
-    </div>  
+     
 
     
   </div>
@@ -160,7 +152,7 @@
   </div>
 
   <div class="card">
-    <h3 data-i18n="fixedPairs"></h3>
+    <span class="browse-title" data-i18n="fixedPairs"></span>
     <select id="fixed-pair-1"></select>
     <select id="fixed-pair-2"></select>
     <button onclick="modifyFixedPair()" data-i18n="add"></button>
@@ -250,6 +242,13 @@
 <!--        Summary / Report       -->
 <!-- ============================= -->
 <div id="page3" class="page" style="display:none;">
+     
+     
+        <div class="exp_btn" onclick="exportBRR2HTML()" 
+          data-i18n="exporthtml">  📄 
+        </div>
+
+    
   <div id="reportContainer"></div>
   <div id="export"></div>
 </div>

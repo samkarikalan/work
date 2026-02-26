@@ -26,7 +26,7 @@ body {
   left: 50%;
   transform: translateX(-50%); /* FIX */
 
-  font-size: 2.2rem;
+  font-size: 2.0rem;
   font-weight: 800;
   background: #1f2933;  
   );
@@ -34,7 +34,6 @@ body {
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
-
   text-shadow: 2px 4px 8px rgba(0,0,0,0.15);
   letter-spacing: -1px;
   white-space: nowrap;
@@ -43,6 +42,7 @@ body {
 
 .app-logo-premium {
   justify-self: center;
+  
 }
 
 /* ===== TOP TABS (Updated Style) ===== */
@@ -53,7 +53,7 @@ body {
   grid-template-columns: auto 1fr auto;
   align-items: center;
   overflow: visible;
-  height: 60px;
+  height: 35px;
   padding: 0 12px;
 }
 
