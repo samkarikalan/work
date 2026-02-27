@@ -2543,8 +2543,32 @@ updateModeLabel();
 modeToggle.addEventListener("change", () => {
   localStorage.setItem("playMode", getPlayMode());
   updateModeLabel();
-  //updateWinCupVisibility(); // <-- update cups visibility when mode changes
+
+  // ← ADD THIS LINE
+  document.getElementById('minRoundsRow')
+    .classList.toggle('visible', getPlayMode() === 'competitive');
 });
+
+let minRoundsValue = parseInt(localStorage.getItem('minRounds')) || 6;
+document.getElementById('minRoundsDisplay').textContent = minRoundsValue;
+
+document.getElementById('minRoundsPlus').addEventListener('click', () => {
+  minRoundsValue = Math.min(20, minRoundsValue + 1);
+  document.getElementById('minRoundsDisplay').textContent = minRoundsValue;
+  localStorage.setItem('minRounds', minRoundsValue);
+  schedulerState.minRounds = minRoundsValue;
+});
+
+document.getElementById('minRoundsMinus').addEventListener('click', () => {
+  minRoundsValue = Math.max(1, minRoundsValue - 1);
+  document.getElementById('minRoundsDisplay').textContent = minRoundsValue;
+  localStorage.setItem('minRounds', minRoundsValue);
+  schedulerState.minRounds = minRoundsValue;
+});
+
+// Restore min rounds row visibility on load
+document.getElementById('minRoundsRow')
+  .classList.toggle('visible', getPlayMode() === 'competitive');
 
 
 
