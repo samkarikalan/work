@@ -174,7 +174,8 @@
   </div>
   
   <div id="game-results"></div>  
-  <div class="row-field">  
+ <!-- Row 1 — Courts + Mode Toggle (always visible) -->
+<div class="row-field">  
   <div class="court-card">
     <label for="num-courts" class="row-label" data-i18n="courts"></label>
     <button class="circle-btn" id="courtMinus">−</button>
@@ -182,18 +183,30 @@
     <button class="circle-btn" id="courtPlus">+</button>
   </div>    
     
-  <!-- Mode Toggle (replaces status-card) -->
+  <!-- Mode Toggle -->
   <div class="mode-card">
     <span id="modeLabel"></span>
-
     <label class="switch">
       <input type="checkbox" id="modeToggle">
       <span class="slider"></span>
     </label>
-
     <span></span>
   </div>
 </div>
+
+<!-- Row 2 — Min Rounds (only visible when competitive ON) -->
+<div class="row-field competitive-settings" id="minRoundsRow">
+  <div class="court-card">
+    <label class="row-label" data-i18n="minRounds">Min Rounds</label>
+    <button class="circle-btn" id="minRoundsMinus">−</button>
+    <span id="minRoundsDisplay">6</span>
+    <button class="circle-btn" id="minRoundsPlus">+</button>
+  </div>
+  <div class="min-rounds-hint">
+    <span data-i18n="minRoundsHint">Warm up before competitive</span>
+  </div>
+</div>
+
 
   <div class="action-card">
   <!-- LEFT : Mix / Refresh (secondary) --> 
