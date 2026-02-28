@@ -293,3 +293,40 @@ body.disabled { pointer-events: none; opacity: 0.9; animation: blinkBorder 1s in
 /* primary / end overrides */
 .primary   { background: var(–green); color: white; }
 .primary.end { background: var(–red); }
+
+/* ── Dark theme overrides for appended classes ── */
+.round-navigation { display: flex; justify-content: space-between; align-items: center; margin-top: 0.5rem; padding: 0.5rem 1rem; background: var(–surface); border: 1px solid var(–border); border-radius: var(–r-md); }
+.round-navigation .center { justify-self: center; width: fit-content; white-space: nowrap; }
+.round-navigation button { font-size: 1rem; background: var(–accent); display: flex; align-items: center; gap: 6px; padding: 5px 20px; color: white; cursor: pointer; border-radius: var(–r-sm); border: none; transition: transform 0.15s; }
+.round-navigation button:hover { background: var(–accent); transform: scale(1.05); }
+.round-navigation button:disabled { opacity: 0.4; cursor: not-allowed; pointer-events: none; }
+.round-navigation button.danger { background: var(–red) !important; }
+.finish-card { width: 98%; margin: 2px auto; border-radius: var(–r-lg); box-shadow: 0 4px 16px rgba(0,0,0,0.3); overflow: hidden; }
+.finish-btn { width: 100%; padding: 10px 0; border: none; font-size: 1.05rem; font-weight: 700; color: #fff; cursor: pointer; background: linear-gradient(135deg, var(–red), #b91c1c); transition: transform 0.1s; }
+.finish-btn:active { transform: scale(0.97); }
+.player-btn { color: var(–text); font-weight: 600; border-radius: var(–r-sm); padding: 4px 10px; margin: 3px auto; text-align: center; white-space: normal; overflow-wrap: break-word; background: var(–surface3); border: 1px solid var(–border2); }
+.player-btn.male { background: rgba(96,165,250,0.12); border-color: rgba(96,165,250,0.2); }
+.player-btn.female { background: rgba(255,101,132,0.12); border-color: rgba(255,101,132,0.2); }
+.timer-card { display: flex; align-items: center; justify-content: center; gap: 10px; background: var(–surface2); border: 1px solid var(–border2); border-radius: var(–r-xl); padding: 5px 10px; width: fit-content; }
+.timer-icon { cursor: pointer; background: var(–surface2); border: 1px solid var(–border2); color: var(–text-dim); padding: 6px 8px; border-radius: 20px; font-size: 1.2rem; user-select: none; display: inline-flex; align-items: center; justify-content: center; gap: 6px; transition: background 0.2s; }
+.timer-icon.running { background: rgba(239,68,68,0.15); border-color: rgba(239,68,68,0.3); color: var(–red); }
+.timer-toggle-btn { background: none; border: none; font-size: 1.4rem; cursor: pointer; padding: 0; color: var(–text-dim); }
+.timer-slider { width: 90%; margin: 0 auto; }
+.timer-slider input[type=“range”] { width: 100%; }
+.disabled-btn { opacity: 0.35; pointer-events: none; }
+.minus { background: rgba(239,68,68,0.15); border-color: rgba(239,68,68,0.3); color: var(–red); }
+.plus  { background: rgba(45,206,137,0.15); border-color: rgba(45,206,137,0.3); color: var(–green); }
+.sec { font-size: 0.85rem; text-align: center; padding: 3px; color: var(–text-dim); }
+.danger { background: var(–red) !important; color: white !important; }
+.action.left { flex: 1.5; background: var(–surface3); border-right: 1px solid var(–border); }
+
+/* ── Additional preserved classes ── */
+.finish-btn .icon {
+margin-left: 6px;
+}
+.card {
+position: relative; /* Keep this */
+}
+/* card class dark override for page2 */
+.card { background: var(–surface); border: 1px solid var(–border); border-radius: var(–r-lg); padding: 12px; margin: 6px 2px; width: calc(100% - 4px); box-sizing: border-box; position: relative; }
+.icon { margin-left: 6px; }
