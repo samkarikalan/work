@@ -114,26 +114,27 @@ function toggleRound() {
       "button, .player-btn, .mode-card, .lock-icon, .swap-icon, .menu-btn"
     ).forEach(el => {
       if (el.id !== "nextBtn" && !el.classList.contains("win-cup")) {
+        // Disable clicks
         el.style.pointerEvents = "none";
+        
+        // Add disabled styling
         el.classList.add("disabled");    
+        
       }
     });   
 
-    // Show win cups whenever competitive toggle is ON
-    // (even during warm-up) so winners can be marked for seeding
     document.querySelectorAll(".win-cup").forEach(cup => {
-      cup.style.visibility = playmode === "competitive" ? "visible" : "hidden";
-      cup.style.pointerEvents = playmode === "competitive" ? "auto" : "none";
+      cup.style.visibility = "visible";
+      cup.style.pointerEvents = "auto";
       cup.classList.add("blinking");
+      cup.style.visibility = playmode === "competitive" ? "visible" : "hidden";
     });
 
+    
     page2.classList.add("active-mode");
 
   } else {
-    // ---- RETURN TO IDLE MODE ----
-
-    // Require winners if competitive toggle is ON
-    // (warm-up rounds included — results seed tier rankings)
+    // ---- RETURN TO IDLE MODE ----   
     if (playmode === "competitive") {     
       const currentRoundGames = allRounds[allRounds.length - 1].games;
       const winnersCount = currentRoundGames.filter(game => game.winner).length;
@@ -143,27 +144,35 @@ function toggleRound() {
         return; // ❌ stay in active mode
       }
 
-      // Always update points when competitive toggle is ON
-      // warm-up rounds → seeds tier rankings
-      // competitive rounds → drives tier rankings
+    }
+    currentState = "idle";
+
+    // ── Update points after competitive round ──
+    if (getPlayMode() === 'competitive' && isWarmupComplete(schedulerState)) {
       updatePointsAfterRound(schedulerState);
     }
+    // ──────────────────────────────────────────
 
-    currentState = "idle";
     nextRound();
     page2.classList.remove("active-mode");
     
-    // Re-enable everything previously disabled
+   // Re-enable everything previously disabled
     document.querySelectorAll(".disabled").forEach(el => {
+      // Restore pointer events
       el.style.pointerEvents = "";
+    
+      // Remove the disabled class
       el.classList.remove("disabled");
     
+      // If you had removed inline onclick handlers, you may need to restore them manually
+      // For example, for the menu button:
       if (el.classList.contains("menu-btn")) {
         el.onclick = function() {
           showPage('homePage', this);
         };
       }
     });
+
 
     // Hide & disable win cups
     document.querySelectorAll(".win-cup").forEach(cup => {

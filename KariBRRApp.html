@@ -19,6 +19,7 @@
   <script src="players.js" defer></script>
   <script src="rounds.js" defer></script>
   <script src="games.js" defer></script>
+  <script src="competitive_algorithm.js" defer></script>
   <script src="engjap.js" defer></script>
   
   <!--<script src="timer.js" defer></script>-->
@@ -33,7 +34,7 @@
 
 <body>
   <div class="top-bar">
-  <span class="menu-btn" onclick="showPage('homePage', this)">☰</span>
+  
 
   <span class="app-logo-premium">CLUB Scheduler</span>
 
@@ -59,14 +60,28 @@
 <!--       TOP TAB NAVIGATION      -->
 <!-- ============================= -->
 <div class="top-tabs">
-  <!-- Tabs container -->
   <div class="tabs-container">
-    <button class="tab-btn active" onclick="showPage('page1', this)" data-i18n="players"></button>
-    <button class="tab-btn" onclick="showPage('page2', this)" data-i18n="rounds"></button>
-    <button class="tab-btn" onclick="showPage('page3', this)" data-i18n="summary"></button>
-    <button class="tab-btn" onclick="showPage('page4', this)" data-i18n="help"></button>
-  </div> 
-
+    <button class="tab-btn" onclick="showPage('homePage', this)" data-i18n="settings">
+      <span class="tab-icon">⚙️</span>
+      <span class="tab-label" data-i18n="settings">Settings</span>
+    </button>
+    <button class="tab-btn active" onclick="showPage('page1', this)">
+      <span class="tab-icon">👥</span>
+      <span class="tab-label" data-i18n="players">Players</span>
+    </button>
+    <button class="tab-btn" onclick="showPage('page2', this)">
+      <span class="tab-icon">🏸</span>
+      <span class="tab-label" data-i18n="rounds">Rounds</span>
+    </button>
+    <button class="tab-btn" onclick="showPage('page3', this)">
+      <span class="tab-icon">📊</span>
+      <span class="tab-label" data-i18n="summary">Summary</span>
+    </button>
+    <button class="tab-btn" onclick="showPage('page4', this)">
+      <span class="tab-icon">❓</span>
+      <span class="tab-label" data-i18n="help">Help</span>
+    </button>
+  </div>
 </div>
 
 <!-- ============================= -->

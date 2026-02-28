@@ -76,6 +76,7 @@ padding: 10px 14px;
 background: var(--bg);
 border-bottom: 1px solid var(--border);
 position: relative;
+
 }
 .app-logo-premium {
 position: absolute; left: 50%; transform: translateX(-50%);
@@ -103,25 +104,96 @@ display: none; overflow: hidden; z-index: 1000; min-width: 130px;
 .lang-menu div:hover { background: var(--surface3); color: var(--text); }
 
 /* ── Tabs ── */
-.top-tabs {
-position: sticky; top: 0;
-display: flex; align-items: center;
-padding: 6px 10px;
-background: var(--surface); border-bottom: 1px solid var(--border);
-z-index: 999;
-}
+
 .tabs-container {
-flex: 1; display: flex; gap: 4px;
-background: var(--surface2); border-radius: var(--r-md); padding: 4px;
+  flex: 1;
+  display: flex;
+  flex-direction: row; /* ← force tabs in a row */
+  gap: 0;
+  background: transparent;
+  border-radius: 0;
+  padding: 0;
+}
+
+.tab-btn {
+  flex: 1;
+  background: none;
+  color: var(--muted);
+  border: none;
+  border-bottom: 3px solid transparent;
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 0.85rem;
+  padding: 6px 4px;
+  border-radius: 0;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: center;
+  position: relative;
+  display: inline-flex;   /* ← inline-flex instead of flex */
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
 }
 .tab-btn {
-flex: 1; background: none; color: var(--muted);
-border: none; font-family: var(--font-body); font-weight: 600;
-font-size: 0.85rem; padding: 7px 4px; border-radius: var(--r-sm);
-cursor: pointer; transition: all 0.2s; text-align: center;
+  flex: 1;
+  background: none;
+  color: var(--muted);
+  border: none;
+  border-bottom: 3px solid transparent;
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 0.85rem;
+  padding: 6px 4px;
+  border-radius: 0;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: center;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
 }
-.tab-btn:hover { color: var(--text-dim); }
-.tab-btn.active { background: var(--accent); color: #fff; box-shadow: var(--shadow-accent); }
+
+.tab-icon {
+  font-size: 1.1rem;
+  line-height: 1;
+}
+
+.tab-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.tab-btn::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 3px;
+  background: var(--accent);
+  border-radius: 2px;
+  transition: width 0.2s;
+}
+
+.tab-btn:hover::after {
+  width: 40%;
+}
+
+.tab-btn.active {
+  background: none;
+  color: var(--accent);
+  box-shadow: none;
+}
+
+.tab-btn.active::after {
+  width: 80%;
+}
 
 /* ── Page ── */
 .page { font-size: 1rem; animation: fadeIn 0.2s ease-out; padding: 8px 6px; }

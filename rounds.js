@@ -20,11 +20,17 @@ let schedulerState = {
     fixedMap: new Map(),
     roundIndex: 0,
     pairPlayedSet: new Set(),
-	pairPlayedSet: new Set(),
-    gamesMap: new Map(), // 🆕 per-player opponent tracking
-	markingWinnerMode: false,
-	winCount: new Map(), // 🏆 Track player wins
-	pairCooldownMap: new Map(),
+    gamesMap: new Map(),
+    markingWinnerMode: false,
+    winCount: new Map(),
+    pairCooldownMap: new Map(),
+    // ── Competitive algorithm additions ──
+    minRounds:  6,
+    rankPoints: new Map(),
+    streakMap:  new Map(),
+    tierMap:    new Map(),
+    courts:     1,
+    // ─────────────────────────────────────
 };
 
 schedulerState.activeplayers = new Proxy([], {
@@ -128,6 +134,7 @@ function updateCourtButtons() {
 function goToRounds() {
   const numCourtsInput = parseInt(document.getElementById("num-courts").textContent);
   //const numCourtsInput = parseInt(document.getElementById('num-courts').value);
+  schedulerState.courts = numCourtsInput; // keep alias in sync for competitive_algorithm.js
   const totalPlayers = schedulerState.activeplayers.length;
   if (!totalPlayers) {
     alert('Please add players first!');
@@ -223,10 +230,8 @@ function prevRound() {
 }
 
 function initScheduler(numCourts) {
-  schedulerState.numCourts = numCourts;  
+  schedulerState.numCourts = numCourts;
   schedulerState.restCount = new Map(schedulerState.activeplayers.map(p => [p, 0]));
- //schedulerState.restQueue = new Map(schedulerState.activeplayers.map(p => [p, 0]));
-    
   schedulerState.PlayedCount = new Map(schedulerState.activeplayers.map(p => [p, 0]));
   schedulerState.PlayerScoreMap = new Map(schedulerState.activeplayers.map(p => [p, 0]));
   schedulerState.playedTogether = new Map();
@@ -234,26 +239,32 @@ function initScheduler(numCourts) {
   schedulerState.pairPlayedSet = new Set();
   schedulerState.gamesMap = new Set();
   schedulerState.roundIndex = 0;
-  // 🆕 Initialize opponentMap — nested map for opponent counts
+
+  // ── Competitive algorithm additions ──
+  schedulerState.minRounds  = parseInt(localStorage.getItem('minRounds')) || 6;
+  schedulerState.rankPoints = new Map(schedulerState.activeplayers.map(p => [p, 100]));
+  schedulerState.streakMap  = new Map(schedulerState.activeplayers.map(p => [p, 0]));
+  schedulerState.tierMap    = new Map();
+  schedulerState.courts     = numCourts;
+  // ─────────────────────────────────────
+
+  // Initialize opponentMap
   schedulerState.opponentMap = new Map();
   for (const p1 of schedulerState.activeplayers) {
     const innerMap = new Map();
     for (const p2 of schedulerState.activeplayers) {
-      if (p1 !== p2) innerMap.set(p2, 0); // start all counts at 0
+      if (p1 !== p2) innerMap.set(p2, 0);
     }
     schedulerState.opponentMap.set(p1, innerMap);
   }
+
   // Map each fixed pair for quick lookup
   schedulerState.fixedPairs.forEach(([a, b]) => {
     schedulerState.fixedMap.set(a, b);
     schedulerState.fixedMap.set(b, a);
   });
-    schedulerState.restQueue = createRestQueue();
-	 // ✅ Competitive ranking points
-  schedulerState.rankPoints = new Map(
-    schedulerState.activeplayers.map(p => [p, 0])
-  );
-    
+
+  schedulerState.restQueue = createRestQueue();
 }
 
 
