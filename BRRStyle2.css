@@ -1,1037 +1,295 @@
-/* Default background */
-#page2 {
-  transition: background-color 0.3s ease;
+/* =============================================
+CLUB SCHEDULER PRO — Dark Theme
+BRRStyle2.css (Rounds / Court / Action)
+============================================= */
+
+/* ── Page 2 modes ── */
+#page2 { transition: background-color 0.3s ease; background: var(–bg); }
+#page2.random-mode      { background: var(–bg); }
+#page2.idle-mode        { background: var(–bg); }
+#page2.competitive-mode { background: #14100a; }
+#page2.active-mode      { background: #0d1209; }
+
+/* ── Title Card (Round header) ── */
+.title-card {
+display: flex; justify-content: center; align-items: center;
+gap: 10px; width: 98%; margin: 6px auto 4px; text-align: center;
 }
-
-/* Random Mode */
-#page2.random-mode {
-  background-color: none;   /* light blue */
+#roundTitle {
+display: flex; width: fit-content; margin: 4px;
+padding: 4px 16px; font-family: var(–font-display);
+font-size: 1.4rem; font-weight: 700; height: 2.2rem;
+border-radius: var(–r-sm); background: transparent;
+justify-content: center; align-items: center;
+color: var(–text);
 }
-
-/* Competitive Mode */
-#page2.competitive-mode {
-  background-color: #fff3e6;   /* light orange */
+.lock-icon {
+width: 28px; height: 28px; border-radius: 50%;
+cursor: pointer; transition: transform 0.2s, filter 0.2s; opacity: 0.7;
 }
-#page2.idle-mode {
-  background-color: none;   /* light blue */
-}
+.lock-icon:hover { transform: scale(1.1); opacity: 1; }
+body.locked .lock-icon   { filter: none; opacity: 1; }
+body:not(.locked) .lock-icon { filter: grayscale(0.6); opacity: 0.55; }
 
-/* Competitive Mode */
-#page2.active-mode {
-  background-color: #d0d89a;   /* light orange */
-}
-
-
-
-.disabled {
-  opacity: 0.9;
-  cursor: not-allowed;
-}
-
-/* base cup */
-.win-cup {
-  position: absolute;
-                     /* ⬅ top center */
-  left: 90%;
-  transform: translateX(-50%);   /* only horizontal centering */
-
-  width: 30px;
-  height: 30px;
-  padding: 3px;
-  border-radius: 50%;
-  
-  
-  background:none;
-  
-  cursor: pointer;
-  z-index: 15;
-
-  opacity: 0.9;
-  filter: grayscale(40%);
-
-  transition:
-    opacity 0.2s,
-    filter 0.2s,
-    box-shadow 0.2s,
-    transform 0.2s,
-    background 0.2s;
-}
-/* blinking state (until clicked) */
-.win-cup.blinking {
-  animation: winCupBlink 2s infinite;
-}
-
-/* active = winner selected → stop blink */
-.win-cup.active {
-  animation: none;
-  opacity: 1;
-  filter: none;
-   background:none;
-  
-  transform: translateX(-50%) scale(1.3);
-}
-
-/* blink animation */
-@keyframes winCupBlink {
-  0% {
-    opacity: 0.3;
-    transform: translateX(-50%) scale(0.5);
-  }
-  50% {
-    opacity: 1;
-    transform: translateX(-50%) scale(1.1);
-  }
-  100% {
-    opacity: 0.3;
-    transform: translateX(-50%) scale(0.5);
-  }
-}
-
-
-.repeated-pair {
-   outline: 1px solid rgba(255, 0, 0, 0.4);
-  background: #e6a5a559 !important;
-}
-
-.repeated-game {
-  outline: 3px solid rgba(255, 0, 0, 0.4);
- background: #ebd5d5 !important;
-}
-
-
-
-
-.mode-card {
-  display: flex;
-  align-items: center;
-  border: 1px solid black; /* ← add style + color */
-  gap: 10px;
-  padding: 5px 10px;
-  border-radius: 20px;
-  background: linear-gradient(to bottom right, #d6f0ff, #b8e0f8);
-  font-size: 1.4rem;
-  font-weight: bold;
-}
-
-/* Toggle switch */
-.switch {
-  position: relative;
-  display: inline-block;
-  width: 44px;
-  height: 22px;
-}
-
-.switch input {
-  opacity: 0;
-  width: 0;
-  height: 0;
-}
-
-.slider {
-  position: absolute;
-  cursor: pointer;
-  inset: 0;
-  background-color: #ccc;
-  transition: 0.3s;
-  border-radius: 22px;
-}
-
-.slider:before {
-  content: "";
-  position: absolute;
-  height: 16px;
-  width: 16px;
-  left: 3px;
-  bottom: 3px;
-  background-color: #fff;
-  transition: 0.3s;
-  border-radius: 50%;
-}
-
-input:checked + .slider {
-  background-color: #4caf50;
-}
-
-input:checked + .slider:before {
-  transform: translateX(22px);
-}
-
-
-
-
-.confirm-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.45);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 999;
-}
-
-.confirm-overlay.hidden {
-  display: none;
-}
-
-.confirm-box {
-  background: #fff;
-  padding: 16px;
-  border-radius: 12px;
-  width: 90%;
-  max-width: 320px;
-  text-align: center;
-  box-shadow: 0 10px 25px rgba(0,0,0,.2);
-}
-
-.confirm-title {
-  font-size: 1rem;
-  margin-bottom: 14px;
-}
-
-.confirm-actions {
-  display: flex;
-  gap: 10px;
-  justify-content: center;
-}
-
-
-/* Each match container */
+/* ── Court Card ── */
 .courtcard {
-  display: flex;
-  background: white;
-  
-  position: relative;
-  width: 95%;
-  border-radius: 1rem;
-  overflow: hidden;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-  margin: 1rem auto;
-  padding: 1px 5px 5px ;
-  text-align: center;
-  font-weight: bold;
-  flex-direction: column; /* 🔑 this fixes it */
+display: flex; flex-direction: column;
+background: var(–surface); border: 1px solid var(–border2);
+position: relative; width: 95%;
+border-radius: var(–r-lg);
+box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+margin: 10px auto; padding: 4px 6px 8px;
+text-align: center; font-weight: bold;
+transition: box-shadow 0.2s;
 }
+.courtcard:hover { box-shadow: 0 6px 24px rgba(0,0,0,0.4); }
+
 .courtname {
-  text-align: center;
-  margin: 2px ;  
-  font-size: 0.8rem;
+text-align: center; margin: 6px;
+font-size: 0.75rem; letter-spacing: 1px;
+text-transform: uppercase; color: var(–muted);
+font-weight: 700;
 }
+
+/* ── Teams ── */
 .teams {
-  display: flex;
-  background:none;
-  position: relative;
-  width: 100%;
-  border-radius: 1rem;
-  overflow: hidden;  
-  
-  padding: 2px;
-  box-sizing: border-box;
-  text-align: center;
-  font-weight: bold;
+display: flex; background: none;
+position: relative; width: 100%;
+border-radius: var(–r-md); overflow: hidden;
+padding: 4px; box-sizing: border-box;
+text-align: center; font-weight: bold; gap: 4px;
 }
+.teams::before { display: none; } /* remove old divider */
 
-/* Left side â€“ Blue team */
-.team[data-team-side="L"] {
-  flex: 1;
-  background: white;
-  border-radius: 1rem;
-  padding: 0.5rem;
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  justify-content: center;
-  
-  position: relative;
-  box-shadow: inset 0 0 6px rgba(255, 255, 255, 0.1);
-  transition: 0.2s ease;
-  cursor: pointer;
+.team[data-team-side=“L”] {
+flex: 1; border-radius: var(–r-md); padding: 6px;
+display: flex; flex-direction: column;
+align-items: stretch; justify-content: center;
+background: linear-gradient(135deg, rgba(108,99,255,0.12), rgba(108,99,255,0.04));
+border: 1px solid rgba(108,99,255,0.2);
+cursor: pointer; transition: all 0.2s;
 }
-/* Right side â€“ Green team */
-.team[data-team-side="R"] {
-  flex: 1;
-  background: white;
-  border-radius: 1rem;
-  padding: 0.5rem;
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  justify-content: center;
-  
-  position: relative;
-  box-shadow: inset 0 0 6px rgba(255, 255, 255, 0.1);
-  transition: 0.2s ease;
-  cursor: pointer;
+.team[data-team-side=“R”] {
+flex: 1; border-radius: var(–r-md); padding: 6px;
+display: flex; flex-direction: column;
+align-items: stretch; justify-content: center;
+background: linear-gradient(135deg, rgba(255,101,132,0.12), rgba(255,101,132,0.04));
+border: 1px solid rgba(255,101,132,0.2);
+cursor: pointer; transition: all 0.2s;
 }
-.team[data-team-side="L"] {
-  background-color: #e9f1ed;
-  border-color: #90caf9;
-  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
-  border-radius: 10px;
-}
-.team[data-team-side="R"] {
-  background-color: #e3f2fd;
-  border-color: #90caf9;
-  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
-  border-radius: 10px;
-}
-.team button {
-  background: none;
-  color: black;
-  font-weight: 600;
-  border: none;
-}
-/* Thick vertical divider */
-.teams::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 50%;
-  width: 0.1rem; /* line thickness */
-  background:none;
-  transform: translateX(-50%);
-  z-index: 1;
-  opacity: 0.9;
-}
-/* Highlight selected team when swapping */
-.selected-team {
-  outline: 3px solid red;
-  box-shadow: 0 0 10px red;
-}
-.match-card {
-  background: white;
-  border-radius: 1rem;
-  padding: 0.25rem;
-  margin: 0.25rem auto;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
-  position: relative;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-.match-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
-}
-.team.swapping {
-  background: #ffa50066;
-  transform: scale(1.05);
-}
+.team[data-team-side=“L”]:hover { background: linear-gradient(135deg,rgba(108,99,255,0.2),rgba(108,99,255,0.08)); }
+.team[data-team-side=“R”]:hover { background: linear-gradient(135deg,rgba(255,101,132,0.2),rgba(255,101,132,0.08)); }
 
+.team button { background: none; color: var(–text); font-weight: 500; border: none; }
 
+/* ── Player Buttons ── */
+.Lplayer-btn, .Rplayer-btn {
+border: none; border-radius: var(–r-sm);
+font-size: var(–player-font-size);
+padding: 5px 8px; margin: 3px auto;
+color: var(–text); cursor: grab;
+display: flex; justify-content: center; align-items: center;
+text-align: center; width: 100%; box-sizing: border-box;
+white-space: normal; overflow-wrap: break-word; word-break: break-word;
+font-weight: 500; gap: 4px;
+touch-action: manipulation; transition: transform 0.15s;
+}
+.Lplayer-btn { background: rgba(108,99,255,0.15); border: 1px solid rgba(108,99,255,0.2); }
+.Rplayer-btn { background: rgba(255,101,132,0.15); border: 1px solid rgba(255,101,132,0.2); }
+.Lplayer-btn:hover { background: rgba(108,99,255,0.25); transform: scale(1.02); }
+.Rplayer-btn:hover { background: rgba(255,101,132,0.25); transform: scale(1.02); }
 
-.vs {
-  display: inline-block;
-  width: 1rem;   /* adjust as you like */
-}
+/* Gender overrides */
+.Lplayer-btn.male, .Rplayer-btn.male { background: rgba(96,165,250,0.12); border-color: rgba(96,165,250,0.2); }
+.Lplayer-btn.female, .Rplayer-btn.female { background: rgba(255,101,132,0.12); border-color: rgba(255,101,132,0.2); }
 
-.rest-btn {  
-  border: none;
-  border-radius: 2rem;
-  font-size: var(--player-font-size);
-  padding: 0.3rem;
-  margin: 0.25rem 0;
-  color: #000000;
-  text-align: center;
-  transition: transform 0.2s, background 0.2s;
-  cursor: grab;
-}
-
-.Lplayer-btn,
-.Rplayer-btn {
-  border: none;
-  border-radius: 2rem;
-  font-size: var(--player-font-size);
-  padding: 0.25rem 0.5rem;
-  margin: 0.25rem auto;
-  color: #000;
-  cursor: grab;
-
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-
-  width: fit-content;     /* grows with text */
-  max-width: 100%;        /* parent defines limit */
-
-  white-space: normal;    /* MULTI-LINE enabled */
-  overflow-wrap: break-word; /* wraps long names */
-}
-
-.Lplayer-btn,
-.Rplayer-btn,
-.rest-btn {
-  touch-action: manipulation;  
-  
-}
-.Lplayer-btn {
-  background: #28a745;
-}
-.Rplayer-btn {
-  background: #0099cc;
-}
-.Lplayer-btn:hover {
-  background: #34995b;
-  transform: scale(1.03);
-}
-.Rplayer-btn:hover {
-  background: #3f8e9c;
-  transform: scale(1.1);
-}
-.Lplayer-btn.selected,
-.Rplayer-btn.selected,
-.rest-btn.selected {
-  outline: 0.1rem solid red;
-  background: #F7F22D !important;
-  color: black;
-  box-shadow: 0 0 0.625rem #4caf50;
-  transform: scale(1.01);
-  animation: borderPulse 2s ease-in-out infinite;
-}
- .rest-btn {
-  color: #000 !important;
-}
-
-.played-round .match-card,
-.played-round .rest-btn,
-.played-round .Lplayer-btn,
-.played-round .Rplayer-btn,
-.played-round .teams,
-.played-round .team[data-team-side="L"],
-.played-round .team[data-team-side="R"] {
-  filter: grayscale(20%) opacity(0.9);
-  transform: scale(1);
-  border: 0.0625rem solid #999;
-}
-/* Swap Icons */
-.swap-icon {
-  position: absolute;
-  top: -1px;
-  right: -1px;
-  z-index: 10;                  /* keeps icon above player buttons */
-  background: rgba(255, 255, 255, 0.9); 
-  color: white;
-  border-radius: 50%;
-  padding: 0.3rem 0.35rem;
-  font-size: 0.9rem;
-  box-shadow: 0 0 8px rgba(0,0,0,0.4);
-  cursor: pointer;
-  transition: 0.2s ease;
-}
-.swap-icon:hover {
-  transform: scale(1.15);
-  background: #ffa726;
+.Lplayer-btn.selected, .Rplayer-btn.selected, .rest-btn.selected {
+outline: 2px solid var(–amber);
+background: rgba(245,158,11,0.2) !important;
+color: var(–amber);
+box-shadow: 0 0 10px rgba(245,158,11,0.4);
+transform: scale(1.02);
+animation: borderPulse 2s ease-in-out infinite;
 }
 @keyframes borderPulse {
-  0%, 100% {
-    box-shadow: 0 0 0.25rem #4caf50, 0 0 0.5rem #4caf50;
-    outline-color: red;
-  }
-  50% {
-    box-shadow: 0 0 1rem #4caf50, 0 0 1.5rem #4caf50;
-    outline-color: black;
-  }
+0%,100% { box-shadow: 0 0 6px rgba(245,158,11,0.4); }
+50%      { box-shadow: 0 0 14px rgba(245,158,11,0.7); }
 }
-/* Rest Box */
+
+/* ── Rest Box ── */
 .rest-box {
-  display: none;
-  flex-wrap: wrap;
-  justify-content: left;
-  align-items: flex-start;  
-  column-gap: 0.3rem;
-  padding: 0.15rem;
-  margin: 0.15rem;
-  color: black;
-  box-sizing: border-box;
-  border-radius: 0.375rem;
-  min-height: 5rem;
-  border: none !important;      /* <-- 100% remove border */
-  outline: none !important;     /* remove fallback outlines */
-  background: transparent;      /* remove background if needed */
+display: none; flex-wrap: wrap; justify-content: flex-start;
+align-items: flex-start; gap: 4px;
+padding: 6px; margin: 4px; color: var(–text);
+box-sizing: border-box; border-radius: var(–r-sm);
+min-height: 2rem; border: none !important; outline: none !important; background: transparent;
 }
-
 .rest-box:not(:empty) {
-  display: flex;
-  background: transparent !important;
-  color: black;
-  border: 0.0625rem solid #999;
+display: flex;
+background: rgba(255,255,255,0.03) !important;
+border: 1px solid var(–border) !important;
 }
+
 .rest-btn {
-  color: black;
-  text-align: center;
+border: 1px solid var(–border2); border-radius: var(–r-xl);
+font-size: var(–player-font-size); padding: 4px 10px; margin: 2px;
+color: var(–text-dim); text-align: center;
+transition: transform 0.2s, background 0.2s; cursor: grab;
+background: var(–surface3); display: inline-flex; align-items: center; gap: 6px;
 }
-.rest-btn:hover {
-  transform: scale(1.05);
-  opacity: 0.9;
-}
+.rest-btn:hover { transform: scale(1.05); background: var(–surface2); color: var(–text); }
 
-.team {
-  background: #f7f7f7;
-  border-radius: 10px;
-  padding: 0.5rem;
-  box-shadow: 0 3px 6px rgba(0,0,0,0.15);
+/* ── Match Card ── */
+.match-card {
+background: var(–surface2); border-radius: var(–r-md);
+padding: 4px; margin: 3px auto;
+box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+position: relative; transition: transform 0.2s, box-shadow 0.2s;
 }
+.match-card:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,0.3); }
 
-.player-btn.male {
-  background: linear-gradient(145deg, #90caf9, #64b5f6);
+/* ── Swap / Win ── */
+.swap-icon {
+position: absolute; top: -1px; right: -1px; z-index: 10;
+background: var(–surface3); color: var(–text-dim);
+border-radius: 50%; padding: 4px; font-size: 0.85rem;
+box-shadow: 0 2px 8px rgba(0,0,0,0.4); cursor: pointer;
+transition: all 0.2s; border: 1px solid var(–border2);
 }
+.swap-icon:hover { transform: scale(1.15); background: var(–amber); color: #000; }
 
-.player-btn.female {
-  background: linear-gradient(145deg, #f48fb1, #f06292);
+.win-cup {
+position: absolute; left: 90%; transform: translateX(-50%);
+width: 28px; height: 28px; padding: 2px; border-radius: 50%;
+background: none; cursor: pointer; z-index: 15;
+opacity: 0.9; filter: grayscale(30%);
+transition: opacity 0.2s, filter 0.2s, transform 0.2s;
 }
-
-.player-btn {
-  color: #000;
-  font-weight: 600;
-  border-radius: 0.375rem;
-  padding: 0.25rem 0.6rem;
-  margin: 0.25rem auto;
-  
-  text-align: center;
-  white-space: normal;
-  overflow-wrap: break-word;
-}
-
-/* Gender colors */
-.Lplayer-btn.male,
-.Rplayer-btn.male {
-  background: linear-gradient(145deg, #b3e5fc, #81d4fa);
-}
-
-.Lplayer-btn.female,
-.Rplayer-btn.female {
-  background: linear-gradient(145deg, #f8bbd0, #f48fb1);
+.win-cup.blinking { animation: winCupBlink 2s infinite; }
+.win-cup.active   { animation: none; opacity: 1; filter: none; transform: translateX(-50%) scale(1.3); }
+@keyframes winCupBlink {
+0%   { opacity: 0.3; transform: translateX(-50%) scale(0.5); }
+50%  { opacity: 1;   transform: translateX(-50%) scale(1.1); }
+100% { opacity: 0.3; transform: translateX(-50%) scale(0.5); }
 }
 
-/* Keep text readable */
-.Lplayer-btn,
-.Rplayer-btn {
-  color: #000;
-  font-weight: 600;
+.selected-team { outline: 2px solid var(–accent); box-shadow: 0 0 12px var(–accent-glow); }
+.team.swapping { background: rgba(245,158,11,0.15) !important; transform: scale(1.04); }
+
+/* ── Repeated warnings ── */
+.repeated-pair { outline: 1px solid rgba(239,68,68,0.4); background: rgba(239,68,68,0.06) !important; }
+.repeated-game { outline: 2px solid rgba(239,68,68,0.5); background: rgba(239,68,68,0.08) !important; }
+
+/* ── Played Round ── */
+.played-round .match-card, .played-round .rest-btn,
+.played-round .Lplayer-btn, .played-round .Rplayer-btn,
+.played-round .teams, .played-round .team {
+filter: grayscale(30%) opacity(0.7); border: 1px solid var(–border);
 }
 
-.Lplayer-btn,
-.Rplayer-btn {
-  width: 100%;              /* full width of team */
-  box-sizing: border-box;
-  text-align: center;
-}
-
-.Lplayer-btn,
-.Rplayer-btn {
-  white-space: normal;
-  overflow-wrap: break-word;
-  word-break: break-word;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-/* REMOVE hard-coded colors */
-.Lplayer-btn,
-.Rplayer-btn {
-  background: #f5f5f5; /* neutral */
-  color: #000;
-}
-
-.gender-btn {
-  width: 30px;
-  height: 30px;
-  margin-right: 3px;
-
-  border-radius: 50%;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-
-  font-size: 18px;
-  pointer-events: none;
-  flex-shrink: 0;
-}
-
-.gender-btn.male {
-  background: #ffffff;
-  color: #fff;
-}
-
-.gender-btn.female {
-  background: #f48fb1;
-  color: #fff;
-}
-
+/* ── Row Field (courts / minRounds row) ── */
 .row-field {
-  display: grid;
-  grid-template-columns: 1fr auto; /* left | right */
-  align-items: center;
-  gap: 15px;
-  padding: 5px 5px;
-  border-radius: 1.5rem;
-  border: 1px solid #ccc;
-  margin: 1px 0;
-  background: B5EBDD;
-  transition: 0.25s ease;
+display: grid; grid-template-columns: 1fr auto;
+align-items: center; gap: 12px;
+padding: 8px 10px; border-radius: var(–r-xl);
+border: 1px solid var(–border); margin: 4px 4px;
+background: var(–surface); transition: 0.25s ease;
 }
 
-
-
-.timer-card {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  background: linear-gradient(to bottom right, #d6f0ff, #b8e0f8);
-  border: 1px solid #0a66a3;
-  border-radius: 1.5rem;
-  padding: 5px 5px;
-  width: fit-content;
-  font-family: sans-serif;
-}
-.timer-toggle-btn {
-  background: none;
-  border: none;
-  font-size: 1.4rem;
-  cursor: pointer;
-  padding: 0;
-}
-
-.timer-toggle-btn:active {
-  transform: scale(0.95);
-}
+/* ── Court Card (stepper) ── */
 .court-card {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  background: linear-gradient(to bottom right, #d6f0ff, #b8e0f8);
-  border: 1px solid #0a66a3;
-  border-radius: 1.5rem;
-  padding: 5px 5px;
-  width: fit-content;
-  font-family: sans-serif;
+display: flex; align-items: center; justify-content: center;
+gap: 8px; padding: 4px 8px;
+background: var(–surface2); border: 1px solid var(–border2);
+border-radius: var(–r-xl); font-family: var(–font-body);
 }
-.row-label {
-  width: auto;
-  font-size: 1.1rem;
-  padding: 5px 5px;
-  color: #333;
-}
+.row-label { font-size: 1rem; padding: 4px; color: var(–text-dim); font-weight: 600; }
 
-.minus {
-  background: #f05d5d;
-}
-
-.plus {
-  background: #0d8b52;
-}
-
-.disabled-btn {
-  opacity: 0.4;
-  pointer-events: none;
-}
-
-
-#num-courts {
-  font-size: 1.25rem;
-  font-weight: 700;
-}
+#num-courts { font-size: 1.2rem; font-weight: 700; color: var(–text); min-width: 1.5rem; text-align: center; }
+#minRoundsDisplay { font-size: 1.2rem; font-weight: 700; color: var(–text); min-width: 1.5rem; text-align: center; }
 
 .circle-btn {
-  width: 25px;
-  height: 25px;
-  border-radius: 50%;
-  border: none;
-  background: #1a8656;
-  color: white;
-  font-size: 1.1rem;
-  font-weight: bold;
-  cursor: pointer;  
-  
+width: 28px; height: 28px; border-radius: 50%;
+border: 1px solid rgba(108,99,255,0.4);
+background: rgba(108,99,255,0.12); color: var(–accent);
+font-size: 1rem; font-weight: 700; cursor: pointer;
+display: flex; align-items: center; justify-content: center;
+transition: all 0.15s;
 }
+.circle-btn:hover { background: rgba(108,99,255,0.25); transform: scale(1.1); }
 
-.timer-icon {
-  cursor: pointer;
-  background: #d7efff;   /* softer, richer */
-  border: 1px solid #0a66a3;
-  border-color: #90caf9; 
-  color: #0f172a;
-  
-  padding: 6px 5px;
-  border-radius: 20px;
-  font-size: 1.25rem;
-  user-select: none;
-
-  display: inline-flex;        /* keeps it inline but flex-enabled */
-  align-items: center;         /* vertical center */
-  justify-content: center;     /* horizontal center */
-  
-  gap: 6px;
-  transition: background 0.2s;
+/* ── Mode Card (trophy toggle) ── */
+.mode-card {
+display: flex; align-items: center; gap: 10px;
+padding: 6px 12px; border-radius: var(–r-xl);
+background: var(–surface2); border: 1px solid var(–border2);
+font-size: 1.3rem; font-weight: bold;
 }
-.timer-icon.running {
-  background: #fecaca; /* Light red when active */
+.switch { position: relative; display: inline-block; width: 44px; height: 24px; }
+.switch input { opacity: 0; width: 0; height: 0; }
+.slider {
+position: absolute; cursor: pointer; inset: 0;
+background: var(–surface3); border: 1px solid var(–border2);
+transition: 0.3s; border-radius: 24px;
 }
-
-.hidden {
-  display: none;
+.slider:before {
+content: “”; position: absolute;
+height: 16px; width: 16px; left: 3px; bottom: 3px;
+background: var(–text-dim); transition: 0.3s; border-radius: 50%;
 }
+input:checked + .slider { background: var(–green); border-color: var(–green); box-shadow: 0 0 10px rgba(45,206,137,0.4); }
+input:checked + .slider:before { transform: translateX(20px); background: #fff; }
 
-.timer-slider {
-  width: 90%;
-  margin: 0 auto;   /* centers it */
-}
+/* ── Min rounds hint ── */
+.min-rounds-hint { font-size: 0.75rem; color: var(–muted); align-self: center; padding-right: 8px; text-align: right; flex: 1; }
+.competitive-settings { overflow: hidden; max-height: 0; opacity: 0; transition: max-height 0.3s ease, opacity 0.3s ease; pointer-events: none; }
+.competitive-settings.visible { max-height: 80px; opacity: 1; pointer-events: auto; }
 
-.timer-slider input[type="range"] {
-  width: 100%;      /* slider fills the container */
-}
-
-.sec {
-  font-size: 0.9rem;
-  text-align: center;
-  padding: 3px; 
-}
-
-/* 🔒 Global interaction lock */
-/* Base lock icon */
-.lock-icon {
-  margin-left: 10px;
-  cursor: pointer;
-  font-size: 20px;
-  user-select: none;
-}
-
-/* Locked state (applied via body.locked) */
-body.locked .lock-icon {
-  color: #ff3b3b;   /* red */
-  opacity: 1;
-}
-
-/* Unlocked state */
-body:not(.locked) .lock-icon {
-  color: #888;       /* gray */
-  opacity: 0.6;
-}
-
-/* Hover feedback */
-.lock-icon:hover {
-  transform: scale(1.1);
-}
-
-
-
-
-/* 🔒 GLOBAL INTERACTION LOCK */
-body.locked .Lplayer-btn,
-body.locked .Rplayer-btn,
-body.locked .rest-btn,
-body.locked .swap-icon {
-  pointer-events: none;
-
-}
-
-.round-navigation {
-  display: flex;
-  justify-content: space-between; /* 🔑 auto spacing */
-  align-items: center;
-  margin-top: 0.75rem;
-  padding: 0.5rem 1rem;
-  background: linear-gradient(135deg, #009ffd);
-  box-shadow: 0 0.1875rem 0.5rem rgba(0, 0, 0, 0.15);
-}
-
-
-.round-navigation .center {
-  justify-self: center;
-  width: fit-content;
-  white-space: nowrap;
-}
-
-/* Navigation Buttons */
-.round-navigation button {
-  font-size: 1rem;
-  background: #800080;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 5px 20px;
-  color: white;
-  cursor: pointer;
-  border-radius: 8px;
-  user-select: none;
-  transition: transform 0.15s ease, background 0.15s ease;
-}
-.round-navigation button:disabled {
-  opacity: 0.45;
-  cursor: not-allowed;
-  transform: none;
-  pointer-events: none;
-}
-.round-navigation button:active {
-  transform: scale(0.97);
-}
-
-
-.primary:hover {
-  background: #f2f9ff;
-}
-
-.round-navigation button.danger {
-  background: #e53935 !important;
-}
-
-
-
-
-
-#roundTitle2 {
-  width: 2rem !important;
-  height: 2rem !important;
-  border-radius: 50% !important;
-  background-color: none;
-  color: #fff;
-  font-size: 1.25rem;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  line-height: 1;
-  padding: 0;
-  font-weight: bold;  
-  
-  cursor: pointer;
-  align-self: center;
-  flex-shrink: 0;
-  
-}
-
-
-
-
-
-
-
-
-.round-navigation button:hover {
-   background: #800080;
-  transform: scale(1.05);
-}
-
+/* ── Action Card (Play button bar) ── */
 .action-card {
-  display: flex;
-  width: 98%;
-  margin: 5px;
-  border-radius: 14px;
-  overflow: hidden;
-  background: #ffffff;
-  box-shadow: 0 6px 14px rgba(15, 23, 42, 0.18); /* softer, premium */
+display: flex; width: 98%; margin: 6px auto;
+border-radius: var(–r-lg); overflow: hidden;
+box-shadow: 0 6px 20px rgba(0,0,0,0.3);
 }
-
-/* base button */
 .action {
-  padding: 10px 0;
-  border: none;
-  font-size: 1.1rem;
-  font-weight: 600;
-  color: #ffffff;
-  cursor: pointer;
-  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
-  transition: transform 0.1s ease, opacity 0.15s ease;
+padding: 12px 0; border: none;
+font-size: 1.05rem; font-weight: 700; color: #fff;
+cursor: pointer; transition: transform 0.1s, opacity 0.15s;
 }
+.action:active { transform: scale(0.97); opacity: 0.9; }
+.action.mid  { flex: 0.5; font-size: 1.5rem; background: var(–surface3); }
+.action.right.primary { flex: 2; background: linear-gradient(135deg, var(–accent) 0%, #9b60ff 100%); box-shadow: inset 0 1px 0 rgba(255,255,255,0.1); }
+.action.right.primary:hover { filter: brightness(1.1); }
+.action.right.primary.end { background: linear-gradient(135deg, var(–red), #b91c1c); }
 
-/* touch feedback */
-.action:active {
-  transform: scale(0.97);
-  opacity: 0.9;
-}
+/* ── Gender icon ── */
+.gender-icon { width: 24px; height: 24px; border-radius: 50%; object-fit: cover; }
+.gender-btn { width: 28px; height: 28px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 16px; pointer-events: none; flex-shrink: 0; }
+.gender-btn.male   { background: rgba(96,165,250,0.2); color: #60a5fa; }
+.gender-btn.female { background: rgba(255,101,132,0.2); color: var(–accent2); }
 
-/* LEFT – secondary (Shuffle) */
-.action.left {
-  flex: 1.5;
-  background: #72204a; /* slate gray */
-  opacity: 0.9;
-  border-right: 1px solid rgba(255, 255, 255, 0.15);
-}
+/* Player name in button */
+.player-name { flex: 1; min-width: 0; white-space: normal; overflow-wrap: break-word; word-break: break-word; line-height: 1.2; font-weight: 400; color: var(–text); }
 
-/* MID – icon / neutral action */
-.action.mid {
-  flex: 0.5;
-  font-size: 1.6rem;
-  background: #000000; /* deep neutral */
-}
+/* ── Lock ── */
+body.locked .swap-icon { display: none; }
+body.locked .Lplayer-btn, body.locked .Rplayer-btn, body.locked .rest-btn, body.locked .swap-icon { pointer-events: none; }
 
-/* RIGHT – primary (Next) */
-.action.right {
-  flex: 1.5;
-  background: #50679b; /* professional blue */
-}
+/* ── VS divider ── */
+.vs { display: inline-block; width: 1rem; color: var(–muted); font-weight: 700; }
 
-.finish-card {
- width: 98%;  
-  margin: 1px auto;
-  border-radius: 14px;  
-  box-shadow: 0 6px 16px rgba(0,0,0,0.18);
-  overflow: hidden;
-}
+/* ── Confirm overlay (also here for isolation) ── */
+.confirm-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.65); display: flex; align-items: center; justify-content: center; z-index: 999; }
+.confirm-overlay.hidden { display: none; }
+.confirm-box { background: var(–surface); border: 1px solid var(–border2); padding: 20px; border-radius: var(–r-lg); width: 90%; max-width: 320px; text-align: center; box-shadow: var(–shadow); }
+.confirm-title { font-size: 1rem; margin-bottom: 16px; color: var(–text); font-weight: 600; }
+.confirm-actions { display: flex; gap: 10px; justify-content: center; }
 
-.finish-btn {
-  width: 100%;
-  padding: 8px 0;
-  border: none;
-  font-size: 1.1rem;
-  font-weight: 600;
-  color: #fff;
-  cursor: pointer;
-  background: linear-gradient(135deg, #ff4d4d, #d90000);
-  transition: transform 0.1s ease, opacity 0.1s ease;
-}
+/* body disabled blinking */
+body.disabled { pointer-events: none; opacity: 0.9; animation: blinkBorder 1s infinite; border: 3px solid var(–amber); box-sizing: border-box; }
+@keyframes blinkBorder { 0%,100% { border-color: var(–amber); } 50% { border-color: transparent; } }
+#nextBtn { pointer-events: auto; opacity: 1; }
 
-.finish-btn:active {
-  transform: scale(0.97);
-  opacity: 0.9;
-}
-
-.finish-btn .icon {
-  margin-left: 6px;
-}
-
-
-.card {
-  position: relative; /* Keep this */
-}
-
-/* Refresh Button (Shuffle) */
-#refreshBtn {
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  padding: 4px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-#refreshBtn svg {
-  width: 28px;
-  height: 28px;
-  transition: transform 0.2s ease, opacity 0.2s ease;
-  opacity: 0.8;
-}
-
-#refreshBtn:hover svg {
-  opacity: 1;
-  transform: rotate(90deg) scale(1.05);
-}
-
-
-
-
-
-
-
-/* Name truncation */
-.player-name {
-  flex: 1;
-  min-width: 0;                /* 🔑 MOST IMPORTANT */
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-
-  font-weight: 400;
-  color: #000;
-}
-
-/* ===== FIX PLAYER BUTTON WIDTH (FINAL OVERRIDE) ===== */
-
-
-.player-name {
-  flex: 1;
-  min-width: 0;                  /* 🔑 CRITICAL */
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-
-/* ===== PLAYER BUTTON (WRAP VERSION – FINAL) ===== */
-
-.team .Lplayer-btn,
-.team .Rplayer-btn {
-  width: 100%;
-  box-sizing: border-box;
-  font-weight:400;
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-
-  white-space: normal;          /* ✅ allow wrap */
-  overflow: visible;
-
-  padding: 1px 1px 1px 1px;
-  gap: 1px;
-}
-
-
-
-
-/* Name wraps nicely */
-.player-name {
-  flex: 1;
-  min-width: 0;
-
-  white-space: normal;
-  overflow-wrap: break-word;
-  word-break: break-word;
-
-  line-height: 1.2;
-}
-
-.gender-icon {
-  width: 25px;
-  height: 25px;
-  border-radius: 50%;
-  object-fit: cover;
-  background-color: none;
-}
-.rest-btn {
-  display: inline-flex;
-  align-items: center;   /* ← vertical alignment */
-  gap: 6px;
-}
-
-.title-card {
-  display: flex;
-  justify-content: center !important;
-  align-items: center !important;
-  gap: 8px;
-  width: 98%;
-  margin: 0 auto;
-  text-align: center;
-}
-
-#roundTitle {
-  display: flex;
-  width: fit-content;
-  margin: 5px;                /* 🔥 remove auto margins */
-  padding: 0 12px;
-
-  font-size: 1.25rem;
-  font-weight: bold;
-  height: 2rem;
-
-  border-radius: 0.5rem;
-  background-color: transparent;
-
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-}
-
-.lock-icon {
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  cursor: pointer;
-}
-
-body.locked .swap-icon {
-  display: none;
-}
-
-/* CARD */
+/* primary / end overrides */
+.primary   { background: var(–green); color: white; }
+.primary.end { background: var(–red); }
