@@ -37,24 +37,9 @@ body.locked .lock-icon   { filter: none; opacity: 1; }
 body:not(.locked) .lock-icon { filter: grayscale(0.6); opacity: 0.55; }
 
 /* ── Court Card ── */
-.courtcard {
-display: flex; flex-direction: column;
-background: var(--surface); border: 1px solid var(--border2);
-position: relative; width: 95%;
-border-radius: var(--r-lg);
-box-shadow: 0 4px 16px rgba(0,0,0,0.3);
-margin: 10px auto; padding: 4px 6px 8px;
-text-align: center; font-weight: bold;
-transition: box-shadow 0.2s;
-}
-.courtcard:hover { box-shadow: 0 6px 24px rgba(0,0,0,0.4); }
 
-.courtname {
-text-align: center; margin: 6px;
-font-size: 0.75rem; letter-spacing: 1px;
-text-transform: uppercase; color: var(--muted);
-font-weight: 700;
-}
+
+
 
 /* ── Teams ── */
 .teams {
@@ -410,8 +395,9 @@ display: flex; flex-direction: column;
 background: var(--surface); border: 1px solid var(--border2);
 position: relative; width: 95%; border-radius: var(--r-lg);
 box-shadow: 0 4px 16px rgba(0,0,0,0.3);
-margin: 10px auto; padding: 4px 6px 8px;
+margin: 5px auto; padding: 4px 6px 8px;
 text-align: center; font-weight: bold;
+width:100%;
 }
 .courtname {
 text-align: center; margin: 6px;
@@ -425,7 +411,7 @@ text-transform: uppercase; color: var(--muted);
 .teams {
 display: flex; background: none; position: relative;
 width: 100%; border-radius: var(--r-md); overflow: hidden;
-padding: 4px; box-sizing: border-box; gap: 4px;
+padding: 3px; box-sizing: border-box; gap: 4px;
 text-align: center; font-weight: bold;
 }
 .team {
