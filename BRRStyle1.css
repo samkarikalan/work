@@ -249,3 +249,79 @@ transition: all 0.25s; margin: 4px 0; cursor: grab;
 
 .app-dark { background: var(–bg); color: var(–text); }
 .app-dark .settings-card, .app-dark .card { background: var(–surface); }
+
+/* ── Dark theme overrides for appended classes ── */
+.competitive-settings { overflow: hidden; max-height: 0; opacity: 0; transition: max-height 0.3s ease, opacity 0.3s ease; pointer-events: none; }
+.competitive-settings.visible { max-height: 80px; opacity: 1; pointer-events: auto; }
+.min-rounds-hint { font-size: 0.75em; color: var(–muted); align-self: center; padding-right: 8px; text-align: right; flex: 1; }
+.primary { background: var(–green) !important; color: white !important; }
+.primary.end { background: var(–red) !important; }
+.card-col { background: var(–surface); border: 1px solid var(–border); border-radius: var(–r-lg); padding: 12px; margin: 6px 2px; }
+.status-card { padding: 12px 16px; border-radius: 10px; width: fit-content; font-weight: 400; font-size: 1rem; }
+.disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* ── Additional preserved classes ── */
+.lang-row {
+display: flex;
+align-items: center;
+justify-content: space-between;
+gap: 12px;
+padding: 5px;
+}
+/* Select container */
+.select-wrapper {
+position: relative;
+display: flex;
+align-items: center;
+background: #f5f7fa;
+border-radius: 12px;
+padding: 0 36px 0 38px;
+height: 44px;
+min-width: 160px;
+}
+/* Native select */
+
+/* Globe icon */
+.globe {
+position: absolute;
+left: 12px;
+font-size: 16px;
+opacity: 0.8;
+}
+/* Dropdown arrow */
+.arrow {
+position: absolute;
+right: 12px;
+font-size: 14px;
+pointer-events: none;
+opacity: 0.6;
+}
+/* Focus effect */
+.lang-select:focus {
+outline: none;
+}
+.select-wrapper:has(.lang-select:focus) {
+box-shadow: 0 0 0 2px #4f8cff33;
+}
+/* Serial number (or bullet) */
+.fixed-sl {
+text-align: center;
+font-weight: 600;
+}
+.player-help section {
+display: none;
+}
+.player-help.lang-en section[data-lang=“en”],
+.player-help.lang-jp section[data-lang=“jp”],
+.player-help.lang-kr section[data-lang=“kr”],
+.player-help.lang-vi section[data-lang=“vi”] {
+display: block;
+}
+.lang-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 5px; }
+.select-wrapper { position: relative; display: flex; align-items: center; background: var(–surface2); border-radius: var(–r-sm); padding: 0 36px 0 38px; height: 44px; min-width: 160px; border: 1px solid var(–border2); }
+.globe { position: absolute; left: 12px; font-size: 16px; opacity: 0.7; }
+.arrow { position: absolute; right: 12px; font-size: 14px; pointer-events: none; opacity: 0.5; color: var(–muted); }
+.lang-select { background: transparent; border: none; color: var(–text); font-size: 1rem; width: 100%; outline: none; }
+.fixed-sl { text-align: center; font-weight: 600; color: var(–muted); }
+.player-help section { display: none; }
+.player-help.lang-en section[data-lang=“en”], .player-help.lang-jp section[data-lang=“jp”], .player-help.lang-kr section[data-lang=“kr”], .player-help.lang-vi section[data-lang=“vi”] { display: block; }
