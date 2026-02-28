@@ -2539,16 +2539,15 @@ const modeLabel  = document.getElementById("modeLabel");
 // Restore saved mode
 modeToggle.checked = localStorage.getItem("playMode") === "competitive";
 updateModeLabel();
+toggleMinRoundsVisibility(); // ← restore on load
 
 modeToggle.addEventListener("change", () => {
   localStorage.setItem("playMode", getPlayMode());
   updateModeLabel();
-
-  // ← ADD THIS LINE
-  document.getElementById('minRoundsRow')
-    .classList.toggle('visible', getPlayMode() === 'competitive');
+  toggleMinRoundsVisibility();
 });
 
+// Min Rounds value
 let minRoundsValue = parseInt(localStorage.getItem('minRounds')) || 6;
 document.getElementById('minRoundsDisplay').textContent = minRoundsValue;
 
@@ -2566,12 +2565,11 @@ document.getElementById('minRoundsMinus').addEventListener('click', () => {
   schedulerState.minRounds = minRoundsValue;
 });
 
-// Restore min rounds row visibility on load
-document.getElementById('minRoundsRow')
-  .classList.toggle('visible', getPlayMode() === 'competitive');
-
-
-
+function toggleMinRoundsVisibility() {
+  const isCompetitive = getPlayMode() === 'competitive';
+  document.getElementById('minRoundsRow')
+    .classList.toggle('visible', isCompetitive);
+}
 
 function updateModeLabel() {
   modeLabel.textContent =

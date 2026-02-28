@@ -105,11 +105,10 @@ function initFontSize() {
 
 
 function applyTheme(mode) {
-  document.body.classList.toggle('app-dark', mode === 'dark');
-
+  document.body.classList.toggle('app-light', mode === 'light');
+  document.body.classList.toggle('app-dark',  mode === 'dark');
   document.getElementById('theme_light')?.classList.toggle('active', mode === 'light');
-  document.getElementById('theme_dark')?.classList.toggle('active', mode === 'dark');
-
+  document.getElementById('theme_dark')?.classList.toggle('active',  mode === 'dark');
   localStorage.setItem('app-theme', mode);
 }
 

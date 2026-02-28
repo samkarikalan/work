@@ -54,7 +54,8 @@ const translations = {
     yes: "Yes",
     browsePlayersSub: "Select from saved players",
     statusReady: "Status: Ready",
-    statusProgress: "Status: Progress..."
+    statusProgress: "Status: Progress...",
+    minRounds: "Warm-Up Rounds"
 
    
   },
