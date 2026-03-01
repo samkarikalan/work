@@ -624,7 +624,7 @@ border-bottom: 1px solid var(--border); margin-bottom: 8px;
 }
 
 .round-settings-body.open {
-  max-height: 300px;
+  max-height: none;
   opacity: 1;
 }
 

@@ -98,6 +98,16 @@ function showPage(pageID, el) {
   document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
   if (el) el.classList.add('active');
 
+  // ── Move shared player slot to the active page ──
+  const slot = document.getElementById('sharedPlayerSlot');
+  if (pageID === 'playersPage') {
+    const anchor = document.getElementById('playersSlotAnchor');
+    if (slot && anchor) anchor.appendChild(slot);
+  } else if (pageID === 'roundsPage') {
+    const anchor = document.getElementById('roundsSlotAnchor');
+    if (slot && anchor) anchor.appendChild(slot);
+  }
+
   // ➜ Additional action when roundsPage is opened
   if (pageID === "roundsPage") {
     if (sessionFinished) {
@@ -119,8 +129,7 @@ function showPage(pageID, el) {
     renderRounds();
   }
 
-  if (pageID === "helpPage") {
-  }
+  if (pageID === "helpPage") {}
 
   // Update last visited page
   lastPage = pageID;
