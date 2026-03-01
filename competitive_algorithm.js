@@ -497,7 +497,7 @@ function AischedulerNextRound(schedulerState) {
 
   const { activeplayers } = schedulerState;
   const playmode = getPlayMode();
-  const page2    = document.getElementById('page2');
+  const page2    = document.getElementById('roundsPage');
 
   // ── Warm up gate ─────────────────────────────────────────
   const warmupDone = isWarmupComplete(schedulerState);

@@ -3,6 +3,7 @@ const translations = {
     appTitle: "CLUB Scheduler",
     home: "Home",
     language: "Language",
+    settings: "Settings",
     players: "Players",
     rounds: "Rounds",
     summary: "Summary",

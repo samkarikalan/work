@@ -173,16 +173,16 @@ function goToRounds() {
        showRound(currentRoundIndex);
     }  
   /*
-  document.getElementById('page1').style.display = 'none';
-  document.getElementById('page2').style.display = 'block';
+  document.getElementById('playersPage').style.display = 'none';
+  document.getElementById('roundsPage').style.display = 'block';
   isOnPage2 = true;
   */
 }
 
 function goBack() {
   updatePlayerList();
-  document.getElementById('page1').style.display = 'block';
-  document.getElementById('page2').style.display = 'none';
+  document.getElementById('playersPage').style.display = 'block';
+  document.getElementById('roundsPage').style.display = 'none';
   isOnPage2 = false;
   const btn = document.getElementById('goToRoundsBtn');
   btn.disabled = false;
@@ -218,7 +218,7 @@ function endRounds() {
   // Optional: also disable End to prevent double-click
   document.getElementById("endBtn").disabled = true;
 	updateSummaryPageAccess();
-	showPage('page3');
+	showPage('summaryPage');
 
 	
 }

@@ -20,8 +20,8 @@ function updateRoundsPageAccess() {
   roundsTab.style.opacity = block ? '0.4' : '1';
   roundsTab.setAttribute('aria-disabled', block);
 
-  if (block && isPageVisible('page2')) {
-    showPage('page1', tabs[0]);
+  if (block && isPageVisible('roundsPage')) {
+    showPage('playersPage', tabs[0]);
   }
 	
 }
@@ -40,8 +40,8 @@ function updateSummaryPageAccess() {
   summaryTab.style.opacity = block ? '0.4' : '1';
   summaryTab.setAttribute('aria-disabled', block);
 
-  if (block && isPageVisible('page3')) {
-    showPage('page1', tabs[0]);
+  if (block && isPageVisible('summaryPage')) {
+    showPage('playersPage', tabs[0]);
   }
 }
 
@@ -51,6 +51,41 @@ document.addEventListener('DOMContentLoaded', () => {
   updateSummaryPageAccess();
 });
 
+
+function updateRoundsPageAccess() {
+  const block = schedulerState.activeplayers.length < 4;
+  const tabs = document.querySelectorAll('.tab-btn');
+  const roundsTab = tabs[2]; // ← was 1, now 2 (Settings added at 0)
+
+  if (!roundsTab) return;
+
+  roundsTab.style.pointerEvents = block ? 'none' : 'auto';
+  roundsTab.style.opacity = block ? '0.4' : '1';
+  roundsTab.setAttribute('aria-disabled', block);
+
+  if (block && isPageVisible('roundsPage')) {
+    showPage('playersPage', tabs[1]);
+  }
+}
+
+
+function updateSummaryPageAccess() {
+  const hasRounds = Array.isArray(allRounds) && allRounds.length > 0;
+  const tabs = document.querySelectorAll('.tab-btn');
+  const summaryTab = tabs[3]; // ← was 2, now 3
+
+  const block = !hasRounds;
+
+  if (!summaryTab) return;
+
+  summaryTab.style.pointerEvents = block ? 'none' : 'auto';
+  summaryTab.style.opacity = block ? '0.4' : '1';
+  summaryTab.setAttribute('aria-disabled', block);
+
+  if (block && isPageVisible('summaryPage')) {
+    showPage('playersPage', tabs[1]);
+  }
+}
 
 function showPage(pageID, el) {
   // Hide all pages
@@ -63,32 +98,31 @@ function showPage(pageID, el) {
   document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
   if (el) el.classList.add('active');
 
-  // ➜ Additional action when page2 is opened
-  if (pageID === "page2") {
-	  if (sessionFinished) {
-    console.warn("Rounds already finished");
-    return;
-	  }
-	 updateMixedSessionFlag();
-     if (allRounds.length <= 1) {
-	     resetRounds();
-		 //goToRounds();
-     } else {
-		 if (lastPage === "page1") {
-          goToRounds();
-		 }
-     }
-   }
-  
-	if (pageID === "page3") {
-     report();
-	 renderRounds();
-   }
+  // ➜ Additional action when roundsPage is opened
+  if (pageID === "roundsPage") {
+    if (sessionFinished) {
+      console.warn("Rounds already finished");
+      return;
+    }
+    updateMixedSessionFlag();
+    if (allRounds.length <= 1) {
+      resetRounds();
+    } else {
+      if (lastPage === "playersPage") {
+        goToRounds();
+      }
+    }
+  }
 
-	if (pageID === "page4") {
+  if (pageID === "summaryPage") {
+    report();
+    renderRounds();
+  }
 
-   }
-	 // Update last visited page
+  if (pageID === "helpPage") {
+  }
+
+  // Update last visited page
   lastPage = pageID;
 }
 
@@ -114,8 +148,8 @@ function updateMixedSessionFlag() {
 
 function goBack() {
   updatePlayerList();
-  document.getElementById('page1').style.display = 'block';
-  document.getElementById('page2').style.display = 'none';
+  document.getElementById('playersPage').style.display = 'block';
+  document.getElementById('roundsPage').style.display = 'none';
   isOnPage2 = false;
   const btn = document.getElementById('goToRoundsBtn');
   btn.disabled = false;
@@ -368,8 +402,8 @@ function toggleGender() {
 
 // Page initialization
 function initPage() {
-  document.getElementById("page1").style.display = 'block';
-  document.getElementById("page2").style.display = 'none';
+  document.getElementById("playersPage").style.display = 'block';
+  document.getElementById("roundsPage").style.display = 'none';
 }
 
 

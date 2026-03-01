@@ -127,7 +127,7 @@ function toggleRound() {
       cup.classList.add("blinking");
     });
 
-    page2.classList.add("active-mode");
+    document.getElementById("roundsPage").classList.add("active-mode");
 
   } else {
     // ---- RETURN TO IDLE MODE ----
@@ -151,7 +151,7 @@ function toggleRound() {
 
     currentState = "idle";
     nextRound();
-    page2.classList.remove("active-mode");
+    document.getElementById("roundsPage").classList.remove("active-mode");
     
     // Re-enable everything previously disabled
     document.querySelectorAll(".disabled").forEach(el => {
@@ -160,7 +160,7 @@ function toggleRound() {
     
       if (el.classList.contains("menu-btn")) {
         el.onclick = function() {
-          showPage('homePage', this);
+          showPage('settingsPage', this);
         };
       }
     });
@@ -285,7 +285,7 @@ function AischedulerNextRound(schedulerState) {
 
   const { activeplayers } = schedulerState;
   const playmode = getPlayMode();
-  const page2 = document.getElementById("page2");
+  const page2 = document.getElementById("roundsPage");
 
   let result;
 
@@ -437,8 +437,13 @@ function buildBestTeam(state, pool) {
 // OLD CompetitiveRound removed — using competitive_algorithm.js instead
 
 function updateAfterRound(state, games) {
+  for (const game of games) {
 
-  for (const [team1, team2] of games) {
+    // Handle both [team1, team2] array format AND {pair1, pair2} object format
+    const team1 = Array.isArray(game) ? game[0] : game.pair1;
+    const team2 = Array.isArray(game) ? game[1] : game.pair2;
+
+    if (!team1 || !team2) continue;
 
     const key1 = createSortedKey(team1[0], team1[1]);
     const key2 = createSortedKey(team2[0], team2[1]);
@@ -446,22 +451,20 @@ function updateAfterRound(state, games) {
     state.pairPlayedSet.add(key1);
     state.pairPlayedSet.add(key2);
 
-    // update opponent map
+    // Update opponent map safely
     for (const p1 of team1) {
       for (const p2 of team2) {
-        state.opponentMap.get(p1).set(
-          p2,
-          state.opponentMap.get(p1).get(p2) + 1
-        );
-        state.opponentMap.get(p2).set(
-          p1,
-          state.opponentMap.get(p2).get(p1) + 1
-        );
+
+        // Ensure maps exist before accessing
+        if (!state.opponentMap.has(p1)) state.opponentMap.set(p1, new Map());
+        if (!state.opponentMap.has(p2)) state.opponentMap.set(p2, new Map());
+
+        state.opponentMap.get(p1).set(p2, (state.opponentMap.get(p1).get(p2) || 0) + 1);
+        state.opponentMap.get(p2).set(p1, (state.opponentMap.get(p2).get(p1) || 0) + 1);
       }
     }
   }
 }
-
 
 
 function RandomRound(schedulerState) {
