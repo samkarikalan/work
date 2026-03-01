@@ -2511,10 +2511,16 @@ document.getElementById('minRoundsMinus').addEventListener('click', () => {
   schedulerState.minRounds = minRoundsValue;
 });
 
+function toggleRoundSettings() {
+  const body    = document.getElementById('roundSettingsBody');
+  const chevron = document.getElementById('roundSettingsChevron');
+  const isOpen  = body.classList.toggle('open');
+  chevron.style.transform = isOpen ? 'rotate(180deg)' : 'rotate(0deg)';
+}
+
 function toggleMinRoundsVisibility() {
   const isCompetitive = getPlayMode() === 'competitive';
-  document.getElementById('minRoundsRow')
-    .classList.toggle('visible', isCompetitive);
+  document.getElementById('minRoundsRow').style.display = isCompetitive ? 'flex' : 'none';
 }
 
 function updateModeLabel() {

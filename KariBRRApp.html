@@ -162,64 +162,76 @@
   <!-- ============================= -->
   <!--          ROUNDS PAGE          -->
   <!-- ============================= -->
-  <div id="roundsPage" class="page" style="display:none;">
+  <!-- ============================= -->
+<!--          ROUNDS PAGE          -->
+<!-- ============================= -->
+<div id="roundsPage" class="page" style="display:none;">
 
-    <div class="title-card">
-      <div id="roundTitle">R</div>
-      <img id="lockToggleBtn" class="lock-icon" src="lock.png" alt="Lock" />
-    </div>
+  <div class="title-card">
+    <div id="roundTitle">R</div>
+    <img id="lockToggleBtn" class="lock-icon" src="lock.png" alt="Lock" />
+  </div>
 
-    <div id="game-results"></div>
+  <div id="game-results"></div>
 
-    <!-- Row 1 — Courts + Mode Toggle (always visible) -->
-    <div class="row-field">
-      <div class="court-card">
-        <label for="num-courts" class="row-label" data-i18n="courts"></label>
-        <button class="circle-btn" id="courtMinus">−</button>
-        <span id="num-courts">1</span>
-        <button class="circle-btn" id="courtPlus">+</button>
+   <div class="action-card">
+    <button class="action mid small" id="roundShufle" onclick="RefreshRound()" aria-label="Mix round">
+      🎲
+    </button>
+    <button id="nextBtn" class="action right primary" onclick="toggleRound()">
+      <span id="btnText" data-i18n="nround"></span>
+      <span class="icon"> ▶</span>
+    </button>
+  </div>
+  
+  <!-- Round Settings Panel -->
+  <div class="round-settings-panel">
+    <button class="round-settings-toggle" onclick="toggleRoundSettings()">
+      <span class="round-settings-label" data-i18n="roundSettings">Round Settings</span>
+      <span class="round-settings-chevron" id="roundSettingsChevron">▾</span>
+    </button>
+
+    <div class="round-settings-body" id="roundSettingsBody">
+
+      <!-- Courts Row -->
+      <div class="setting-row">
+        <label class="setting-label" data-i18n="courts">Courts</label>
+        <div class="counter">
+          <button class="circle-btn" id="courtMinus">−</button>
+          <span id="num-courts">1</span>
+          <button class="circle-btn" id="courtPlus">+</button>
+        </div>
       </div>
 
-      <!-- Mode Toggle -->
-      <div class="mode-card">
-        <span id="modeLabel"></span>
+      <div class="setting-divider"></div>
+
+      <!-- Mode Toggle Row -->
+      <div class="setting-row">
+        <label class="setting-label">
+          <span id="modeLabel"></span>
+          <span data-i18n="competitive">Competitive</span>
+        </label>
         <label class="switch">
           <input type="checkbox" id="modeToggle">
           <span class="slider"></span>
         </label>
-        <span></span>
       </div>
-    </div>
 
-    <!-- Row 2 — Min Rounds (only visible when competitive ON) -->
-    <div class="row-field competitive-settings" id="minRoundsRow">
-      <div class="court-card">
-        <label class="row-label" data-i18n="minRounds">Min Rounds</label>
-        <button class="circle-btn" id="minRoundsMinus">−</button>
-        <span id="minRoundsDisplay">6</span>
-        <button class="circle-btn" id="minRoundsPlus">+</button>
+      <div class="setting-divider"></div>
+
+      <!-- Min Rounds Row -->
+      <div class="setting-row" id="minRoundsRow">
+        <label class="setting-label" data-i18n="minRounds">Warm-Up Rounds</label>
+        <div class="counter">
+          <button class="circle-btn" id="minRoundsMinus">−</button>
+          <span id="minRoundsDisplay">6</span>
+          <button class="circle-btn" id="minRoundsPlus">+</button>
+        </div>
       </div>
+
     </div>
-
-    <div class="action-card">
-      <!-- LEFT : Mix / Refresh (secondary) -->
-      <button
-        class="action mid small"
-        id="roundShufle"
-        onclick="RefreshRound()"
-        aria-label="Mix round"
-      >
-        🎲
-      </button>
-
-      <!-- RIGHT : Next (primary) -->
-      <button id="nextBtn" class="action right primary" onclick="toggleRound()">
-        <span id="btnText" data-i18n="nround"></span>
-        <span class="icon"> ▶</span>
-      </button>
-    </div>
-
   </div>
+</div>
 
 
   <!-- ============================= -->
