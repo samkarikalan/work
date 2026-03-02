@@ -416,3 +416,20 @@ display: block;
 .fixed-sl { text-align: center; font-weight: 600; color: var(--muted); }
 .player-help section { display: none; }
 .player-help.lang-en section[data-lang=“en”], .player-help.lang-jp section[data-lang=“jp”], .player-help.lang-kr section[data-lang=“kr”], .player-help.lang-vi section[data-lang=“vi”] { display: block; }
+
+
+.round-settings-body {
+  padding: 0; /* ← remove horizontal padding */
+}
+
+.setting-row {
+  padding: 12px 18px; /* ← move padding to rows instead */
+}
+
+.setting-divider {
+  margin: 0 18px; /* ← indent divider only */
+}
+
+#roundsSlotAnchor {
+  padding: 0; /* ← no extra padding on the slot */
+}
